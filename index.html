@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artivo Architecture | Spatial Poetry</title>
+
+  <!-- Tailwind CDN (only for utility classes if needed) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #040006;
+      --bg-deep: #0a000f;
+      --surface: #0f0118;
+      --muted: #9a8aaa;
+      --border: #2a1540;
+      --accent: #6b21a5;        /* darker purple */
+      --accent-light: #8b3dff;
+      --glow: #a855f7;
+      --gradient: linear-gradient(135deg, #6b21a5, #a855f7);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none; /* إخفاء المؤشر الافتراضي */
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* مؤشر الفأرة المخصص - بدون ضبابية ومصغر */
+    .custom-cursor {
+      width: 25px;
+      height: 25px;
+      border: 2px solid var(--accent-light);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
+      box-shadow: 0 0 15px var(--glow);
+    }
+    .custom-cursor.hover {
+      width: 40px;
+      height: 40px;
+      border-color: var(--glow);
+      background-color: rgba(168, 85, 247, 0.1);
+      box-shadow: 0 0 30px var(--glow);
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    #bgCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .ambient-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(107,33,165,0.08) 0%, transparent 50%);
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Intro animation */
+    @keyframes letterAssemble {
+      0% {
+        opacity: 0;
+        transform: translate(var(--start-x), var(--start-y)) scale(1.5) rotate(var(--start-rot));
+      }
+      100% {
+        opacity: 1;
+        transform: translate(0,0) scale(1) rotate(0deg);
+      }
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .header.scrolled {
+      background: rgba(4,0,6,0.6);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(107,33,165,0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      overflow: hidden;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .logo-main {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .logo-short {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-left: 0.25rem;
+      opacity: 1;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .logo-full {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin-left: 0.25rem;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .logo:hover .logo-short {
+      opacity: 0;
+      max-width: 0;
+    }
+
+    .logo:hover .logo-full {
+      opacity: 1;
+      max-width: 200px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), var(--glow));
+      transition: width 0.4s ease;
+    }
+
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active { color: var(--accent); }
+
+    /* زر LET'S TALK */
+    .lets-talk-btn {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #fff;
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      border-radius: 30px;
+      padding: 0.5rem 1.5rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(107,33,165,0.3);
+      margin-left: 1rem;
+    }
+    .lets-talk-btn:hover {
+      background: var(--gradient);
+      border-color: transparent;
+      box-shadow: 0 0 20px var(--glow);
+      transform: scale(1.05);
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      z-index: 200;
+    }
+    .menu-toggle span {
+      width: 28px;
+      height: 1px;
+      background: #fff;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 700px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(107,33,165,0.2), transparent, rgba(168,85,247,0.2));
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      max-width: 1000px;
+      padding: 0 2rem;
+    }
+
+    .hero-welcome {
+      margin-bottom: 2rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 600;
+      margin-bottom: 2rem;
+      line-height: 1.1;
+    }
+
+    .hero-title .text-gradient {
+      background: linear-gradient(to right, #6b21a5, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-typewriter {
+      height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.6);
+    }
+    /* مؤشر الكتابة الوامض */
+    .cursor-blink {
+      display: inline-block;
+      width: 2px;
+      height: 1.2em;
+      background-color: var(--accent);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.8s infinite;
+    }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(135deg, #6b21a5, #a855f7);
+      border: none;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(107,33,165,0.4);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    /* أيقونة الفأرة المتحركة */
+    .mouse-icon {
+      width: 26px;
+      height: 40px;
+      border: 2px solid rgba(168,85,247,0.6);
+      border-radius: 20px;
+      position: relative;
+    }
+    .mouse-icon::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: scrollWheel 1.5s infinite;
+    }
+    @keyframes scrollWheel {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(15px); }
+    }
+
+    /* Statement Section */
+    .statement {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 2rem;
+      position: relative;
+    }
+    .statement-text {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 300;
+      text-align: center;
+      max-width: 900px;
+      line-height: 1.4;
+      opacity: 0.1;
+      transform: scale(0.95);
+    }
+    .statement-text .highlight {
+      background: linear-gradient(135deg, #6b21a5, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 500;
+    }
+
+    /* Featured Projects */
+    .featured {
+      padding: 8rem 0;
+      position: relative;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 4rem;
+      margin-bottom: 4rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 500;
+    }
+    .section-title span {
+      background: linear-gradient(135deg, #6b21a5, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .view-all {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s ease;
+    }
+    .view-all:hover { color: var(--accent); }
+    .view-all svg { transition: transform 0.3s ease; }
+    .view-all:hover svg { transform: translateX(4px); }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+    .project-card {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--surface);
+      text-decoration: none;
+      color: inherit;
+    }
+    .project-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+      filter: grayscale(30%);
+      transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .project-card:hover img {
+      opacity: 1;
+      filter: grayscale(0%);
+      transform: scale(1.05);
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(4,0,6,0.95) 0%, transparent 60%);
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .project-card:hover::before { opacity: 1; }
+    .project-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem;
+      z-index: 2;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .project-card:hover .project-info {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .project-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .project-category {
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* Philosophy */
+    .philosophy {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 8rem 4rem;
+      gap: 4rem;
+      align-items: center;
+    }
+    .philosophy-content {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+    .philosophy-label {
+      font-size: 0.625rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    .philosophy-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem,4vw,3.5rem);
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+    }
+    .philosophy-title span {
+      background: linear-gradient(135deg, #6b21a5, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .philosophy-text {
+      color: var(--muted);
+      line-height: 1.9;
+      max-width: 500px;
+      font-size: 1.05rem;
+    }
+    .philosophy-visual {
+      position: relative;
+      aspect-ratio: 4/3;
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    .philosophy-visual video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.5) contrast(1.15) saturate(0.85) grayscale(15%);
+      opacity: 0.75;
+      transition: filter 0.8s cubic-bezier(0.16,1,0.3,1), opacity 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .philosophy-visual:hover video {
+      filter: brightness(0.65) contrast(1.1) saturate(0.9) grayscale(10%);
+      opacity: 0.88;
+    }
+    .philosophy-visual::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border: 1px solid rgba(107,33,165,0.3);
+      pointer-events: none;
+      z-index: 3;
+      transition: border-color 0.6s ease, box-shadow 0.6s ease;
+    }
+    .philosophy-visual:hover::before {
+      border-color: rgba(168,85,247,0.5);
+      box-shadow: 0 0 40px rgba(107,33,165,0.15);
+    }
+    .philosophy-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(107,33,165,0.2), transparent 60%, rgba(168,85,247,0.08)),
+        radial-gradient(ellipse at center, transparent 30%, rgba(4,0,6,0.5) 100%);
+      pointer-events: none;
+      z-index: 2;
+      transition: background 0.8s ease;
+    }
+    .philosophy-visual:hover::after {
+      background:
+        linear-gradient(135deg, rgba(107,33,165,0.12), transparent 60%, rgba(168,85,247,0.04)),
+        radial-gradient(ellipse at center, transparent 45%, rgba(4,0,6,0.3) 100%);
+    }
+
+    /* Stats */
+    .stats-section {
+      padding: 6rem 4rem;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3rem;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem,5vw,4.5rem);
+      font-weight: 300;
+      background: linear-gradient(135deg, #6b21a5, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 1rem;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 6rem 4rem 2rem;
+    }
+    .footer-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 4rem;
+    }
+    .footer-brand p {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 1.5rem;
+      max-width: 300px;
+      line-height: 1.7;
+    }
+    .footer-title {
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+    .footer-links a:hover { color: #fff; }
+    .footer-contact .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .footer-contact .social-links a {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+    .footer-contact .social-links a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(107,33,165,0.1);
+    }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-copyright {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Artivo Bot - محسّن */
+    .artivo-bot {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+    }
+    .bot-toggle {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: var(--gradient);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 30px rgba(107,33,165,0.5);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .bot-toggle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .bot-toggle:hover {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 8px 50px rgba(168,85,247,0.8);
+    }
+    .bot-toggle:hover::before {
+      opacity: 1;
+    }
+    .bot-toggle svg {
+      width: 28px;
+      height: 28px;
+      color: #fff;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .bot-panel {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 340px;
+      background: rgba(15, 1, 24, 0.9);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 24px;
+      padding: 1.2rem;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(168,85,247,0.2) inset;
+    }
+    .bot-panel.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .bot-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 1rem;
+    }
+    .bot-avatar {
+      position: relative;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bot-avatar svg {
+      width: 26px;
+      height: 26px;
+      color: #fff;
+    }
+    .online-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid var(--bg-deep);
+    }
+    .bot-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .bot-status {
+      font-size: 0.7rem;
+      color: #22c55e;
+    }
+    .chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+    .message {
+      display: flex;
+      flex-direction: column;
+    }
+    .message.bot { align-items: flex-start; }
+    .message.user { align-items: flex-end; }
+    .message-bubble {
+      max-width: 85%;
+      padding: 0.75rem 1rem;
+      border-radius: 18px;
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+    .bot .message-bubble {
+      background: rgba(107,33,165,0.2);
+      border: 1px solid rgba(107,33,165,0.3);
+      color: #fff;
+      border-bottom-left-radius: 4px;
+    }
+    .user .message-bubble {
+      background: var(--accent);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .message-time {
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
+    .chat-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .chat-option {
+      padding: 0.75rem 1rem;
+      background: rgba(107,33,165,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
+      color: #fff;
+      text-align: left;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(5px);
+    }
+    .chat-option:hover {
+      background: var(--gradient);
+      border-color: transparent;
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(168,85,247,0.4);
+    }
+
+    /* تحسينات للهاتف */
+    @media (max-width: 1024px) {
+      .project-grid { grid-template-columns: repeat(2, 1fr); }
+      .philosophy { grid-template-columns: 1fr; padding: 4rem 2rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-content { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .header { padding: 1rem 1.5rem; }
+      .nav-links {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s;
+      }
+      .nav-links.active { 
+        opacity: 1; 
+        visibility: visible; 
+      }
+      .nav-link { font-size: 1.5rem; }
+      .lets-talk-btn {
+        margin-left: 0;
+        margin-top: 1rem;
+        font-size: 1rem;
+        padding: 0.7rem 2rem;
+      }
+      .menu-toggle { 
+        display: flex; 
+        z-index: 201;
+      }
+      .section-header { flex-direction: column; align-items: flex-start; padding: 0 1.5rem; gap: 1rem; }
+      .project-grid { grid-template-columns: 1fr; }
+      .stats-section { padding: 4rem 1.5rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .footer { padding: 4rem 1.5rem 2rem; }
+      .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 1.5rem; }
+      .bot-panel {
+        width: 300px;
+        right: -10px;
+      }
+      .custom-cursor {
+        display: none; /* إخفاء المؤشر المخصص على الهاتف */
+      }
+      * {
+        cursor: auto; /* استعادة المؤشر الافتراضي على الهاتف */
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- مؤشر الفأرة المخصص -->
+  <div class="custom-cursor" id="customCursor"></div>
+
+  <canvas id="bgCanvas"></canvas>
+  <div class="ambient-overlay"></div>
+
+  <!-- Intro Animation -->
+  <div id="intro" class="fixed inset-0 z-50 flex items-center justify-center transition-all duration-1000" style="background: linear-gradient(135deg,#0a0a0f,#0d0d18,#0a0f14);">
+    <div id="letters" class="flex gap-4 text-8xl font-semibold text-white"></div>
+    <div class="absolute bottom-32 text-sm tracking-[0.3em] text-white/40 uppercase">Architecture</div>
+    <div class="absolute bottom-16 w-32 h-[1px] bg-white/10 overflow-hidden">
+      <div id="loadbar" class="h-full bg-gradient-to-r from-violet-700 to-purple-500" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Header -->
+    <header class="header" id="header">
+      <div class="logo" id="logo">
+        <span class="logo-main">Artivo</span>
+        <span class="logo-short">A.</span>
+        <span class="logo-full">Architecture</span>
+      </div>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="projects.html" class="nav-link">Projects</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+        <!-- زر LET'S TALK الجديد -->
+        <a href="https://wa.me/905424318166" class="lets-talk-btn" target="_blank">Let's Talk</a>
+      </nav>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-welcome">Welcome to</div>
+        <h1 class="hero-title">
+          <span class="text-gradient">Artivo</span> Architecture
+        </h1>
+        <div class="hero-typewriter">
+          <span id="typewriter"></span><span class="cursor-blink"></span>
+        </div>
+        <a href="projects.html" class="btn-primary">
+          <span>Explore Our Work</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="scroll-indicator">
+        <div class="mouse-icon"></div>
+        Scroll
+      </div>
+    </section>
+
+    <!-- Statement Section -->
+    <section class="statement">
+      <p class="statement-text" id="statementText">
+        We don't design spaces. We craft <span class="highlight">experiences</span> that breathe, move, and inspire.
+      </p>
+    </section>
+
+    <!-- Featured Projects -->
+    <section class="featured" id="featured">
+      <div class="section-header">
+        <h2 class="section-title">Selected <span>Works</span></h2>
+        <a href="projects.html" class="view-all">
+          View All Projects
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="project-grid">
+        <a href="project-detail.html?id=3" class="project-card">
+          <img src="assets/images/home/project1.jpg" alt="Modern Master Bedroom">
+          <div class="project-info">
+            <h3 class="project-name">Modern Master Bedroom</h3>
+            <span class="project-category">Residential</span>
+          </div>
+        </a>
+        <a href="project-detail.html?id=6" class="project-card">
+          <img src="assets/images/home/project2.jpg" alt="Luxury Living Room">
+          <div class="project-info">
+            <h3 class="project-name">Luxury Living Room</h3>
+            <span class="project-category">Residential</span>
+          </div>
+        </a>
+        <a href="project-detail.html?id=19" class="project-card">
+          <img src="assets/images/home/project3.jpg" alt="Classical Villa Exterior">
+          <div class="project-info">
+            <h3 class="project-name">Classical Villa Exterior</h3>
+            <span class="project-category">Residential</span>
+          </div>
+        </a>
+        <a href="project-detail.html?id=9" class="project-card">
+          <img src="assets/images/home/project4.jpg" alt="Luxurious Master Bedroom">
+          <div class="project-info">
+            <h3 class="project-name">Luxurious Master Bedroom</h3>
+            <span class="project-category">Residential</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="philosophy" id="philosophy">
+      <div class="philosophy-content">
+        <span class="philosophy-label">Our Philosophy</span>
+        <h2 class="philosophy-title">Architecture as<br><span>Poetry in Stone</span></h2>
+        <p class="philosophy-text">
+          Every line we draw carries intention. Every space we create tells a story. 
+          We believe architecture should not just be seen, it should be felt. 
+          Our approach marries bold vision with quiet restraint, creating spaces 
+          that speak softly but leave lasting impressions.
+        </p>
+      </div>
+      <div class="philosophy-visual">
+        <video autoplay loop muted playsinline>
+          <source src="assets/videos/home-video.mp4" type="video/mp4">
+        </video>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">300+</div>
+          <div class="stat-label">Completed Projects</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">6+</div>
+          <div class="stat-label">Ongoing Projects</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">10+</div>
+          <div class="stat-label">Years of Practice</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">8+</div>
+          <div class="stat-label">Countries</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="logo" style="font-size:1.5rem;"><span class="logo-main">Artivo</span><span class="logo-full" style="color:var(--muted);">Architecture</span></a>
+          <p>Creating spaces that inspire, transform, and endure. Architecture for those who see beyond walls.</p>
+        </div>
+        <div>
+          <h4 class="footer-title">Navigation</h4>
+          <ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="projects.html">Projects</a></li><li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li></ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Services</h4>
+          <ul class="footer-links"><li><a href="#">Architecture</a></li><li><a href="#">Interior Design</a></li><li><a href="#">Renovation</a></li><li><a href="#">Consulting</a></li></ul>
+        </div>
+        <div class="footer-contact">
+          <h4 class="footer-title">Contact</h4>
+          <ul class="footer-links">
+            <li><a href="https://wa.me/905424318166">+90 542 431 81 66</a></li>
+            <li><a href="mailto:info@artivo.pro">info@artivo.pro</a></li>
+            <li>Istanbul, Beylikduzu</li>
+          </ul>
+          <div class="social-links">
+            <a href="https://www.facebook.com/artivo.pro" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+            <a href="https://www.instagram.com/artivo.design/" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></a>
+            <a href="https://www.behance.net/artivopro" aria-label="Behance"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12h6.5a3.5 3.5 0 0 0 0-7H1v14h7a4 4 0 0 0 0-8"/><path d="M15 7h6M15 19h2.5a4.5 4.5 0 1 0 0-9H15v9z"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copyright">2026 Artivo Architecture. All rights reserved.</span>
+      </div>
+    </footer>
+
+    <!-- Artivo Bot -->
+    <div class="artivo-bot">
+      <button class="bot-toggle" id="botToggle" aria-label="Open assistant">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+
+      <div class="bot-panel" id="botPanel">
+        <div class="bot-header">
+          <div class="bot-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20v-2a7 7 0 0 1 14 0v2"/></svg>
+            <span class="online-dot"></span>
+          </div>
+          <div>
+            <div class="bot-name">Artivo-Bot</div>
+            <div class="bot-status">Online</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-options" id="chatOptions"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Register GSAP
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ---------- Custom Cursor ----------
+    const cursor = document.getElementById('customCursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .project-card, .chat-option, .bot-toggle, .lets-talk-btn').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    // ---------- Background Canvas ----------
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas(); window.addEventListener("resize", resizeCanvas);
+    const pointer = { x: null, y: null, active: false };
+    let lastInteraction = Date.now();
+    const ripples = [];
+    document.addEventListener("mousemove", e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = true; lastInteraction = Date.now(); });
+    document.addEventListener("mouseleave", () => pointer.active = false);
+    document.addEventListener("mousedown", e => { createRipple(e.clientX, e.clientY); lastInteraction = Date.now(); });
+    document.addEventListener("touchmove", e => { pointer.x = e.touches[0].clientX; pointer.y = e.touches[0].clientY; pointer.active = true; lastInteraction = Date.now(); }, { passive: true });
+    document.addEventListener("touchstart", e => { createRipple(e.touches[0].clientX, e.touches[0].clientY); lastInteraction = Date.now(); });
+    document.addEventListener("touchend", () => pointer.active = false);
+    window.addEventListener("scroll", () => { createRipple(window.innerWidth/2, window.innerHeight/2); lastInteraction = Date.now(); });
+    function createRipple(x, y) { ripples.push({ x, y, r: 0, alpha: 0.5 }); }
+    const particles = []; const COUNT = window.innerWidth < 768 ? 60 : 100; const MAX_DIST = 130; const FORCE_RADIUS = 150;
+    for (let i = 0; i < COUNT; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3 });
+    function animateCanvas() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const bgGradient = ctx.createRadialGradient(canvas.width/2,0,0,canvas.width/2,0,canvas.height);
+      bgGradient.addColorStop(0, '#14001f'); bgGradient.addColorStop(1, '#040006');
+      ctx.fillStyle = bgGradient; ctx.fillRect(0,0,canvas.width,canvas.height);
+      const idle = Date.now() - lastInteraction > 3500; const activity = idle ? 0.35 : 1;
+      particles.forEach(p => {
+        if (pointer.active && !idle) {
+          const dx = p.x - pointer.x, dy = p.y - pointer.y, dist = Math.sqrt(dx*dx+dy*dy);
+          if (dist < FORCE_RADIUS) { const force = (FORCE_RADIUS - dist) / FORCE_RADIUS; p.vx += dx/dist * force * 0.5; p.vy += dy/dist * force * 0.5; }
+        }
+        p.x += p.vx * activity; p.y += p.vy * activity; p.vx *= 0.96; p.vy *= 0.96;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1; if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      });
+      for (let i = 0; i < COUNT; i++) {
+        for (let j = i+1; j < COUNT; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx*dx+dy*dy);
+          if (dist < MAX_DIST) {
+            let alpha = 1 - dist/MAX_DIST;
+            if (pointer.active && !idle) {
+              const mx = (particles[i].x+particles[j].x)/2 - pointer.x, my = (particles[i].y+particles[j].y)/2 - pointer.y, md = Math.sqrt(mx*mx+my*my);
+              alpha += Math.max(0, 1 - md/200) * 0.6;
+            }
+            ripples.forEach(r => { const rd = Math.abs(Math.sqrt((particles[i].x-r.x)**2+(particles[i].y-r.y)**2)-r.r); if (rd < 18) alpha += 0.35; });
+            ctx.strokeStyle = `rgba(107,33,165,${alpha})`; ctx.lineWidth = 0.6; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+          }
+        }
+      }
+      particles.forEach(p => { ctx.fillStyle = "rgba(168,85,247,0.9)"; ctx.beginPath(); ctx.arc(p.x,p.y,1.5,0,Math.PI*2); ctx.fill(); });
+      for (let i = ripples.length-1; i >= 0; i--) { const r = ripples[i]; r.r += 3.5; r.alpha -= 0.015; ctx.strokeStyle = `rgba(168,85,247,${r.alpha})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2); ctx.stroke(); if (r.alpha <= 0) ripples.splice(i,1); }
+      requestAnimationFrame(animateCanvas);
+    }
+    animateCanvas();
+
+    // ---------- Intro Animation ----------
+    const lettersArr = ['A','R','T','I','V','O'];
+    const start = [[-200,-150,-15],[200,-100,10],[-150,150,20],[180,120,-10],[-250,0,15],[250,-50,-20]];
+    const container = document.getElementById("letters");
+    lettersArr.forEach((l,i)=>{
+      const span = document.createElement("span");
+      span.innerText = l;
+      span.style.setProperty("--start-x", start[i][0]+"px");
+      span.style.setProperty("--start-y", start[i][1]+"px");
+      span.style.setProperty("--start-rot", start[i][2]+"deg");
+      span.style.animation = "letterAssemble 1.2s cubic-bezier(0.34,1.56,0.64,1) "+(i*0.1)+"s forwards";
+      span.style.opacity="0";
+      container.appendChild(span);
+    });
+    let load = 0;
+    const loadbar = document.getElementById("loadbar");
+    const loadInterval = setInterval(()=>{
+      load += 2;
+      loadbar.style.width = load+"%";
+      if(load>=100){
+        clearInterval(loadInterval);
+        document.getElementById("intro").style.opacity="0";
+        document.getElementById("intro").style.transform="translateY(-100%)";
+        setTimeout(()=>document.getElementById("intro").remove(),1000);
+      }
+    },50);
+
+    // ---------- Header scroll effect ----------
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    });
+
+    // ---------- Mobile menu ----------
+    const toggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+    // ---------- Typewriter with reverse delete effect ----------
+    const phrases = [
+      "Where vision becomes structure.",
+      "Architecture that breathes life.",
+      "Designing tomorrow's landmarks."
+    ];
+    let current = 0, char = 0;
+    const typewriterEl = document.getElementById("typewriter");
+    let isDeleting = false;
+    let deleteSpeed = 30; // سرعة المسح أسرع قليلاً
+
+    function type() {
+      if (!isDeleting) {
+        // كتابة
+        if (char < phrases[current].length) {
+          typewriterEl.innerHTML += phrases[current][char];
+          char++;
+          setTimeout(type, 60);
+        } else {
+          // انتظار ثم بدء المسح
+          setTimeout(() => {
+            isDeleting = true;
+            type();
+          }, 2000);
+        }
+      } else {
+        // مسح عكسي
+        if (char > 0) {
+          typewriterEl.innerHTML = phrases[current].substring(0, char - 1);
+          char--;
+          setTimeout(type, deleteSpeed);
+        } else {
+          isDeleting = false;
+          current = (current + 1) % phrases.length;
+          setTimeout(type, 500);
+        }
+      }
+    }
+    type();
+
+    // ---------- Artivo Bot (محسّن حسب المتطلبات) ----------
+    const botToggle = document.getElementById('botToggle');
+    const botPanel = document.getElementById('botPanel');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatOptions = document.getElementById('chatOptions');
+
+    botToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      botPanel.classList.toggle('active');
+      if (botPanel.classList.contains('active') && chatMessages.children.length === 0) {
+        addBotMessage("Welcome. How can I assist you today?");
+        showMainOptions();
+      }
+    });
+
+    // لا نغلق البوت تلقائياً عند النقر على الخيارات، فقط عند النقر خارج البوت
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.artivo-bot')) {
+        botPanel.classList.remove('active');
+      }
+    });
+
+    // منع إغلاق البوت عند النقر داخله
+    botPanel.addEventListener('click', (e) => e.stopPropagation());
+
+    function addBotMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message bot';
+      msgDiv.innerHTML = `<div class="message-bubble">${text}</div><div class="message-time">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message user';
+      msgDiv.innerHTML = `<div class="message-bubble">${text}</div><div class="message-time">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function clearOptions() {
+      chatOptions.innerHTML = '';
+    }
+
+    function showMainOptions() {
+      clearOptions();
+      const options = [
+        { text: '🔹 Explore Projects', action: 'explore' },
+        { text: '🔹 Start a New Project', action: 'newProject' },
+        { text: '🔹 Learn About Artivo', action: 'about' },
+        { text: '🔹 Contact Information', action: 'contact' }
+      ];
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'chat-option';
+        btn.textContent = opt.text;
+        btn.onclick = (e) => {
+          e.stopPropagation(); // منع إغلاق البوت
+          handleOption(opt.action);
+        };
+        chatOptions.appendChild(btn);
+      });
+    }
+
+    function handleOption(action) {
+      if (action === 'explore') {
+        addUserMessage('Explore Projects');
+        addBotMessage('Redirecting to projects page in 3 seconds...');
+        clearOptions();
+        // إضافة زر إلغاء اختياري
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'chat-option';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.onclick = (e) => {
+          e.stopPropagation();
+          addBotMessage('Redirect cancelled. How can I help?');
+          showMainOptions();
+        };
+        chatOptions.appendChild(cancelBtn);
+        
+        setTimeout(() => {
+          window.location.href = 'projects.html';
+        }, 3000);
+      }
+      else if (action === 'newProject') {
+        addUserMessage('Start a New Project');
+        addBotMessage('Opening WhatsApp chat...');
+        clearOptions();
+        setTimeout(() => {
+          window.open('https://wa.me/905424318166', '_blank');
+          // لا نغلق البوت
+        }, 500);
+      }
+      else if (action === 'about') {
+        addUserMessage('Learn About Artivo');
+        addBotMessage('Taking you to About page...');
+        clearOptions();
+        setTimeout(() => {
+          window.location.href = 'about.html';
+        }, 500);
+      }
+      else if (action === 'contact') {
+        addUserMessage('Contact Information');
+        addBotMessage('Taking you to Contact page...');
+        clearOptions();
+        setTimeout(() => {
+          window.location.href = 'contact.html';
+        }, 500);
+      }
+    }
+
+    // ---------- Scroll Animations ----------
+    gsap.to('#statementText', {
+      scrollTrigger: {
+        trigger: '.statement',
+        start: 'top center',
+        end: 'bottom center',
+        scrub: 1
+      },
+      opacity: 1,
+      scale: 1,
+      ease: 'none'
+    });
+
+    gsap.from('.project-card', {
+      scrollTrigger: {
+        trigger: '.featured',
+        start: 'top 80%'
+      },
+      y: 100,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.15,
+      ease: 'power4.out'
+    });
+
+    gsap.to('.philosophy-content', {
+      scrollTrigger: {
+        trigger: '.philosophy',
+        start: 'top 60%'
+      },
+      opacity: 1,
+      x: 0,
+      duration: 1,
+      ease: 'power4.out'
+    });
+
+    gsap.to('.philosophy-visual', {
+      scrollTrigger: {
+        trigger: '.philosophy',
+        start: 'top 60%'
+      },
+      opacity: 1,
+      x: 0,
+      duration: 1,
+      delay: 0.3,
+      ease: 'power4.out'
+    });
+
+    gsap.from('.stat-item', {
+      scrollTrigger: {
+        trigger: '.stats-section',
+        start: 'top 80%'
+      },
+      y: 30,
+      opacity: 0,
+      stagger: 0.1,
+      duration: 0.8
+    });
+  </script>
+</body>
+</html>

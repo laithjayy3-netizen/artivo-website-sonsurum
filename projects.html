@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects | Artivo Architecture</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #040006;
+      --bg-deep: #0a000f;
+      --surface: #0f0118;
+      --muted: #9a8aaa;
+      --border: #2a1540;
+      --accent: #6b21a5;
+      --accent-light: #8b3dff;
+      --glow: #a855f7;
+      --gradient: linear-gradient(135deg, #6b21a5, #a855f7);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none; /* إخفاء المؤشر الافتراضي */
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* مؤشر الفأرة المخصص - بدون ضبابية ومصغر */
+    .custom-cursor {
+      width: 25px;
+      height: 25px;
+      border: 2px solid var(--accent-light);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
+      box-shadow: 0 0 15px var(--glow);
+    }
+    .custom-cursor.hover {
+      width: 40px;
+      height: 40px;
+      border-color: var(--glow);
+      background-color: rgba(168, 85, 247, 0.1);
+      box-shadow: 0 0 30px var(--glow);
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    #bgCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .ambient-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(107,33,165,0.08) 0%, transparent 50%);
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .header.scrolled {
+      background: rgba(4,0,6,0.6);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(107,33,165,0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      overflow: hidden;
+      font-family: 'Syne', sans-serif;
+      text-decoration: none;
+    }
+
+    .logo-main {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .logo-short {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-left: 0.25rem;
+      opacity: 1;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .logo-full {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin-left: 0.25rem;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .logo:hover .logo-short {
+      opacity: 0;
+      max-width: 0;
+    }
+
+    .logo:hover .logo-full {
+      opacity: 1;
+      max-width: 200px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), var(--glow));
+      transition: width 0.4s ease;
+    }
+
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link.active { color: var(--accent); }
+
+    /* زر LET'S TALK */
+    .lets-talk-btn {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #fff;
+      background: transparent;
+      border: 1.5px solid var(--accent);
+      border-radius: 30px;
+      padding: 0.5rem 1.5rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(107,33,165,0.3);
+      margin-left: 1rem;
+    }
+    .lets-talk-btn:hover {
+      background: var(--gradient);
+      border-color: transparent;
+      box-shadow: 0 0 20px var(--glow);
+      transform: scale(1.05);
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      z-index: 200;
+      background: none;
+      border: none;
+    }
+    .menu-toggle span {
+      width: 28px;
+      height: 1px;
+      background: #fff;
+      transition: all 0.3s ease;
+    }
+
+    /* Page Header */
+    .page-header {
+      padding: 12rem 4rem 4rem;
+      text-align: center;
+    }
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+    .page-title span {
+      background: linear-gradient(135deg, #6b21a5, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-subtitle {
+      font-size: 0.875rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ==================== ENHANCED SNAP GRID ==================== */
+    .snap-grid-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .snap-grid-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Row Indicator */
+    .row-indicator {
+      position: fixed;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .row-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(107,33,165,0.3);
+      border: 1px solid var(--accent);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .row-dot.active {
+      background: var(--glow);
+      box-shadow: 0 0 20px var(--glow), 0 0 40px rgba(168,85,247,0.3);
+      transform: scale(1.4);
+    }
+
+    .row-dot:hover:not(.active) {
+      background: rgba(107,33,165,0.6);
+      transform: scale(1.2);
+    }
+
+    /* Snap Sections */
+    .snap-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem;
+      position: relative;
+      transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .snap-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(107,33,165,0.05) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+
+    .snap-section.active::before {
+      opacity: 1;
+    }
+
+    /* Project Row */
+    .project-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      max-width: 1400px;
+      width: 100%;
+      transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+      will-change: transform, filter, opacity;
+      transform-style: preserve-3d;
+    }
+
+    .project-row.blurred {
+      filter: blur(8px);
+      opacity: 0.3;
+      transform: scale(0.88) translateZ(-50px);
+      pointer-events: none;
+    }
+
+    .project-row.focused {
+      filter: blur(0);
+      opacity: 1;
+      transform: scale(1) translateZ(0);
+    }
+
+    .project-row.partially-visible-up {
+      filter: blur(4px);
+      opacity: 0.5;
+      transform: scale(0.94) translateY(20px) translateZ(-25px);
+    }
+
+    .project-row.partially-visible-down {
+      filter: blur(4px);
+      opacity: 0.5;
+      transform: scale(0.94) translateY(-20px) translateZ(-25px);
+    }
+
+    /* Project Items */
+    .project-item {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+      text-decoration: none;
+      color: inherit;
+      transform-style: preserve-3d;
+    }
+
+    .project-item::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, var(--accent), var(--glow), var(--accent));
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      border-radius: 4px;
+    }
+
+    .project-row.focused .project-item:hover::before {
+      opacity: 1;
+    }
+
+    .project-row.focused .project-item:hover {
+      transform: scale(1.03) translateZ(20px);
+      box-shadow: 0 20px 60px rgba(107,33,165,0.4);
+    }
+
+    .project-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .project-row.focused .project-item:hover img {
+      transform: scale(1.1);
+    }
+
+    .project-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(4,0,6,0.95) 0%,
+        rgba(4,0,6,0.6) 30%,
+        rgba(4,0,6,0.2) 60%,
+        transparent 100%
+      );
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 1;
+    }
+
+    .project-row.focused .project-item:hover .project-overlay {
+      opacity: 1;
+    }
+
+    /* العنوان الثابت (يظهر دائمًا) */
+    .project-static-title {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      color: #fff;
+      z-index: 2;
+      transition: opacity 0.3s ease;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .project-row.focused .project-item:hover .project-static-title {
+      opacity: 0;
+    }
+
+    /* المحتوى الذي يظهر عند الهوفر */
+    .project-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.5rem;
+      z-index: 2;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .project-row.focused .project-item:hover .project-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .project-category {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--glow);
+      margin-bottom: 0.5rem;
+    }
+
+    .project-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 0.75rem;
+    }
+
+    .project-view {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.3s ease;
+    }
+
+    .project-view svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s ease;
+    }
+
+    .project-row.focused .project-item:hover .project-view {
+      color: #fff;
+    }
+
+    .project-row.focused .project-item:hover .project-view svg {
+      transform: translateX(4px);
+    }
+
+    /* Row Label */
+    .row-label {
+      position: absolute;
+      left: 2rem;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: center center;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      white-space: nowrap;
+    }
+
+    .snap-section.active .row-label {
+      opacity: 0.6;
+    }
+
+    /* Scroll Hint */
+    .scroll-hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 90;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+
+    .scroll-hint.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .scroll-hint-text {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .scroll-hint-icon {
+      width: 24px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-hint-dot {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--glow);
+      border-radius: 50%;
+      animation: scrollHint 2s infinite;
+    }
+
+    @keyframes scrollHint {
+      0%, 100% { top: 8px; opacity: 1; }
+      50% { top: 24px; opacity: 0.3; }
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      padding: 6rem 4rem 2rem;
+    }
+    .footer-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 4rem;
+    }
+    .footer-brand p {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 1.5rem;
+      max-width: 300px;
+      line-height: 1.7;
+    }
+    .footer-title {
+      font-size: 0.625rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+    .footer-links a:hover { color: #fff; }
+    .footer-contact .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .footer-contact .social-links a {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+    .footer-contact .social-links a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(107,33,165,0.1);
+    }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-copyright {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Artivo Bot - محسّن */
+    .artivo-bot {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+    }
+    .bot-toggle {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      background: var(--gradient);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 30px rgba(107,33,165,0.5);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .bot-toggle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .bot-toggle:hover {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 8px 50px rgba(168,85,247,0.8);
+    }
+    .bot-toggle:hover::before {
+      opacity: 1;
+    }
+    .bot-toggle svg {
+      width: 28px;
+      height: 28px;
+      color: #fff;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .bot-panel {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 340px;
+      background: rgba(15, 1, 24, 0.9);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 24px;
+      padding: 1.2rem;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(168,85,247,0.2) inset;
+    }
+    .bot-panel.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+    .bot-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 1rem;
+    }
+    .bot-avatar {
+      position: relative;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bot-avatar svg {
+      width: 26px;
+      height: 26px;
+      color: #fff;
+    }
+    .online-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid var(--bg-deep);
+    }
+    .bot-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .bot-status {
+      font-size: 0.7rem;
+      color: #22c55e;
+    }
+    .chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+    .message {
+      display: flex;
+      flex-direction: column;
+    }
+    .message.bot { align-items: flex-start; }
+    .message.user { align-items: flex-end; }
+    .message-bubble {
+      max-width: 85%;
+      padding: 0.75rem 1rem;
+      border-radius: 18px;
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+    .bot .message-bubble {
+      background: rgba(107,33,165,0.2);
+      border: 1px solid rgba(107,33,165,0.3);
+      color: #fff;
+      border-bottom-left-radius: 4px;
+    }
+    .user .message-bubble {
+      background: var(--accent);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .message-time {
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+    }
+    .chat-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .chat-option {
+      padding: 0.75rem 1rem;
+      background: rgba(107,33,165,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
+      color: #fff;
+      text-align: left;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(5px);
+    }
+    .chat-option:hover {
+      background: var(--gradient);
+      border-color: transparent;
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(168,85,247,0.4);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 1200px) {
+      .project-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .project-row { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 1rem;
+      }
+      .footer-content { grid-template-columns: 1fr 1fr; }
+      .snap-section {
+        padding: 2rem;
+      }
+      .row-indicator {
+        right: 1rem;
+      }
+      .row-label {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header { padding: 1rem 1.5rem; }
+      .nav-links {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .nav-links.active { 
+        opacity: 1; 
+        visibility: visible; 
+      }
+      .nav-link { font-size: 1.5rem; }
+      .lets-talk-btn {
+        margin-left: 0;
+        margin-top: 1rem;
+        font-size: 1rem;
+        padding: 0.7rem 2rem;
+      }
+      .menu-toggle { 
+        display: flex; 
+        z-index: 201;
+      }
+      
+      .page-header { padding: 10rem 1.5rem 3rem; }
+      
+      .snap-section {
+        min-height: auto;
+        padding: 2rem 1rem;
+      }
+      
+      .project-row { 
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      
+      .project-row.blurred {
+        filter: blur(5px);
+        transform: scale(0.92);
+      }
+      
+      .project-row.partially-visible-up,
+      .project-row.partially-visible-down {
+        filter: blur(3px);
+        transform: scale(0.96);
+      }
+      
+      .project-name {
+        font-size: 0.9rem;
+      }
+      
+      .project-content {
+        padding: 1rem;
+      }
+      
+      .row-indicator {
+        display: none;
+      }
+      
+      .scroll-hint {
+        bottom: 5rem;
+      }
+      
+      .footer { padding: 4rem 1.5rem 2rem; }
+      .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 1.5rem; }
+      
+      .artivo-bot {
+        bottom: 1rem;
+        right: 1rem;
+      }
+      .bot-toggle {
+        width: 50px;
+        height: 50px;
+      }
+      .bot-panel {
+        width: calc(100vw - 2rem);
+        right: -0.5rem;
+      }
+
+      .custom-cursor {
+        display: none; /* إخفاء المؤشر المخصص على الهاتف */
+      }
+      * {
+        cursor: auto; /* استعادة المؤشر الافتراضي على الهاتف */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .project-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .project-item {
+        aspect-ratio: 4/3;
+      }
+    }
+
+    /* Touch device optimizations */
+    @media (hover: none) and (pointer: coarse) {
+      .project-row.focused .project-overlay {
+        opacity: 0.7;
+      }
+      .project-row.focused .project-content {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .project-row.focused .project-item::before {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- مؤشر الفأرة المخصص -->
+  <div class="custom-cursor" id="customCursor"></div>
+
+  <canvas id="bgCanvas"></canvas>
+  <div class="ambient-overlay"></div>
+
+  <div class="content-wrapper">
+    <!-- Header -->
+    <header class="header" id="header">
+      <a href="index.html" class="logo" id="logo">
+        <span class="logo-main">Artivo</span>
+        <span class="logo-short">A.</span>
+        <span class="logo-full">Architecture</span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="projects.html" class="nav-link active">Projects</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+        <!-- زر LET'S TALK الجديد -->
+        <a href="https://wa.me/905424318166" class="lets-talk-btn" target="_blank">Let's Talk</a>
+      </nav>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+      <h1 class="page-title">Our <span>Projects</span></h1>
+      <p class="page-subtitle">A curated selection of architectural works</p>
+    </section>
+
+    <!-- Snap Grid Container (بدون فلتر) -->
+    <section class="snap-grid-container">
+      <div class="snap-grid-wrapper" id="snapGridWrapper"></div>
+      
+      <!-- Row Indicator -->
+      <div class="row-indicator" id="rowIndicator"></div>
+      
+      <!-- Scroll Hint -->
+      <div class="scroll-hint" id="scrollHint">
+        <span class="scroll-hint-text">Scroll to explore</span>
+        <div class="scroll-hint-icon">
+          <div class="scroll-hint-dot"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="logo" style="font-size:1.5rem;">
+            <span class="logo-main">Artivo</span>
+            <span class="logo-full" style="color:var(--muted);opacity:1;max-width:200px;">Architecture</span>
+          </a>
+          <p>Creating spaces that inspire, transform, and endure. Architecture for those who see beyond walls.</p>
+        </div>
+        <div>
+          <h4 class="footer-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Services</h4>
+          <ul class="footer-links">
+            <li><a href="#">Architecture</a></li>
+            <li><a href="#">Interior Design</a></li>
+            <li><a href="#">Renovation</a></li>
+            <li><a href="#">Consulting</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4 class="footer-title">Contact</h4>
+          <ul class="footer-links">
+            <li><a href="https://wa.me/905424318166">+90 542 431 81 66</a></li>
+            <li><a href="mailto:info@artivo.pro">info@artivo.pro</a></li>
+            <li>Istanbul, Beylikduzu</li>
+          </ul>
+          <div class="social-links">
+            <a href="https://www.facebook.com/artivo.pro" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+            <a href="https://www.instagram.com/artivo.design/" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></a>
+            <a href="https://www.behance.net/artivopro" aria-label="Behance"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12h6.5a3.5 3.5 0 0 0 0-7H1v14h7a4 4 0 0 0 0-8"/><path d="M15 7h6M15 19h2.5a4.5 4.5 0 1 0 0-9H15v9z"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copyright">2026 Artivo Architecture. All rights reserved.</span>
+      </div>
+    </footer>
+
+    <!-- Artivo Bot -->
+    <div class="artivo-bot">
+      <button class="bot-toggle" id="botToggle" aria-label="Open assistant">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+
+      <div class="bot-panel" id="botPanel">
+        <div class="bot-header">
+          <div class="bot-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20v-2a7 7 0 0 1 14 0v2"/></svg>
+            <span class="online-dot"></span>
+          </div>
+          <div>
+            <div class="bot-name">Artivo-Bot</div>
+            <div class="bot-status">Online</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-options" id="chatOptions"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== Custom Cursor ====================
+    const cursor = document.getElementById('customCursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .project-item, .chat-option, .bot-toggle, .lets-talk-btn').forEach(el => {
+      if (el) {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+      }
+    });
+
+    // ==================== Background Canvas ====================
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    
+    function resizeCanvas() { 
+      canvas.width = window.innerWidth; 
+      canvas.height = window.innerHeight; 
+    }
+    resizeCanvas(); 
+    window.addEventListener("resize", resizeCanvas);
+    
+    const pointer = { x: null, y: null, active: false };
+    let lastInteraction = Date.now();
+    const ripples = [];
+    
+    document.addEventListener("mousemove", e => { 
+      pointer.x = e.clientX; 
+      pointer.y = e.clientY; 
+      pointer.active = true; 
+      lastInteraction = Date.now(); 
+    });
+    document.addEventListener("mouseleave", () => pointer.active = false);
+    document.addEventListener("mousedown", e => { 
+      createRipple(e.clientX, e.clientY); 
+      lastInteraction = Date.now(); 
+    });
+    document.addEventListener("touchmove", e => { 
+      pointer.x = e.touches[0].clientX; 
+      pointer.y = e.touches[0].clientY; 
+      pointer.active = true; 
+      lastInteraction = Date.now(); 
+    }, { passive: true });
+    document.addEventListener("touchstart", e => { 
+      createRipple(e.touches[0].clientX, e.touches[0].clientY); 
+      lastInteraction = Date.now(); 
+    });
+    document.addEventListener("touchend", () => pointer.active = false);
+    window.addEventListener("scroll", () => { 
+      createRipple(window.innerWidth/2, window.innerHeight/2); 
+      lastInteraction = Date.now(); 
+    });
+    
+    function createRipple(x, y) { 
+      ripples.push({ x, y, r: 0, alpha: 0.5 }); 
+    }
+    
+    const particles = []; 
+    const COUNT = window.innerWidth < 768 ? 60 : 100; 
+    const MAX_DIST = 130; 
+    const FORCE_RADIUS = 150;
+    
+    for (let i = 0; i < COUNT; i++) {
+      particles.push({ 
+        x: Math.random() * canvas.width, 
+        y: Math.random() * canvas.height, 
+        vx: (Math.random()-0.5)*0.3, 
+        vy: (Math.random()-0.5)*0.3 
+      });
+    }
+    
+    function animateCanvas() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const bgGradient = ctx.createRadialGradient(canvas.width/2,0,0,canvas.width/2,0,canvas.height);
+      bgGradient.addColorStop(0, '#14001f'); 
+      bgGradient.addColorStop(1, '#040006');
+      ctx.fillStyle = bgGradient; 
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      
+      const idle = Date.now() - lastInteraction > 3500; 
+      const activity = idle ? 0.35 : 1;
+      
+      particles.forEach(p => {
+        if (pointer.active && !idle) {
+          const dx = p.x - pointer.x, dy = p.y - pointer.y, dist = Math.sqrt(dx*dx+dy*dy);
+          if (dist < FORCE_RADIUS) { 
+            const force = (FORCE_RADIUS - dist) / FORCE_RADIUS; 
+            p.vx += dx/dist * force * 0.5; 
+            p.vy += dy/dist * force * 0.5; 
+          }
+        }
+        p.x += p.vx * activity; 
+        p.y += p.vy * activity; 
+        p.vx *= 0.96; 
+        p.vy *= 0.96;
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1; 
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      });
+      
+      for (let i = 0; i < COUNT; i++) {
+        for (let j = i+1; j < COUNT; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx*dx+dy*dy);
+          if (dist < MAX_DIST) {
+            let alpha = 1 - dist/MAX_DIST;
+            if (pointer.active && !idle) {
+              const mx = (particles[i].x+particles[j].x)/2 - pointer.x, my = (particles[i].y+particles[j].y)/2 - pointer.y, md = Math.sqrt(mx*mx+my*my);
+              alpha += Math.max(0, 1 - md/200) * 0.6;
+            }
+            ripples.forEach(r => { 
+              const rd = Math.abs(Math.sqrt((particles[i].x-r.x)**2+(particles[i].y-r.y)**2)-r.r); 
+              if (rd < 18) alpha += 0.35; 
+            });
+            ctx.strokeStyle = `rgba(107,33,165,${alpha})`; 
+            ctx.lineWidth = 0.6; 
+            ctx.beginPath(); 
+            ctx.moveTo(particles[i].x, particles[i].y); 
+            ctx.lineTo(particles[j].x, particles[j].y); 
+            ctx.stroke();
+          }
+        }
+      }
+      
+      particles.forEach(p => { 
+        ctx.fillStyle = "rgba(168,85,247,0.9)"; 
+        ctx.beginPath(); 
+        ctx.arc(p.x,p.y,1.5,0,Math.PI*2); 
+        ctx.fill(); 
+      });
+      
+      for (let i = ripples.length-1; i >= 0; i--) { 
+        const r = ripples[i]; 
+        r.r += 3.5; 
+        r.alpha -= 0.015; 
+        ctx.strokeStyle = `rgba(168,85,247,${r.alpha})`; 
+        ctx.lineWidth = 1.5; 
+        ctx.beginPath(); 
+        ctx.arc(r.x,r.y,r.r,0,Math.PI*2); 
+        ctx.stroke(); 
+        if (r.alpha <= 0) ripples.splice(i,1); 
+      }
+      
+      requestAnimationFrame(animateCanvas);
+    }
+    animateCanvas();
+
+    // ==================== Header Scroll Effect ====================
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    });
+
+    // ==================== Mobile Menu ====================
+    const toggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+    // ==================== Projects Data (13 صفوف) ====================
+    // توليد 52 مشروع (13 صف × 4 أعمدة)
+    const categories = ['residential', 'commercial', 'cultural', 'hospitality'];
+    const projectNames = [
+      'Ramadan Event Hall', 'Modern Kids Bedroom', 'Modern Master Bedroom', 'Luxury Modern Master Bedroom',
+      'Dining Room Design', 'Luxury Living Room', 'Neoclassical Majlis', 'Luxury Womens Majlis',
+      'Luxurious Master Bedroom', 'Lobby interior design', 'Modern Kids Rooms', 'Modern Kids Bathroom',
+      'Modern Meeting Room', 'Jewelry Shop', 'Assistants Bedroom', 'Modern Master Bedroom',
+      'Teen Bedroom', 'Classic Master Bedroom', 'Classical Villa Exterior', 'Modern Master Bedroom',
+      'Living Room And Kitchen Design', 'Children Room Design', 'Baby Room Design', 'Master Bedroom Design',
+      'Children Room Design', 'Children Room Design', 'Neoclassical Master Bedroom', 'Modern Master Bedroom',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon'
+    ];
+
+    // إنشاء مصفوفة المشاريع مع مسار الغلاف الصحيح
+    const projectsData = [];
+    for (let i = 0; i < 52; i++) {
+      const id = i + 1;
+      projectsData.push({
+        id: id,
+        title: projectNames[i % projectNames.length] + ' ' + (Math.floor(i / projectNames.length) + 1),
+        category: categories[i % categories.length],
+        img: `assets/images/projects/${id}/cover.jpg` // استخدام cover.jpg كصورة الغلاف
+      });
+    }
+
+    // ==================== Enhanced Snap Grid System ====================
+    const snapGridWrapper = document.getElementById('snapGridWrapper');
+    const rowIndicator = document.getElementById('rowIndicator');
+    const scrollHint = document.getElementById('scrollHint');
+    
+    let currentRowIndex = 0;
+    let isScrolling = false;
+    let snapSections = [];
+    let rowDots = [];
+    let hasEnteredGridArea = false; // متغير جديد لتتبع دخول منطقة الشبكة
+    
+    // Get items per row based on screen size
+    function getItemsPerRow() {
+      const width = window.innerWidth;
+      if (width <= 480) return 1;
+      if (width <= 768) return 2;
+      if (width <= 1024) return 2;
+      if (width <= 1200) return 3;
+      return 4;
+    }
+    
+    // Build the grid (بدون فلتر)
+    function buildGrid() {
+      const itemsPerRow = getItemsPerRow();
+      const rows = [];
+      
+      // تقسيم المشاريع إلى صفوف بناءً على itemsPerRow
+      for (let i = 0; i < projectsData.length; i += itemsPerRow) {
+        rows.push(projectsData.slice(i, i + itemsPerRow));
+      }
+      
+      // Clear existing content
+      snapGridWrapper.innerHTML = '';
+      rowIndicator.innerHTML = '';
+      snapSections = [];
+      rowDots = [];
+      
+      // Create sections for each row
+      rows.forEach((rowProjects, rowIndex) => {
+        const section = document.createElement('div');
+        section.className = 'snap-section';
+        section.dataset.rowIndex = rowIndex;
+        
+        // Row label
+        const label = document.createElement('div');
+        label.className = 'row-label';
+        label.textContent = `Collection ${String(rowIndex + 1).padStart(2, '0')}`;
+        section.appendChild(label);
+        
+        // Project row
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'project-row blurred';
+        rowDiv.dataset.row = rowIndex;
+        
+        rowProjects.forEach(proj => {
+          const a = document.createElement('a');
+          a.href = `project-detail.html?id=${proj.id}`;
+          a.className = `project-item`;
+          a.dataset.category = proj.category;
+          a.innerHTML = `
+            <img src="${proj.img}" alt="${proj.title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=800&fit=crop'">
+            <div class="project-overlay"></div>
+            <!-- العنوان الثابت -->
+            <div class="project-static-title">${proj.title}</div>
+            <!-- المحتوى الذي يظهر عند الهوفر -->
+            <div class="project-content">
+              <div class="project-category">${proj.category}</div>
+              <div class="project-name">${proj.title}</div>
+              <div class="project-view">
+                View Project
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          `;
+          rowDiv.appendChild(a);
+        });
+        
+        section.appendChild(rowDiv);
+        snapGridWrapper.appendChild(section);
+        snapSections.push(section);
+        
+        // Create row indicator dot
+        const dot = document.createElement('div');
+        dot.className = 'row-dot';
+        dot.dataset.row = rowIndex;
+        dot.addEventListener('click', () => scrollToRow(rowIndex));
+        rowIndicator.appendChild(dot);
+        rowDots.push(dot);
+      });
+      
+      // Initialize first row as focused
+      if (snapSections.length > 0) {
+        updateRowStates(0);
+      }
+    }
+    
+    // Scroll to specific row
+    function scrollToRow(index) {
+      if (index < 0 || index >= snapSections.length || isScrolling) return;
+      
+      isScrolling = true;
+      currentRowIndex = index;
+      
+      const section = snapSections[index];
+      const rect = section.getBoundingClientRect();
+      const offsetTop = window.scrollY + rect.top - (window.innerHeight - section.offsetHeight) / 2;
+      
+      window.scrollTo({
+        top: Math.max(0, offsetTop),
+        behavior: 'smooth'
+      });
+      
+      updateRowStates(index);
+      
+      setTimeout(() => {
+        isScrolling = false;
+      }, 800);
+    }
+    
+    // Update row visual states
+    function updateRowStates(focusedIndex) {
+      const rows = document.querySelectorAll('.project-row');
+      
+      rows.forEach((row, index) => {
+        row.classList.remove('focused', 'blurred', 'partially-visible-up', 'partially-visible-down');
+        
+        if (index === focusedIndex) {
+          row.classList.add('focused');
+        } else if (index === focusedIndex - 1) {
+          row.classList.add('partially-visible-up');
+        } else if (index === focusedIndex + 1) {
+          row.classList.add('partially-visible-down');
+        } else {
+          row.classList.add('blurred');
+        }
+      });
+      
+      // Update section active states
+      snapSections.forEach((section, index) => {
+        section.classList.toggle('active', index === focusedIndex);
+      });
+      
+      // Update row indicator
+      rowDots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === focusedIndex);
+      });
+      
+      // Hide scroll hint after first scroll
+      if (focusedIndex > 0) {
+        scrollHint.classList.add('hidden');
+      }
+    }
+    
+    // Intersection Observer for scroll-based updates
+    function setupIntersectionObserver() {
+      const options = {
+        root: null,
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0
+      };
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !isScrolling) {
+            const index = parseInt(entry.target.dataset.rowIndex);
+            if (index !== currentRowIndex) {
+              currentRowIndex = index;
+              updateRowStates(index);
+            }
+          }
+        });
+      }, options);
+      
+      snapSections.forEach(section => observer.observe(section));
+      
+      return observer;
+    }
+    
+    // التحقق من أن الصف الحالي مركز في الشاشة
+    function isCurrentRowCentered() {
+      if (snapSections.length === 0) return true;
+      
+      const currentSection = snapSections[currentRowIndex];
+      if (!currentSection) return true;
+      
+      const rect = currentSection.getBoundingClientRect();
+      const sectionCenter = rect.top + rect.height / 2;
+      const viewportCenter = window.innerHeight / 2;
+      const tolerance = rect.height * 0.35; // نسبة التسامح
+      
+      return Math.abs(sectionCenter - viewportCenter) <= tolerance;
+    }
+    
+    // Wheel/Touch snap handling
+    let lastWheelTime = 0;
+    let accumulatedDelta = 0;
+    const WHEEL_THRESHOLD = 80;
+    const WHEEL_COOLDOWN = 600;
+    
+    function handleWheel(e) {
+      const now = Date.now();
+      
+      // Check if we're in the grid area
+      const gridRect = snapGridWrapper.getBoundingClientRect();
+      const isInGridArea = gridRect.top < window.innerHeight * 0.6 && gridRect.bottom > window.innerHeight * 0.4;
+      
+      if (!isInGridArea) {
+        accumulatedDelta = 0;
+        hasEnteredGridArea = false; // إعادة تعيين عند الخروج من منطقة الشبكة
+        return;
+      }
+      
+      if (isScrolling) {
+        e.preventDefault();
+        return;
+      }
+      
+      // عند دخول منطقة الشبكة لأول مرة، تأكد من تمركز الصف الأول
+      if (!hasEnteredGridArea) {
+        hasEnteredGridArea = true;
+        // تحقق مما إذا كان الصف الأول مركزاً
+        if (!isCurrentRowCentered()) {
+          e.preventDefault();
+          scrollToRow(currentRowIndex); // قم بتمركز الصف الحالي أولاً
+          return;
+        }
+      }
+      
+      // تحقق من أن الصف الحالي مركز قبل السماح بالانتقال للصف التالي
+      if (!isCurrentRowCentered()) {
+        e.preventDefault();
+        scrollToRow(currentRowIndex); // قم بتمركز الصف الحالي أولاً
+        return;
+      }
+      
+      // Reset accumulated delta if too much time passed
+      if (now - lastWheelTime > 200) {
+        accumulatedDelta = 0;
+      }
+      
+      accumulatedDelta += e.deltaY;
+      lastWheelTime = now;
+      
+      if (Math.abs(accumulatedDelta) > WHEEL_THRESHOLD && now - lastWheelTime >= 0) {
+        e.preventDefault();
+        
+        if (accumulatedDelta > 0 && currentRowIndex < snapSections.length - 1) {
+          scrollToRow(currentRowIndex + 1);
+        } else if (accumulatedDelta < 0 && currentRowIndex > 0) {
+          scrollToRow(currentRowIndex - 1);
+        }
+        
+        accumulatedDelta = 0;
+      }
+    }
+    
+    // Touch handling for mobile
+    let touchStartY = 0;
+    let touchStartTime = 0;
+    
+    function handleTouchStart(e) {
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+    }
+    
+    function handleTouchEnd(e) {
+      const gridRect = snapGridWrapper.getBoundingClientRect();
+      const isInGridArea = gridRect.top < window.innerHeight * 0.6 && gridRect.bottom > window.innerHeight * 0.4;
+      
+      if (!isInGridArea || isScrolling) return;
+      
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchStartY - touchEndY;
+      const deltaTime = Date.now() - touchStartTime;
+      
+      // عند دخول منطقة الشبكة، تأكد من تمركز الصف الحالي أولاً
+      if (!isCurrentRowCentered()) {
+        scrollToRow(currentRowIndex);
+        return;
+      }
+      
+      // Swipe detection
+      if (Math.abs(deltaY) > 50 && deltaTime < 300) {
+        if (deltaY > 0 && currentRowIndex < snapSections.length - 1) {
+          scrollToRow(currentRowIndex + 1);
+        } else if (deltaY < 0 && currentRowIndex > 0) {
+          scrollToRow(currentRowIndex - 1);
+        }
+      }
+    }
+    
+    // Keyboard navigation
+    function handleKeydown(e) {
+      const gridRect = snapGridWrapper.getBoundingClientRect();
+      const isInGridArea = gridRect.top < window.innerHeight && gridRect.bottom > 0;
+      
+      if (!isInGridArea) return;
+      
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        e.preventDefault();
+        scrollToRow(currentRowIndex + 1);
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        scrollToRow(currentRowIndex - 1);
+      }
+    }
+    
+    // Initialize
+    buildGrid();
+    const observer = setupIntersectionObserver();
+    
+    // Event listeners
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('keydown', handleKeydown);
+    
+    // Rebuild on resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        buildGrid();
+        setupIntersectionObserver();
+        hasEnteredGridArea = false; // إعادة تعيين عند تغيير حجم الشاشة
+      }, 250);
+    });
+
+    // ==================== Artivo Bot ====================
+    const botToggle = document.getElementById('botToggle');
+    const botPanel = document.getElementById('botPanel');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatOptions = document.getElementById('chatOptions');
+
+    botToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      botPanel.classList.toggle('active');
+      if (botPanel.classList.contains('active') && chatMessages.children.length === 0) {
+        addBotMessage("Welcome. How can I assist you today?");
+        showMainOptions();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.artivo-bot')) {
+        botPanel.classList.remove('active');
+      }
+    });
+
+    botPanel.addEventListener('click', (e) => e.stopPropagation());
+
+    function addBotMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message bot';
+      msgDiv.innerHTML = `<div class="message-bubble">${text}</div><div class="message-time">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message user';
+      msgDiv.innerHTML = `<div class="message-bubble">${text}</div><div class="message-time">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function clearOptions() {
+      chatOptions.innerHTML = '';
+    }
+
+    function showMainOptions() {
+      clearOptions();
+      const options = [
+        { text: '🔹 Explore Projects', action: 'explore' },
+        { text: '🔹 Start a New Project', action: 'newProject' },
+        { text: '🔹 Learn About Artivo', action: 'about' },
+        { text: '🔹 Contact Information', action: 'contact' }
+      ];
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'chat-option';
+        btn.textContent = opt.text;
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          handleOption(opt.action);
+        };
+        chatOptions.appendChild(btn);
+      });
+    }
+
+    function handleOption(action) {
+      if (action === 'explore') {
+        addUserMessage('Explore Projects');
+        addBotMessage('Redirecting to projects page in 3 seconds...');
+        clearOptions();
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'chat-option';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.onclick = (e) => {
+          e.stopPropagation();
+          addBotMessage('Redirect cancelled. How can I help?');
+          showMainOptions();
+        };
+        chatOptions.appendChild(cancelBtn);
+        
+        setTimeout(() => {
+          window.location.href = 'projects.html';
+        }, 3000);
+      }
+      else if (action === 'newProject') {
+        addUserMessage('Start a New Project');
+        addBotMessage('Opening WhatsApp chat...');
+        clearOptions();
+        setTimeout(() => {
+          window.open('https://wa.me/905424318166', '_blank');
+        }, 500);
+      }
+      else if (action === 'about') {
+        addUserMessage('Learn About Artivo');
+        addBotMessage('Taking you to About page...');
+        clearOptions();
+        setTimeout(() => {
+          window.location.href = 'about.html';
+        }, 500);
+      }
+      else if (action === 'contact') {
+        addUserMessage('Contact Information');
+        addBotMessage('Taking you to Contact page...');
+        clearOptions();
+        setTimeout(() => {
+          window.location.href = 'contact.html';
+        }, 500);
+      }
+    }
+  </script>
+</body>
+</html>
