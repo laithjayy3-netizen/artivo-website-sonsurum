@@ -93,7 +93,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
+      z-index: 100; /* منخفض نسبياً لكي لا يغطي القائمة الجانبية */
       padding: 1.5rem 3rem;
       display: flex;
       justify-content: space-between;
@@ -114,6 +114,8 @@
       overflow: hidden;
       font-family: 'Syne', sans-serif;
       text-decoration: none;
+      z-index: 102; /* أعلى من الهيدر */
+      position: relative;
     }
 
     .logo-main {
@@ -213,7 +215,7 @@
       flex-direction: column;
       gap: 6px;
       cursor: pointer;
-      z-index: 200;
+      z-index: 101;
       background: none;
       border: none;
     }
@@ -839,22 +841,33 @@
 
     @media (max-width: 768px) {
       .header { padding: 1rem 1.5rem; }
+      
+      /* 
+         ===== إصلاح جذري لمشكلة القائمة في الهاتف ===== 
+         رفع Z-Index وتثبيت الأبعاد والخلفية 
+      */
       .nav-links {
         position: fixed;
-        inset: 0;
-        background: var(--bg);
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #040006; /* لون خلفية صريح وداكن */
+        z-index: 9999; /* أعلى من أي عنصر آخر في الصفحة */
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 2rem;
         opacity: 0;
         visibility: hidden;
-        transition: all 0.3s ease;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
       }
+      
       .nav-links.active { 
         opacity: 1; 
         visibility: visible; 
       }
+
       .nav-link { font-size: 1.5rem; }
       .lets-talk-btn {
         margin-left: 0;
@@ -864,9 +877,8 @@
       }
       .menu-toggle { 
         display: flex; 
-        z-index: 201;
+        z-index: 10000; /* أعلى من القائمة لضمان إمكانية النقر عليه */
       }
-      
       .page-header { padding: 10rem 1.5rem 3rem; }
       
       .snap-section {
@@ -879,17 +891,25 @@
         gap: 0.75rem;
       }
       
+      /* ===== التعديل المطلوب: إصلاح تاثير ال Scroll للهاتف ===== */
+      /* جعل التاثير أخف ليكون التصفح أسهل وعدم اختفاء الصور تماماً */
       .project-row.blurred {
-        filter: blur(5px);
-        transform: scale(0.92);
+        filter: blur(3px); /* خفض الضبابية من 5px */
+        opacity: 0.6;      /* رفع الوضوح من 0.3 */
+        transform: scale(0.96); /* تقليل التقلص من 0.92 */
       }
       
       .project-row.partially-visible-up,
       .project-row.partially-visible-down {
-        filter: blur(3px);
-        transform: scale(0.96);
+        filter: blur(2px); /* خفض الضبابية */
+        transform: scale(0.98); /* تقليل التقلص */
       }
       
+      /* ===== التعديل المطلوب: إخفاء العنوان الثابت في الهاتف ===== */
+      .project-static-title {
+        display: none; /* إخفاء العنوان الثابت تماماً في نسخة الهاتف */
+      }
+
       .project-name {
         font-size: 0.9rem;
       }
@@ -909,7 +929,6 @@
       .footer { padding: 4rem 1.5rem 2rem; }
       .footer-content { grid-template-columns: 1fr; gap: 2rem; }
       .footer-bottom { flex-direction: column; gap: 1.5rem; }
-      
       .artivo-bot {
         bottom: 1rem;
         right: 1rem;
@@ -1226,17 +1245,37 @@
     }
     animateCanvas();
 
-    // ==================== Header Scroll Effect ====================
+    // ==================== Header Scroll Effect & Mobile Menu Close ====================
     const header = document.getElementById('header');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 100) header.classList.add('scrolled');
-      else header.classList.remove('scrolled');
-    });
-
-    // ==================== Mobile Menu ====================
     const toggle = document.getElementById('menuToggle');
     const navLinks = document.getElementById('navLinks');
-    toggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+    
+    // فتح/إغلاق القائمة عند النقر على الزر
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navLinks.classList.toggle('active');
+    });
+
+    // ===== إصلاح: إغلاق القائمة عند التمرير (Scroll) على الهاتف =====
+    window.addEventListener('scroll', () => {
+      // 1. تأثير الهيدر للكمبيوتر
+      if (window.scrollY > 100) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+
+      // 2. إصلاح مشكلة القائمة في الهاتف: إغلاقها إذا تم التمرير
+      if (window.innerWidth <= 768 && navLinks.classList.contains('active')) {
+        navLinks.classList.remove('active');
+      }
+    });
+
+    // ===== إغلاق القائمة عند النقر على أي رابط داخلي =====
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          navLinks.classList.remove('active');
+        }
+      });
+    });
 
     // ==================== Projects Data (13 صفوف) ====================
     // توليد 52 مشروع (13 صف × 4 أعمدة)
@@ -1249,6 +1288,9 @@
       'Teen Bedroom', 'Classic Master Bedroom', 'Classical Villa Exterior', 'Modern Master Bedroom',
       'Living Room And Kitchen Design', 'Children Room Design', 'Baby Room Design', 'Master Bedroom Design',
       'Children Room Design', 'Children Room Design', 'Neoclassical Master Bedroom', 'Modern Master Bedroom',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
+      'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
       'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
       'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',
       'Coming Soon', 'Coming Soon', 'Coming Soon', 'Coming Soon',

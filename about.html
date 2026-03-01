@@ -107,7 +107,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
+      z-index: 100; /* منخفض نسبياً لكي لا يغطي القائمة الجانبية */
       padding: 1.5rem 3rem;
       display: flex;
       justify-content: space-between;
@@ -127,6 +127,8 @@
       cursor: pointer;
       overflow: hidden;
       font-family: 'Syne', sans-serif;
+      z-index: 102; /* أعلى من الهيدر */
+      position: relative;
     }
 
     .logo-main {
@@ -226,7 +228,7 @@
       flex-direction: column;
       gap: 6px;
       cursor: pointer;
-      z-index: 200;
+      z-index: 101;
     }
     .menu-toggle span {
       width: 28px;
@@ -657,22 +659,33 @@
     }
     @media (max-width: 768px) {
       .header { padding: 1rem 1.5rem; }
+      
+      /* 
+         ===== إصلاح جذري لمشكلة القائمة في الهاتف ===== 
+         رفع Z-Index وتثبيت الأبعاد والخلفية 
+      */
       .nav-links {
         position: fixed;
-        inset: 0;
-        background: var(--bg);
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #040006; /* لون خلفية صريح وداكن */
+        z-index: 9999; /* أعلى من أي عنصر آخر في الصفحة */
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 2rem;
         opacity: 0;
         visibility: hidden;
-        transition: all 0.4s;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
       }
+      
       .nav-links.active { 
         opacity: 1; 
         visibility: visible; 
       }
+
       .nav-link { font-size: 1.5rem; }
       .lets-talk-btn {
         margin-left: 0;
@@ -682,20 +695,27 @@
       }
       .menu-toggle { 
         display: flex; 
-        z-index: 201;
+        z-index: 10000; /* أعلى من القائمة لضمان إمكانية النقر عليه */
       }
       .about-hero { padding: 10rem 1.5rem 4rem; }
       .about-content { padding: 0 1.5rem 4rem; }
+      
+      /* ===== إلغاء الثبات (sticky) للشريط الجانبي في الهاتف ===== */
+      .about-sidebar {
+        position: relative; 
+        top: auto; 
+        margin-bottom: 3rem; 
+      }
       .team-grid { grid-template-columns: 1fr; }
       .footer { padding: 4rem 1.5rem 2rem; }
       .footer-content { grid-template-columns: 1fr; gap: 2rem; }
       .footer-bottom { flex-direction: column; gap: 1.5rem; }
       
       .custom-cursor {
-        display: none; /* إخفاء المؤشر المخصص على الهاتف */
+        display: none;
       }
       * {
-        cursor: auto; /* استعادة المؤشر الافتراضي على الهاتف */
+        cursor: auto;
       }
     }
   </style>
@@ -891,17 +911,37 @@
     }
     animateCanvas();
 
-    // ==================== Header scroll effect ====================
+    // ==================== Header scroll effect & Mobile Menu Close ====================
     const header = document.getElementById('header');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 100) header.classList.add('scrolled');
-      else header.classList.remove('scrolled');
-    });
-
-    // ==================== Mobile menu ====================
     const toggle = document.getElementById('menuToggle');
     const navLinks = document.getElementById('navLinks');
-    toggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+    
+    // فتح/إغلاق القائمة عند النقر على الزر
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navLinks.classList.toggle('active');
+    });
+
+    // ===== إصلاح: إغلاق القائمة عند التمرير (Scroll) على الهاتف =====
+    window.addEventListener('scroll', () => {
+      // 1. تأثير الهيدر للكمبيوتر
+      if (window.scrollY > 100) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+
+      // 2. إصلاح مشكلة القائمة في الهاتف: إغلاقها إذا تم التمرير
+      if (window.innerWidth <= 768 && navLinks.classList.contains('active')) {
+        navLinks.classList.remove('active');
+      }
+    });
+
+    // ===== إغلاق القائمة عند النقر على أي رابط داخلي =====
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          navLinks.classList.remove('active');
+        }
+      });
+    });
 
     // ==================== Artivo Bot (محسّن حسب المتطلبات) ====================
     const botToggle = document.getElementById('botToggle');
