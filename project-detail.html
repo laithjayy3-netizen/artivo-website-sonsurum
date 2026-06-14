@@ -744,6 +744,353 @@
         cursor: auto; /* استعادة المؤشر الافتراضي على الهاتف */
       }
     }
+
+
+    /* ===== ARTIVO GLOBAL VISUAL SYNC 2026 ===== */
+    :root {
+      --bg: #02030a;
+      --bg-deep: #05030d;
+      --surface: rgba(12, 10, 28, 0.72);
+      --surface-strong: rgba(14, 12, 32, 0.88);
+      --muted: #b8abc8;
+      --border: rgba(174, 140, 255, 0.18);
+      --accent: #8b5cf6;
+      --accent-light: #38bdf8;
+      --accent-pink: #f472b6;
+      --accent-warm: #fb7185;
+      --glow: #a78bfa;
+      --c1: #38bdf8;
+      --c2: #8b5cf6;
+      --c3: #f472b6;
+      --c4: #fb7185;
+      --gradient: linear-gradient(120deg, #38bdf8 0%, #8b5cf6 38%, #f472b6 72%, #fb7185 100%);
+      --gradient-soft: linear-gradient(135deg, rgba(56,189,248,.92), rgba(139,92,246,.92) 45%, rgba(244,114,182,.92));
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background:
+        radial-gradient(circle at 16% 12%, rgba(56,189,248,.10), transparent 26rem),
+        radial-gradient(circle at 84% 18%, rgba(244,114,182,.12), transparent 25rem),
+        radial-gradient(circle at 50% 88%, rgba(139,92,246,.12), transparent 30rem),
+        var(--bg) !important;
+      color: #fff;
+    }
+
+    .ambient-overlay {
+      background:
+        radial-gradient(ellipse 70% 45% at 50% 0%, rgba(56,189,248,0.10) 0%, transparent 58%),
+        radial-gradient(ellipse 44% 38% at 78% 20%, rgba(244,114,182,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(2,3,10,0.12), rgba(2,3,10,0.38)) !important;
+    }
+
+    .custom-cursor {
+      border-color: rgba(56,189,248,.92) !important;
+      box-shadow: 0 0 16px rgba(56,189,248,.45), 0 0 34px rgba(244,114,182,.18) !important;
+      mix-blend-mode: normal;
+    }
+
+    .custom-cursor.hover {
+      border-color: rgba(244,114,182,.94) !important;
+      background: rgba(139,92,246,.10) !important;
+      box-shadow: 0 0 22px rgba(56,189,248,.45), 0 0 46px rgba(244,114,182,.30) !important;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--c1), var(--c2), var(--c3)) !important;
+    }
+
+    .header {
+      isolation: isolate;
+    }
+
+    .header.scrolled {
+      background: rgba(2, 3, 10, 0.62) !important;
+      backdrop-filter: blur(18px) saturate(140%) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+      border-bottom: 1px solid rgba(174, 140, 255, 0.16) !important;
+      box-shadow: 0 14px 40px rgba(0,0,0,.18) !important;
+    }
+
+    .logo-main,
+    .logo-short,
+    .nav-link.active,
+    .footer-title,
+    .project-category,
+    .meta-label,
+    .about-label,
+    .contact-label,
+    .member-role,
+    .bot-status {
+      color: var(--accent-light) !important;
+    }
+
+    .logo-full { color: rgba(255,255,255,.92) !important; }
+
+    .nav-link {
+      color: rgba(184,171,200,.82) !important;
+      transition: color .28s ease, opacity .28s ease;
+    }
+
+    .nav-link::after {
+      background: var(--gradient) !important;
+      height: 1px !important;
+      box-shadow: 0 0 16px rgba(56,189,248,.35);
+    }
+
+    .nav-link:hover { color: #fff !important; }
+
+    .lets-talk-btn {
+      border-color: rgba(56,189,248,.48) !important;
+      background: rgba(255,255,255,.035) !important;
+      backdrop-filter: blur(14px) saturate(130%);
+      -webkit-backdrop-filter: blur(14px) saturate(130%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.035) inset, 0 0 22px rgba(56,189,248,.12) !important;
+    }
+
+    .lets-talk-btn:hover {
+      background: var(--gradient) !important;
+      border-color: transparent !important;
+      box-shadow: 0 14px 45px rgba(139,92,246,.32), 0 0 36px rgba(56,189,248,.20) !important;
+      transform: translateY(-2px) scale(1.03) !important;
+    }
+
+    .text-gradient,
+    .page-title span,
+    .about-statement span,
+    .contact-title span,
+    .stat-number,
+    .project-title span {
+      background: var(--gradient) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+    }
+
+    .page-title,
+    .about-statement,
+    .contact-title,
+    .project-title {
+      letter-spacing: -0.045em;
+      text-shadow: 0 28px 90px rgba(0,0,0,.34);
+    }
+
+    .page-header,
+    .about-hero,
+    .contact-container,
+    .project-hero,
+    .project-info-section,
+    .snap-section {
+      position: relative;
+    }
+
+    .glass-card,
+    .project-item,
+    .gallery-item,
+    .map-container,
+    .bot-panel,
+    .meta-item,
+    .stat-item {
+      border-color: rgba(174,140,255,.18) !important;
+    }
+
+    .glass-card,
+    .map-container,
+    .bot-panel {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.060), rgba(255,255,255,.020)) !important;
+      backdrop-filter: blur(18px) saturate(135%) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(135%) !important;
+      box-shadow: 0 24px 80px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.05) !important;
+    }
+
+    .glass-card::before,
+    .map-container::before,
+    .project-item::before {
+      background: linear-gradient(135deg, var(--c1), var(--c2), var(--c3), var(--c4)) !important;
+    }
+
+    .glass-card:hover,
+    .map-container:hover,
+    .gallery-item:hover,
+    .project-item:hover {
+      border-color: rgba(56,189,248,.35) !important;
+      box-shadow: 0 26px 85px rgba(0,0,0,.34), 0 0 44px rgba(139,92,246,.16) !important;
+    }
+
+    .footer {
+      position: relative;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(56,189,248,.10), transparent 28rem),
+        radial-gradient(circle at 84% 22%, rgba(244,114,182,.08), transparent 26rem),
+        rgba(5,3,13,.96) !important;
+      border-top: 1px solid rgba(174,140,255,.16) !important;
+    }
+
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 4rem;
+      right: 4rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,.45), rgba(244,114,182,.38), transparent);
+      pointer-events: none;
+    }
+
+    .footer-links a,
+    .footer-brand p,
+    .footer-copyright,
+    .contact-text,
+    .project-description p,
+    .about-main p,
+    .card-text,
+    .stat-label,
+    .page-subtitle {
+      color: rgba(184,171,200,.86) !important;
+    }
+
+    .footer-links a:hover,
+    .contact-item:hover,
+    .project-view:hover,
+    .back-link:hover {
+      color: #fff !important;
+    }
+
+    .footer-contact .social-links a,
+    .social-row a {
+      border-color: rgba(174,140,255,.18) !important;
+      background: rgba(255,255,255,.025) !important;
+      border-radius: 999px;
+    }
+
+    .footer-contact .social-links a:hover,
+    .social-row a:hover {
+      color: var(--accent-light) !important;
+      border-color: rgba(56,189,248,.42) !important;
+      background: rgba(56,189,248,.08) !important;
+      box-shadow: 0 0 24px rgba(56,189,248,.14) !important;
+      transform: translateY(-2px);
+    }
+
+    .bot-toggle,
+    .bot-avatar,
+    .user .message-bubble {
+      background: var(--gradient) !important;
+      box-shadow: 0 14px 48px rgba(139,92,246,.32), 0 0 34px rgba(56,189,248,.18) !important;
+    }
+
+    .bot .message-bubble {
+      background: rgba(255,255,255,.055) !important;
+      border-color: rgba(174,140,255,.16) !important;
+    }
+
+    @media (max-width: 768px) {
+      .footer::before { left: 1.5rem; right: 1.5rem; }
+      .header.scrolled { backdrop-filter: blur(14px) saturate(130%) !important; }
+    }
+
+
+    /* ===== PROJECT DETAIL VISUAL REFINEMENT ===== */
+    .project-hero {
+      isolation: isolate;
+      min-height: 680px !important;
+      background:
+        radial-gradient(circle at 50% 25%, rgba(56,189,248,.10), transparent 32rem),
+        var(--bg) !important;
+    }
+
+    .project-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(2,3,10,.28) 0%, rgba(2,3,10,.12) 45%, rgba(2,3,10,.78) 100%),
+        radial-gradient(circle at 50% 70%, rgba(139,92,246,.10), transparent 34rem);
+    }
+
+    .project-hero img {
+      filter: none !important;
+      opacity: .88 !important;
+      transform: scale(1.01);
+    }
+
+    .project-hero-content {
+      z-index: 3 !important;
+      max-width: 1100px;
+    }
+
+    .project-title {
+      font-size: clamp(3.2rem, 8vw, 7rem) !important;
+      font-weight: 500 !important;
+      line-height: .95 !important;
+      max-width: 1100px;
+    }
+
+    .project-info-section {
+      gap: 5rem !important;
+    }
+
+    .project-meta {
+      border-right-color: rgba(174,140,255,.14) !important;
+    }
+
+    .meta-item {
+      border-left-color: rgba(174,140,255,.16) !important;
+    }
+
+    .meta-item:hover { border-color: var(--accent-light) !important; }
+
+    .project-description h3 {
+      letter-spacing: -.035em;
+    }
+
+    .gallery-grid {
+      gap: 1.35rem !important;
+    }
+
+    .gallery-item {
+      border-radius: 22px !important;
+      border: 1px solid rgba(174,140,255,.16);
+      background: rgba(255,255,255,.025);
+      box-shadow: 0 18px 60px rgba(0,0,0,.22);
+    }
+
+    .gallery-item img {
+      filter: none !important;
+      transition: transform .65s cubic-bezier(.16,1,.3,1);
+    }
+
+    .gallery-item:hover img { transform: scale(1.045); }
+
+    .lightbox {
+      background: rgba(2,3,10,.92) !important;
+    }
+
+    .lightbox-close,
+    .lightbox-nav,
+    .lightbox-counter {
+      border-color: rgba(56,189,248,.34) !important;
+      background: rgba(2,3,10,.54) !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .lightbox-close:hover,
+    .lightbox-nav:hover {
+      background: var(--gradient) !important;
+      border-color: transparent !important;
+    }
+
+    @media (max-width: 768px) {
+      .project-hero { min-height: 620px !important; }
+      .project-hero-content { left: 1.5rem !important; right: 1.5rem !important; bottom: 3rem !important; }
+      .gallery-item { border-radius: 18px !important; }
+    }
+
   </style>
 </head>
 <body>
@@ -831,13 +1178,13 @@
           <h4 class="footer-title">Contact</h4>
           <ul class="footer-links">
             <li><a href="https://wa.me/905424318166">+90 542 431 81 66</a></li>
-            <li><a href="mailto:info@artivo.pro">info@artivo.pro</a></li>
+            <li><a href="mailto:info@artivo.tr">info@artivo.tr</a></li>
             <li>Istanbul, Beylikduzu</li>
           </ul>
           <div class="social-links">
             <a href="https://www.facebook.com/artivo.pro" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
             <a href="https://www.instagram.com/artivo.design/" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></a>
-            <a href="https://www.behance.net/artivopro" aria-label="Behance"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12h6.5a3.5 3.5 0 0 0 0-7H1v14h7a4 4 0 0 0 0-8"/><path d="M15 7h6M15 19h2.5a4.5 4.5 0 1 0 0-9H15v9z"/></svg></a>
+            <a href="https://www.behance.net/artivotr" aria-label="Behance"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12h6.5a3.5 3.5 0 0 0 0-7H1v14h7a4 4 0 0 0 0-8"/><path d="M15 7h6M15 19h2.5a4.5 4.5 0 1 0 0-9H15v9z"/></svg></a>
           </div>
         </div>
       </div>
@@ -915,13 +1262,13 @@
     function animateCanvas() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
       const bgGradient = ctx.createRadialGradient(canvas.width/2,0,0,canvas.width/2,0,canvas.height);
-      bgGradient.addColorStop(0, '#14001f'); bgGradient.addColorStop(1, '#040006');
+      bgGradient.addColorStop(0, '#101a3d'); bgGradient.addColorStop(0.46, '#090416'); bgGradient.addColorStop(1, '#02030a');
       ctx.fillStyle = bgGradient; ctx.fillRect(0,0,canvas.width,canvas.height);
       const idle = Date.now() - lastInteraction > 3500; const activity = idle ? 0.35 : 1;
       particles.forEach(p => {
         if (pointer.active && !idle) {
           const dx = p.x - pointer.x, dy = p.y - pointer.y, dist = Math.sqrt(dx*dx+dy*dy);
-          if (dist < FORCE_RADIUS) { const force = (FORCE_RADIUS - dist) / FORCE_RADIUS; p.vx += dx/dist * force * 0.5; p.vy += dy/dist * force * 0.5; }
+          if (dist < FORCE_RADIUS && dist > 1) { const force = (FORCE_RADIUS - dist) / FORCE_RADIUS; p.vx += dx/dist * force * 0.38; p.vy += dy/dist * force * 0.38; }
         }
         p.x += p.vx * activity; p.y += p.vy * activity; p.vx *= 0.96; p.vy *= 0.96;
         if (p.x < 0 || p.x > canvas.width) p.vx *= -1; if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
@@ -936,12 +1283,12 @@
               alpha += Math.max(0, 1 - md/200) * 0.6;
             }
             ripples.forEach(r => { const rd = Math.abs(Math.sqrt((particles[i].x-r.x)**2+(particles[i].y-r.y)**2)-r.r); if (rd < 18) alpha += 0.35; });
-            ctx.strokeStyle = `rgba(107,33,165,${alpha})`; ctx.lineWidth = 0.6; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+            ctx.strokeStyle = `rgba(125, 92, 255, ${Math.min(alpha * 0.28, 0.34)})`; ctx.lineWidth = 0.55; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
           }
         }
       }
-      particles.forEach(p => { ctx.fillStyle = "rgba(168,85,247,0.9)"; ctx.beginPath(); ctx.arc(p.x,p.y,1.5,0,Math.PI*2); ctx.fill(); });
-      for (let i = ripples.length-1; i >= 0; i--) { const r = ripples[i]; r.r += 3.5; r.alpha -= 0.015; ctx.strokeStyle = `rgba(168,85,247,${r.alpha})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2); ctx.stroke(); if (r.alpha <= 0) ripples.splice(i,1); }
+      particles.forEach((p, idx) => { const palette = ['rgba(56,189,248,.72)','rgba(167,139,250,.72)','rgba(244,114,182,.62)']; ctx.fillStyle = palette[idx % palette.length]; ctx.beginPath(); ctx.arc(p.x,p.y,1.25,0,Math.PI*2); ctx.fill(); });
+      for (let i = ripples.length-1; i >= 0; i--) { const r = ripples[i]; r.r += 3.5; r.alpha -= 0.015; ctx.strokeStyle = `rgba(56,189,248,${r.alpha * 0.5})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2); ctx.stroke(); if (r.alpha <= 0) ripples.splice(i,1); }
       requestAnimationFrame(animateCanvas);
     }
     animateCanvas();
@@ -1485,18 +1832,18 @@
         galleryCount: 7
       },
       29: {
-        title: 'Coming Soon',
-        category: 'Commercial',
+        title: 'Modern Dressing & Makeup Room',
+        category: 'Residential',
         heroImg: 'assets/images/projects/29/cover.jpg',
-        location: 'Amsterdam, Netherlands',
-        year: '2021',
-        area: '1200 m²',
-        status: 'Industrial, Modern',
-        descTitle: 'Coming Soon',
+        location: 'Iraq',
+        year: '2024',
+        area: '40 m²',
+        status: 'Modern, Curves',
+        descTitle: 'Fluid Elegance with Soft Curves',
         desc: [
-          'Coming Soon',
+          'This modern dressing and makeup room is defined by smooth curved lines that create a sense of flow and visual harmony. Soft forms are seamlessly integrated into the cabinetry, mirrors, and vanity design, enhancing both functionality and aesthetic appeal. A refined material palette, combined with subtle lighting, adds depth and sophistication, resulting in a luxurious and calming space tailored for daily rituals with a contemporary touch.',
         ],
-        galleryCount: 1
+        galleryCount: 13
       },
       30: {
         title: 'Coming Soon',
