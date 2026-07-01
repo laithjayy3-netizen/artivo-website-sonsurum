@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0a0e1a">
+<title>ARTİVO · 360° Sanal Tur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marzipano@0.10.2/build/marzipano.min.js"></script>
+<script>
+  if (typeof window.Marzipano === 'undefined') {
+      document.write(unescape('%3Cscript src="https://unpkg.com/marzipano@0.10.2/build/marzipano.min.js"%3E%3C/script%3E'));
+  }
+</script>
+<style>
+:root {
+  --bg-1: #0a0e1a;
+  --bg-2: #131826;
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.10);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-strong: rgba(255, 255, 255, 0.22);
+  --text: #f5f6f8;
+  --text-muted: rgba(245, 246, 248, 0.65);
+  --accent: #d4af6a;
+  --accent-bright: #e8c789;
+  --accent-glow: rgba(212, 175, 106, 0.35);
+  --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-1);
+  color: var(--text);
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  touch-action: none;
+}
+
+#pano {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: 1;
+  cursor: grab;
+}
+#pano.grabbing { cursor: grabbing; }
+
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #1a2030 0%, #0a0e1a 70%);
+  transition: opacity 0.8s var(--ease), visibility 0.8s var(--ease);
+}
+#loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.loader-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 600;
+  letter-spacing: 8px;
+  color: var(--accent-bright);
+  text-shadow: 0 0 30px var(--accent-glow);
+  margin-bottom: 32px;
+}
+.loader-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+.loader-ring::before, .loader-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+.loader-ring::before {
+  border-top-color: var(--accent);
+  border-right-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+.loader-ring::after {
+  border-bottom-color: var(--accent-bright);
+  opacity: 0.4;
+  animation: spin 1.6s linear infinite reverse;
+}
+.loader-text {
+  margin-top: 22px;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  padding-top: max(18px, env(safe-area-inset-top));
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(10,14,26,0.6) 0%, transparent 100%);
+}
+.brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: var(--accent-bright);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  pointer-events: auto;
+}
+.scene-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text);
+  padding: 10px 18px;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  pointer-events: auto;
+  box-shadow: var(--shadow-1);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.scene-title.swap {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+#controls {
+  position: fixed;
+  bottom: 28px;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-2);
+}
+.ctrl-btn {
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s var(--ease);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.ctrl-btn:hover {
+  background: rgba(255,255,255,0.10);
+  transform: translateY(-1px);
+}
+.ctrl-btn:active { transform: scale(0.94); }
+.ctrl-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ctrl-btn.active {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-bright) 100%);
+  color: #1a1a1a;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.ctrl-btn .tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 5px 10px;
+  background: rgba(20,25,40,0.95);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s var(--ease);
+}
+.ctrl-btn:hover .tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.ctrl-divider {
+  width: 1px;
+  height: 26px;
+  align-self: center;
+  background: var(--glass-border);
+}
+
+#thumbs {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+}
+.thumb {
+  position: relative;
+  width: 96px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s var(--ease);
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s var(--ease);
+}
+.thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 100%);
+  opacity: 0.7;
+  transition: opacity 0.3s var(--ease);
+}
+.thumb-label {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  right: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  z-index: 2;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.thumb:hover img { transform: scale(1.08); }
+.thumb:hover::after { opacity: 0.5; }
+.thumb.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow), 0 6px 18px rgba(0,0,0,0.4);
+}
+.thumb.active::after { opacity: 0.35; }
+
+#watermark {
+  position: fixed;
+  bottom: 28px;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  left: 24px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--accent-bright);
+  text-decoration: none;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  box-shadow: var(--shadow-1);
+  transition: all 0.3s var(--ease);
+}
+#watermark:hover {
+  background: var(--glass-strong);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+#watermark .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+#hint {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+#hint.show { opacity: 1; }
+#hint.hide { opacity: 0; }
+#hint svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.55;
+}
+
+#toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(20px);
+  z-index: 500;
+  padding: 14px 22px;
+  background: rgba(20,25,40,0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.35s var(--ease);
+  text-align: center;
+  max-width: 86%;
+  pointer-events: none;
+}
+#toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) translateY(0);
+}
+
+@media (max-width: 768px) {
+  #topbar { padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); }
+  .brand { font-size: 18px; letter-spacing: 3px; }
+  .scene-title { font-size: 11px; padding: 8px 14px; }
+  #controls { gap: 6px; padding: 6px; bottom: 16px; bottom: max(16px, env(safe-area-inset-bottom)); }
+  .ctrl-btn { width: 40px; height: 40px; }
+  .ctrl-btn svg { width: 18px; height: 18px; }
+  .ctrl-btn .tip { display: none; }
+  .ctrl-divider { height: 22px; }
+  #thumbs {
+    right: 12px;
+    top: auto;
+    bottom: 80px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    transform: none;
+    flex-direction: row;
+    gap: 8px;
+    padding: 6px;
+  }
+  .thumb { width: 72px; height: 48px; }
+  .thumb-label { font-size: 8px; }
+  #watermark { bottom: 16px; bottom: max(16px, env(safe-area-inset-bottom)); left: 12px; font-size: 13px; padding: 6px 12px; letter-spacing: 2px; }
+  .loader-mark { font-size: 32px; letter-spacing: 6px; }
+}
+
+@media (max-width: 480px) {
+  #thumbs { gap: 6px; padding: 5px; }
+  .thumb { width: 64px; height: 44px; border-width: 2px; }
+  .thumb-label { font-size: 7px; bottom: 4px; left: 6px; right: 6px; }
+  #controls { gap: 4px; }
+  .ctrl-btn { width: 38px; height: 38px; }
+}
+
+@media (orientation: landscape) and (max-height: 480px) {
+  #topbar { padding: 10px 16px; padding-top: max(10px, env(safe-area-inset-top)); }
+  .brand { font-size: 16px; }
+  .scene-title { font-size: 10px; padding: 6px 12px; }
+  #controls { bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  .ctrl-btn { width: 38px; height: 38px; }
+  #thumbs { top: 50%; bottom: auto; transform: translateY(-50%); right: 12px; }
+  .thumb { width: 72px; height: 48px; }
+  #watermark { bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+</style>
+</head>
+<body>
+
+<div id="pano" aria-label="360 derece panorama görüntüleyici"></div>
+
+<div id="loader" role="status" aria-live="polite">
+  <div class="loader-mark">ARTİVO</div>
+  <div class="loader-ring"></div>
+  <div class="loader-text">Yükleniyor</div>
+</div>
+
+<header id="topbar">
+  <div class="brand">ARTİVO</div>
+  <div class="scene-title" id="sceneTitle">BEYAZ MUTFAK</div>
+</header>
+
+<div id="thumbs" aria-label="Panorama seçenekleri"></div>
+
+<nav id="controls" aria-label="Görüntüleyici kontrolleri">
+  <button class="ctrl-btn" data-action="zoom-in" aria-label="Yakınlaştır" type="button">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    <span class="tip">Yakınlaştır</span>
+  </button>
+  <button class="ctrl-btn" data-action="zoom-out" aria-label="Uzaklaştır" type="button">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    <span class="tip">Uzaklaştır</span>
+  </button>
+  <button class="ctrl-btn" data-action="reset" aria-label="Sıfırla" type="button">
+    <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg>
+    <span class="tip">Sıfırla</span>
+  </button>
+  <div class="ctrl-divider"></div>
+  <button class="ctrl-btn" data-action="autorotate" aria-label="Otomatik Döndür" type="button">
+    <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>
+    <span class="tip">Otomatik Döndür</span>
+  </button>
+  <button class="ctrl-btn" data-action="vr" aria-label="VR" type="button">
+    <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="3"/><line x1="8" y1="12" x2="10" y2="12"/><line x1="14" y1="12" x2="16" y2="12"/></svg>
+    <span class="tip">VR</span>
+  </button>
+  <button class="ctrl-btn" data-action="fullscreen" aria-label="Tam Ekran" type="button">
+    <svg class="fs-enter" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    <svg class="fs-exit" viewBox="0 0 24 24" style="display:none"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+    <span class="tip">Tam Ekran</span>
+  </button>
+</nav>
+
+<a id="watermark" href="https://www.artivo.tr" target="_blank" rel="noopener noreferrer" aria-label="ARTİVO web sitesini ziyaret edin">
+  <span class="dot"></span>
+  ARTİVO
+</a>
+
+<div id="hint" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M5 12l4-4M5 12l4 4M19 12l-4-4M19 12l-4 4"/></svg>
+  <span>Sürükleyerek Keşfedin</span>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  const SCENES = [
+    { id: 'beyaz-mutfak', title: 'BEYAZ MUTFAK', image: 'assets/images/360/1.jpg' },
+    { id: 'ahsap-mutfak', title: 'AHŞAP MUTFAK', image: 'assets/images/360/2.jpg' }
+  ];
+  const IMAGE_WIDTH  = 2048;
+  const IMAGE_HEIGHT = 1024;
+  const AUTO_ROTATE_SPEED      = 0.08;   
+  const TRANSITION_DURATION    = 1200;   
+  const USER_INACTIVITY_RESUME = 2500;   
+  const MIN_FOV = Math.PI / 6;           
+  const MAX_FOV = Math.PI * 0.85;        
+  const DEFAULT_FOV = Math.PI / 2;       
+
+  let viewer = null;
+  let scenes = [];
+  let currentSceneIndex = 0;
+  let autoRotateActive = false;
+  let autoRotateRafId = null;
+  let autoRotateLastTime = null;
+  let vrActive = false;
+  let vrHandler = null;
+  let userInteracting = false;
+  let inactivityTimer = null;
+  let isTransitioning = false;
+  let loaderHidden = false;
+
+  const panoEl        = document.getElementById('pano');
+  const loaderEl      = document.getElementById('loader');
+  const sceneTitleEl  = document.getElementById('sceneTitle');
+  const thumbsEl      = document.getElementById('thumbs');
+  const controlsEl    = document.getElementById('controls');
+  const hintEl        = document.getElementById('hint');
+  const toastEl       = document.getElementById('toast');
+
+  function showToast(message, duration) {
+    toastEl.textContent = message;
+    toastEl.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => {
+      toastEl.classList.remove('show');
+    }, duration || 2200);
+  }
+
+  function preloadImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload  = () => resolve(img);
+      img.onerror = () => reject(new Error('Görüntü yüklenemedi: ' + url));
+      img.src = url;
+    });
+  }
+
+  function buildScene(cfg) {
+    const source   = Marzipano.ImageUrlSource.fromString(cfg.image);
+    const geometry = new Marzipano.EquirectGeometry([{ width: IMAGE_WIDTH, height: IMAGE_HEIGHT }]);
+    const limiter  = Marzipano.RectilinearView.limit.traditional(IMAGE_WIDTH, 110 * Math.PI / 180);
+    const view     = new Marzipano.RectilinearView({ yaw: 0, pitch: 0, fov: DEFAULT_FOV }, limiter);
+    const scene    = viewer.createScene({
+      source: source,
+      geometry: geometry,
+      view: view,
+      pinFirstLevel: true
+    });
+    return { config: cfg, scene: scene, view: view };
+  }
+
+  function buildThumbnails() {
+    thumbsEl.innerHTML = '';
+    SCENES.forEach((cfg, i) => {
+      const t = document.createElement('div');
+      t.className = 'thumb' + (i === 0 ? ' active' : '');
+      t.dataset.index = i;
+      t.setAttribute('role', 'button');
+      t.setAttribute('tabindex', '0');
+      t.setAttribute('aria-label', cfg.title + ' sahnesine geç');
+      const img = document.createElement('img');
+      img.src = cfg.image;
+      img.alt = cfg.title;
+      img.loading = 'lazy';
+      img.draggable = false;
+      const label = document.createElement('div');
+      label.className = 'thumb-label';
+      label.textContent = cfg.title;
+      t.appendChild(img);
+      t.appendChild(label);
+      const activate = () => {
+        if (i === currentSceneIndex || isTransitioning) return;
+        activateScene(i, { duration: TRANSITION_DURATION });
+      };
+      t.addEventListener('click', activate);
+      t.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activate();
+        }
+      });
+      thumbsEl.appendChild(t);
+    });
+  }
+
+  function activateScene(index, opts) {
+    const target = scenes[index];
+    if (!target) return;
+    if (isTransitioning && opts && opts.duration !== 0) return;
+
+    isTransitioning = true;
+    currentSceneIndex = index;
+
+    sceneTitleEl.classList.add('swap');
+    setTimeout(() => {
+      sceneTitleEl.textContent = target.config.title;
+      sceneTitleEl.classList.remove('swap');
+    }, 200);
+
+    document.querySelectorAll('.thumb').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+
+    const duration = (opts && typeof opts.duration !== 'undefined') ? opts.duration : TRANSITION_DURATION;
+
+    target.scene.switchTo({ transitionDuration: duration });
+
+    const wait = duration === 0 ? 60 : duration + 80;
+    setTimeout(() => {
+      isTransitioning = false;
+    }, wait);
+
+    if (!loaderHidden) {
+      hideLoaderWhenReady();
+    }
+  }
+
+  function hideLoaderWhenReady() {
+    if (loaderHidden) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        loaderHidden = true;
+        loaderEl.classList.add('hidden');
+      });
+    });
+  }
+
+  function startAutoRotate() {
+    if (autoRotateActive) return;
+    autoRotateActive = true;
+    autoRotateLastTime = null;
+    updateButtonState('autorotate', true);
+    autoRotateRafId = requestAnimationFrame(autoRotateLoop);
+  }
+
+  function stopAutoRotate() {
+    autoRotateActive = false;
+    if (autoRotateRafId) {
+      cancelAnimationFrame(autoRotateRafId);
+      autoRotateRafId = null;
+    }
+    updateButtonState('autorotate', false);
+  }
+
+  function toggleAutoRotate() {
+    if (autoRotateActive) stopAutoRotate();
+    else startAutoRotate();
+  }
+
+  function autoRotateLoop(time) {
+    if (!autoRotateActive) return;
+    if (autoRotateLastTime === null) autoRotateLastTime = time;
+    const dt = (time - autoRotateLastTime) / 1000;
+    autoRotateLastTime = time;
+
+    if (!userInteracting && !isTransitioning && scenes[currentSceneIndex]) {
+      const view = scenes[currentSceneIndex].view;
+      try {
+        const newYaw = view.yaw() + AUTO_ROTATE_SPEED * dt;
+        view.setYaw(newYaw);
+      } catch (e) {}
+    }
+    autoRotateRafId = requestAnimationFrame(autoRotateLoop);
+  }
+
+  function zoomIn() {
+    const view = scenes[currentSceneIndex] && scenes[currentSceneIndex].view;
+    if (!view) return;
+    const newFov = Math.max(view.fov() * 0.82, MIN_FOV);
+    view.setFov(newFov);
+  }
+
+  function zoomOut() {
+    const view = scenes[currentSceneIndex] && scenes[currentSceneIndex].view;
+    if (!view) return;
+    const newFov = Math.min(view.fov() * 1.22, MAX_FOV);
+    view.setFov(newFov);
+  }
+
+  function resetView() {
+    const view = scenes[currentSceneIndex] && scenes[currentSceneIndex].view;
+    if (!view) return;
+    const startYaw   = view.yaw();
+    const startPitch = view.pitch();
+    const startFov   = view.fov();
+    const targetYaw   = 0;
+    const targetPitch = 0;
+    const targetFov   = DEFAULT_FOV;
+    const duration = 700;
+    const t0 = performance.now();
+    function tick(now) {
+      const t = Math.min((now - t0) / duration, 1);
+      const e = 1 - Math.pow(1 - t, 3);
+      try {
+        view.setYaw(startYaw + (targetYaw - startYaw) * e);
+        view.setPitch(startPitch + (targetPitch - startPitch) * e);
+        view.setFov(startFov + (targetFov - startFov) * e);
+      } catch (err) {}
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  async function toggleVR() {
+    if (vrActive) {
+      disableVR();
+      showToast('VR modu kapatıldı');
+      return;
+    }
+    await enableVR();
+  }
+
+  async function enableVR() {
+    if (typeof DeviceOrientationEvent === 'undefined') {
+      showToast('Bu cihaz yön sensörünü desteklemiyor');
+      return;
+    }
+
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        const response = await DeviceOrientationEvent.requestPermission();
+        if (response !== 'granted') {
+          showToast('VR modu için sensör izni gerekli');
+          return;
+        }
+      } catch (e) {
+        showToast('Sensör izni alınamadı');
+        return;
+      }
+    }
+
+    if (autoRotateActive) stopAutoRotate();
+
+    vrActive = true;
+    updateButtonState('vr', true);
+    showToast('VR modu etkin');
+
+    let firstReading = true;
+    let baseAlpha = 0;
+    let baseYaw = 0;
+
+    vrHandler = function(event) {
+      if (!vrActive) return;
+      const current = scenes[currentSceneIndex];
+      if (!current) return;
+      const view = current.view;
+
+      let alpha = event.alpha;
+      let beta  = event.beta;
+      if (alpha === null || beta === null) return;
+
+      alpha = alpha * Math.PI / 180;
+      beta  = beta  * Math.PI / 180;
+
+      if (firstReading) {
+        baseAlpha = alpha;
+        baseYaw = view.yaw();
+        firstReading = false;
+        return;
+      }
+
+      let deltaYaw = alpha - baseAlpha;
+      while (deltaYaw > Math.PI)  deltaYaw -= 2 * Math.PI;
+      while (deltaYaw < -Math.PI) deltaYaw += 2 * Math.PI;
+
+      const newYaw = baseYaw - deltaYaw;
+
+      let pitch = beta - Math.PI / 2;
+      pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, pitch));
+
+      try {
+        view.setYaw(newYaw);
+        view.setPitch(pitch);
+      } catch (e) {}
+    };
+
+    window.addEventListener('deviceorientation', vrHandler, true);
+  }
+
+  function disableVR() {
+    vrActive = false;
+    if (vrHandler) {
+      window.removeEventListener('deviceorientation', vrHandler, true);
+      vrHandler = null;
+    }
+    updateButtonState('vr', false);
+  }
+
+  function toggleFullscreen() {
+    const docEl = document.documentElement;
+    const isInFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.webkitIsFullScreen);
+    if (!isInFS) {
+      const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.webkitEnterFullscreen;
+      if (req) {
+        try {
+          const p = req.call(docEl);
+          if (p && p.catch) p.catch(() => {});
+        } catch (e) {}
+      } else if (document.body && document.body.webkitEnterFullscreen) {
+        try { document.body.webkitEnterFullscreen(); } catch (e) {}
+      } else {
+        showToast('Tam ekran bu cihazda desteklenmiyor');
+      }
+    } else {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
+      if (exit) {
+        try { exit.call(document); } catch (e) {}
+      }
+    }
+  }
+
+  function bindFullscreenChange() {
+    const handler = () => {
+      const isInFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      const btn = controlsEl.querySelector('[data-action="fullscreen"]');
+      if (!btn) return;
+      const enterSvg = btn.querySelector('.fs-enter');
+      const exitSvg  = btn.querySelector('.fs-exit');
+      if (isInFS) {
+        btn.classList.add('active');
+        if (enterSvg) enterSvg.style.display = 'none';
+        if (exitSvg)  exitSvg.style.display  = '';
+      } else {
+        btn.classList.remove('active');
+        if (enterSvg) enterSvg.style.display = '';
+        if (exitSvg)  exitSvg.style.display  = 'none';
+      }
+    };
+    document.addEventListener('fullscreenchange', handler);
+    document.addEventListener('webkitfullscreenchange', handler);
+    document.addEventListener('mozfullscreenchange', handler);
+    document.addEventListener('MSFullscreenChange', handler);
+  }
+
+  function bindControls() {
+    controlsEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.ctrl-btn');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      switch (action) {
+        case 'zoom-in':   zoomIn();          break;
+        case 'zoom-out':  zoomOut();         break;
+        case 'reset':     resetView();       break;
+        case 'autorotate':toggleAutoRotate();break;
+        case 'vr':        toggleVR();        break;
+        case 'fullscreen':toggleFullscreen();break;
+      }
+    });
+  }
+
+  function updateButtonState(action, active) {
+    const btn = controlsEl.querySelector('[data-action="' + action + '"]');
+    if (btn) btn.classList.toggle('active', !!active);
+  }
+
+  function bindViewerInteraction() {
+    let controls = null;
+    try { controls = viewer.controls(); } catch (e) { return; }
+    if (!controls) return;
+
+    controls.addEventListener('active', () => {
+      userInteracting = true;
+      if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = null;
+      }
+    });
+
+    controls.addEventListener('inactive', () => {
+      userInteracting = false;
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        inactivityTimer = null;
+      }, USER_INACTIVITY_RESUME);
+    });
+
+    panoEl.addEventListener('pointerdown', () => panoEl.classList.add('grabbing'));
+    window.addEventListener('pointerup',   () => panoEl.classList.remove('grabbing'));
+    window.addEventListener('pointercancel',() => panoEl.classList.remove('grabbing'));
+  }
+
+  function bindResize() {
+    let raf = null;
+    const onResize = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        if (viewer && typeof viewer.updateSize === 'function') {
+          try { viewer.updateSize(); } catch (e) {}
+        }
+      });
+    };
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+  }
+
+  function showError(message) {
+    const mark = loaderEl.querySelector('.loader-mark');
+    const ring = loaderEl.querySelector('.loader-ring');
+    const text = loaderEl.querySelector('.loader-text');
+    if (mark) mark.textContent = 'HATA';
+    if (ring) ring.style.display = 'none';
+    if (text) text.textContent = message || 'Bir hata oluştu';
+  }
+
+  function init() {
+    if (typeof window.Marzipano === 'undefined') {
+      showError('MARZİPANO KÜTÜPHANESİ YÜKLENEMEDİ. İnternet bağlantınızı kontrol edin veya VS Code Live Server ile açın.');
+      return;
+    }
+
+    buildThumbnails();
+
+    try {
+      viewer = Marzipano.createViewer(panoEl, {
+        controls: {
+          mouseViewDrag: true,
+          touchViewTwoFingers: false
+        },
+        stage: {
+          preserveDrawingBuffer: false
+        }
+      });
+    } catch (e) {
+      showError('Görüntüleyici başlatılamadı. Lütfen bir Local Server (Live Server) kullanın.');
+      return;
+    }
+
+    try {
+      scenes = SCENES.map(buildScene);
+    } catch (e) {
+      showError('Sahneler oluşturulamadı');
+      return;
+    }
+
+    preloadImage(SCENES[0].image)
+      .then(() => {
+        activateScene(0, { duration: 0 });
+      })
+      .catch(() => {
+        showError('Panorama görseli (assets/images/360/1.jpg) yüklenemedi');
+      });
+
+    bindControls();
+    bindViewerInteraction();
+    bindFullscreenChange();
+    bindResize();
+
+    setTimeout(() => {
+      hintEl.classList.add('show');
+      setTimeout(() => {
+        hintEl.classList.add('hide');
+      }, 3500);
+    }, 1800);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (autoRotateRafId) {
+          cancelAnimationFrame(autoRotateRafId);
+          autoRotateRafId = null;
+        }
+      } else if (autoRotateActive && !autoRotateRafId) {
+        autoRotateLastTime = null;
+        autoRotateRafId = requestAnimationFrame(autoRotateLoop);
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
