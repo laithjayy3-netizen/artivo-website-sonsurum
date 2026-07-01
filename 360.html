@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#0a0e1a">
 <title>ARTİVO · 360° Sanal Tur</title>
+<!-- للتخلص من خطأ favicon -->
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
@@ -964,24 +966,17 @@ body {
     buildThumbnails();
 
     try {
-      viewer = Marzipano.createViewer(panoEl, {
-        controls: {
-          mouseViewDrag: true,
-          touchViewTwoFingers: false
-        },
-        stage: {
-          preserveDrawingBuffer: false
-        }
-      });
+      // تم إصلاح الخطأ البرمجي هنا: استخدام new Marzipano.Viewer بدلاً من createViewer
+      viewer = new Marzipano.Viewer(panoEl);
     } catch (e) {
-      showError('Görüntüleyici başlatılamadı.');
+      showError('Görüntüleyici başlatılamadı: ' + e.message);
       return;
     }
 
     try {
       scenes = SCENES.map(buildScene);
     } catch (e) {
-      showError('Sahneler oluşturulamadı');
+      showError('Sahneler oluşturulamadı: ' + e.message);
       return;
     }
 
