@@ -9,8 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 
-<!-- تم تغيير مصدر المكتبة إلى Cloudflare CDN لتجنب الحظر -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marzipano/0.10.2/marzipano.min.js"></script>
+<!-- المصدر الرسمي للمكتبة -->
+<script src="https://cdn.marzipano.net/marzipano/v0.10.2/marzipano.min.js"></script>
+<script>
+  if (typeof window.Marzipano === 'undefined') {
+      document.write(unescape('%3Cscript src="https://cdn.jsdelivr.net/npm/marzipano@0.10.2/build/marzipano.min.js"%3E%3C/script%3E'));
+  }
+</script>
 
 <style>
 :root {
@@ -951,14 +956,14 @@ body {
         }
       });
     } catch (e) {
-      showError('Görüntüleyici başlatılamadı.');
+      showError('Görüntüleyici başlatılamadı: ' + e.message);
       return;
     }
 
     try {
       scenes = SCENES.map(buildScene);
     } catch (e) {
-      showError('Sahneler oluşturulamadı');
+      showError('Sahneler oluşturulamadı: ' + e.message);
       return;
     }
 
@@ -966,8 +971,8 @@ body {
       .then(() => {
         activateScene(0, { duration: 0 });
       })
-      .catch(() => {
-        showError('Panorama görseli (assets/images/360/1.jpg) yüklenemedi');
+      .catch((err) => {
+        showError('Panorama görseli bulunamadı (404): ' + SCENES[0].image);
       });
 
     bindControls();
