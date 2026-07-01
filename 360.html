@@ -8,12 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/marzipano@0.10.2/build/marzipano.min.js"></script>
-<script>
-  if (typeof window.Marzipano === 'undefined') {
-      document.write(unescape('%3Cscript src="https://unpkg.com/marzipano@0.10.2/build/marzipano.min.js"%3E%3C/script%3E'));
-  }
-</script>
+
+<!-- تم تغيير مصدر المكتبة إلى Cloudflare CDN لتجنب الحظر -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marzipano/0.10.2/marzipano.min.js"></script>
+
 <style>
 :root {
   --bg-1: #0a0e1a;
@@ -936,7 +934,7 @@ body {
 
   function init() {
     if (typeof window.Marzipano === 'undefined') {
-      showError('MARZİPANO KÜTÜPHANESİ YÜKLENEMEDİ. İnternet bağlantınızı kontrol edin veya VS Code Live Server ile açın.');
+      showError('MARZİPANO KÜTÜPHANESİ YÜKLENEMEDİ. İnternet bağlantınızı kontrol edin.');
       return;
     }
 
@@ -953,7 +951,7 @@ body {
         }
       });
     } catch (e) {
-      showError('Görüntüleyici başlatılamadı. Lütfen bir Local Server (Live Server) kullanın.');
+      showError('Görüntüleyici başlatılamadı.');
       return;
     }
 
