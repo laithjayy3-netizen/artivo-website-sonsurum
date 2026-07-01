@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#0a0e1a">
 <title>ARTİVO · 360° Sanal Tur</title>
-<!-- للتخلص من خطأ favicon -->
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -307,48 +306,6 @@ body {
 }
 .thumb.active::after { opacity: 0.35; }
 
-#watermark {
-  position: fixed;
-  bottom: 28px;
-  bottom: max(28px, env(safe-area-inset-bottom));
-  left: 24px;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  background: var(--glass);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid var(--glass-border);
-  border-radius: 999px;
-  color: var(--accent-bright);
-  text-decoration: none;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  box-shadow: var(--shadow-1);
-  transition: all 0.3s var(--ease);
-}
-#watermark:hover {
-  background: var(--glass-strong);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-#watermark .dot {
-  width: 6px;
-  height: 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--accent);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
 #hint {
   position: fixed;
   top: 50%;
@@ -426,7 +383,6 @@ body {
   }
   .thumb { width: 72px; height: 48px; }
   .thumb-label { font-size: 8px; }
-  #watermark { bottom: 16px; bottom: max(16px, env(safe-area-inset-bottom)); left: 12px; font-size: 13px; padding: 6px 12px; letter-spacing: 2px; }
   .loader-mark { font-size: 32px; letter-spacing: 6px; }
 }
 
@@ -446,7 +402,6 @@ body {
   .ctrl-btn { width: 38px; height: 38px; }
   #thumbs { top: 50%; bottom: auto; transform: translateY(-50%); right: 12px; }
   .thumb { width: 72px; height: 48px; }
-  #watermark { bottom: 12px; bottom: max(12px, env(safe-area-inset-bottom)); }
 }
 </style>
 </head>
@@ -496,11 +451,6 @@ body {
   </button>
 </nav>
 
-<a id="watermark" href="https://www.artivo.tr" target="_blank" rel="noopener noreferrer" aria-label="ARTİVO web sitesini ziyaret edin">
-  <span class="dot"></span>
-  ARTİVO
-</a>
-
 <div id="hint" aria-hidden="true">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M5 12l4-4M5 12l4 4M19 12l-4-4M19 12l-4 4"/></svg>
   <span>Sürükleyerek Keşfedin</span>
@@ -512,7 +462,6 @@ body {
 (function() {
   'use strict';
 
-  // دالة ذكية لتحميل المكتبة من عدة مصادر لتفادي الحظر
   function loadMarzipano(cb) {
     if (window.Marzipano) return cb();
     var sources = [
@@ -557,8 +506,16 @@ body {
   let autoRotateActive = false;
   let autoRotateRafId = null;
   let autoRotateLastTime = null;
+  
   let vrActive = false;
   let vrHandler = null;
+  let vrRafId = null;
+  let targetYaw = 0;
+  let targetPitch = 0;
+  let baseAlpha = 0;
+  let baseYaw = 0;
+  let firstReading = true;
+  
   let userInteracting = false;
   let inactivityTimer = null;
   let isTransitioning = false;
@@ -657,7 +614,6 @@ body {
     });
 
     const duration = (opts && typeof opts.duration !== 'undefined') ? opts.duration : TRANSITION_DURATION;
-
     target.scene.switchTo({ transitionDuration: duration });
 
     const wait = duration === 0 ? 60 : duration + 80;
@@ -756,6 +712,7 @@ body {
     requestAnimationFrame(tick);
   }
 
+  // --- VR GELİŞTİRİLMİŞ SÜRÜM (Lerp ile) ---
   async function toggleVR() {
     if (vrActive) {
       disableVR();
@@ -790,15 +747,12 @@ body {
     updateButtonState('vr', true);
     showToast('VR modu etkin');
 
-    let firstReading = true;
-    let baseAlpha = 0;
-    let baseYaw = 0;
+    firstReading = true;
 
     vrHandler = function(event) {
       if (!vrActive) return;
       const current = scenes[currentSceneIndex];
       if (!current) return;
-      const view = current.view;
 
       let alpha = event.alpha;
       let beta  = event.beta;
@@ -809,7 +763,9 @@ body {
 
       if (firstReading) {
         baseAlpha = alpha;
-        baseYaw = view.yaw();
+        baseYaw = current.view.yaw();
+        targetYaw = baseYaw;
+        targetPitch = current.view.pitch();
         firstReading = false;
         return;
       }
@@ -818,18 +774,38 @@ body {
       while (deltaYaw > Math.PI)  deltaYaw -= 2 * Math.PI;
       while (deltaYaw < -Math.PI) deltaYaw += 2 * Math.PI;
 
-      const newYaw = baseYaw - deltaYaw;
-
+      targetYaw = baseYaw - deltaYaw;
+      
       let pitch = beta - Math.PI / 2;
-      pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, pitch));
-
-      try {
-        view.setYaw(newYaw);
-        view.setPitch(pitch);
-      } catch (e) {}
+      targetPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, pitch));
     };
 
     window.addEventListener('deviceorientation', vrHandler, true);
+    vrRafId = requestAnimationFrame(vrLoop);
+  }
+
+  function vrLoop() {
+    if (!vrActive) return;
+    const current = scenes[currentSceneIndex];
+    if (current && !userInteracting) {
+      const view = current.view;
+      try {
+        let currentYaw = view.yaw();
+        let currentPitch = view.pitch();
+        
+        // Lerp (Smooth) hesaplaması
+        let dyaw = targetYaw - currentYaw;
+        while (dyaw > Math.PI) dyaw -= 2 * Math.PI;
+        while (dyaw < -Math.PI) dyaw += 2 * Math.PI;
+        
+        let smoothYaw = currentYaw + dyaw * 0.15; 
+        let smoothPitch = currentPitch + (targetPitch - currentPitch) * 0.15;
+        
+        view.setYaw(smoothYaw);
+        view.setPitch(smoothPitch);
+      } catch (e) {}
+    }
+    vrRafId = requestAnimationFrame(vrLoop);
   }
 
   function disableVR() {
@@ -837,6 +813,10 @@ body {
     if (vrHandler) {
       window.removeEventListener('deviceorientation', vrHandler, true);
       vrHandler = null;
+    }
+    if (vrRafId) {
+      cancelAnimationFrame(vrRafId);
+      vrRafId = null;
     }
     updateButtonState('vr', false);
   }
@@ -959,14 +939,13 @@ body {
 
   function startApp(err) {
     if (err || typeof window.Marzipano === 'undefined') {
-      showError('MARZİPANO KÜTÜPHANESİ YÜKLENEMEDİ. İnternet bağlantınızı kontrol edin veya VPN deneyin.');
+      showError('MARZİPANO KÜTÜPHANESİ YÜKLENEMEDİ. İnternet bağlantınızı kontrol edin.');
       return;
     }
 
     buildThumbnails();
 
     try {
-      // تم إصلاح الخطأ البرمجي هنا: استخدام new Marzipano.Viewer بدلاً من createViewer
       viewer = new Marzipano.Viewer(panoEl);
     } catch (e) {
       showError('Görüntüleyici başlatılamadı: ' + e.message);
