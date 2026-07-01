@@ -9,14 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 
-<!-- المصدر الرسمي للمكتبة -->
-<script src="https://cdn.marzipano.net/marzipano/v0.10.2/marzipano.min.js"></script>
-<script>
-  if (typeof window.Marzipano === 'undefined') {
-      document.write(unescape('%3Cscript src="https://cdn.jsdelivr.net/npm/marzipano@0.10.2/build/marzipano.min.js"%3E%3C/script%3E'));
-  }
-</script>
-
 <style>
 :root {
   --bg-1: #0a0e1a;
@@ -518,6 +510,32 @@ body {
 (function() {
   'use strict';
 
+  // دالة ذكية لتحميل المكتبة من عدة مصادر لتفادي الحظر
+  function loadMarzipano(cb) {
+    if (window.Marzipano) return cb();
+    var sources = [
+      'https://unpkg.com/marzipano@0.10.2/build/marzipano.min.js',
+      'https://cdn.jsdelivr.net/npm/marzipano@0.10.2/build/marzipano.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/marzipano/0.10.2/marzipano.min.js'
+    ];
+    var i = 0;
+    function loadNext() {
+      if (i >= sources.length) {
+        return cb(new Error('Tüm kaynaklardan yükleme başarısız.'));
+      }
+      var src = sources[i++];
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function() {
+        if (window.Marzipano) cb(); 
+        else loadNext();
+      };
+      s.onerror = loadNext;
+      document.head.appendChild(s);
+    }
+    loadNext();
+  }
+
   const SCENES = [
     { id: 'beyaz-mutfak', title: 'BEYAZ MUTFAK', image: 'assets/images/360/1.jpg' },
     { id: 'ahsap-mutfak', title: 'AHŞAP MUTFAK', image: 'assets/images/360/2.jpg' }
@@ -937,9 +955,9 @@ body {
     if (text) text.textContent = message || 'Bir hata oluştu';
   }
 
-  function init() {
-    if (typeof window.Marzipano === 'undefined') {
-      showError('MARZİPANO KÜTÜPHANESİ YÜKLENEMEDİ. İnternet bağlantınızı kontrol edin.');
+  function startApp(err) {
+    if (err || typeof window.Marzipano === 'undefined') {
+      showError('MARZİPANO KÜTÜPHANESİ YÜKLENEMEDİ. İnternet bağlantınızı kontrol edin veya VPN deneyin.');
       return;
     }
 
@@ -956,14 +974,14 @@ body {
         }
       });
     } catch (e) {
-      showError('Görüntüleyici başlatılamadı: ' + e.message);
+      showError('Görüntüleyici başlatılamadı.');
       return;
     }
 
     try {
       scenes = SCENES.map(buildScene);
     } catch (e) {
-      showError('Sahneler oluşturulamadı: ' + e.message);
+      showError('Sahneler oluşturulamadı');
       return;
     }
 
@@ -971,8 +989,8 @@ body {
       .then(() => {
         activateScene(0, { duration: 0 });
       })
-      .catch((err) => {
-        showError('Panorama görseli bulunamadı (404): ' + SCENES[0].image);
+      .catch(() => {
+        showError('Panorama görseli yüklenemedi (404): assets/images/360/1.jpg');
       });
 
     bindControls();
@@ -1001,9 +1019,11 @@ body {
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', function() {
+      loadMarzipano(startApp);
+    });
   } else {
-    init();
+    loadMarzipano(startApp);
   }
 })();
 </script>
