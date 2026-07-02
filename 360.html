@@ -512,9 +512,6 @@ body {
   let vrRafId = null;
   let targetYaw = 0;
   let targetPitch = 0;
-  let baseAlpha = 0;
-  let baseYaw = 0;
-  let firstReading = true;
   
   let userInteracting = false;
   let inactivityTimer = null;
@@ -712,7 +709,7 @@ body {
     requestAnimationFrame(tick);
   }
 
-  // --- VR GELİŞTİRİLMİŞ SÜRÜM (Lerp ile) ---
+  // --- VR ENGINE: QUATERNION/MATRIX BASED (PROFESSIONAL) ---
   async function toggleVR() {
     if (vrActive) {
       disableVR();
@@ -747,40 +744,81 @@ body {
     updateButtonState('vr', true);
     showToast('VR modu etkin');
 
-    firstReading = true;
-
+    // استخدام الأحداث المطلقة إذا كانت مدعومة لضمان دقة البوصلة
+    const eventName = ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation';
+    
     vrHandler = function(event) {
       if (!vrActive) return;
       const current = scenes[currentSceneIndex];
       if (!current) return;
 
-      let alpha = event.alpha;
-      let beta  = event.beta;
-      if (alpha === null || beta === null) return;
-
-      alpha = alpha * Math.PI / 180;
-      beta  = beta  * Math.PI / 180;
-
-      if (firstReading) {
-        baseAlpha = alpha;
-        baseYaw = current.view.yaw();
-        targetYaw = baseYaw;
-        targetPitch = current.view.pitch();
-        firstReading = false;
-        return;
-      }
-
-      let deltaYaw = alpha - baseAlpha;
-      while (deltaYaw > Math.PI)  deltaYaw -= 2 * Math.PI;
-      while (deltaYaw < -Math.PI) deltaYaw += 2 * Math.PI;
-
-      targetYaw = baseYaw - deltaYaw;
+      const alpha = event.alpha;
+      const beta = event.beta;
+      const gamma = event.gamma;
       
-      let pitch = beta - Math.PI / 2;
-      targetPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, pitch));
+      if (alpha === null || beta === null || gamma === null) return;
+
+      // تحويل الزوايا إلى راديان
+      const degtorad = Math.PI / 180; 
+      const _x = beta ? beta * degtorad : 0; // beta
+      const _y = gamma ? gamma * degtorad : 0; // gamma
+      const _z = alpha ? alpha * degtorad : 0; // alpha
+      
+      // حساب مصفوفة الدوران لتجنب Gimbal Lock
+      const cX = Math.cos(_x);
+      const cY = Math.cos(_y);
+      const cZ = Math.cos(_z);
+      const sX = Math.sin(_x);
+      const sY = Math.sin(_y);
+      const sZ = Math.sin(_z);
+      
+      // ZXY ordered rotation matrix
+      const m11 = cZ * cY - sZ * sX * sY;
+      const m12 = -cX * sZ;
+      const m13 = cZ * sY + sZ * sX * cY;
+      const m21 = sZ * cY + cZ * sX * sY;
+      const m22 = cZ * cX;
+      const m23 = sZ * sY - cZ * sX * cY;
+      const m31 = -cY * sX;
+      const m32 = sX;
+      const m33 = cY * cX;
+      
+      // استخراج Yaw و Pitch
+      let yaw = Math.atan2(m21, m11);
+      let pitch = Math.asin(-m23);
+      
+      // تعويض اتجاه الشاشة (Portrait / Landscape)
+      const screenOrientation = (screen.orientation && screen.orientation.angle !== undefined) 
+                                ? screen.orientation.angle 
+                                : (window.orientation || 0);
+                                
+      if (screenOrientation === 90) {
+        yaw += Math.PI / 2;
+      } else if (screenOrientation === -90 || screenOrientation === 270) {
+        yaw -= Math.PI / 2;
+      } else if (screenOrientation === 180) {
+        yaw += Math.PI;
+      }
+      
+      // حدوث فرق أولي لمنع القفزات
+      if (!vrHandler.initialized) {
+        const currentViewYaw = current.view.yaw();
+        targetYaw = currentViewYaw;
+        targetPitch = current.view.pitch();
+        vrHandler.yawOffset = currentViewYaw - yaw;
+        vrHandler.pitchOffset = current.view.pitch() - pitch;
+        vrHandler.initialized = true;
+      }
+      
+      targetYaw = yaw + vrHandler.yawOffset;
+      targetPitch = pitch + vrHandler.pitchOffset;
+      
+      // تقييد زاوية الـ Pitch
+      targetPitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, targetPitch));
     };
 
-    window.addEventListener('deviceorientation', vrHandler, true);
+    vrHandler.initialized = false;
+    window.addEventListener(eventName, vrHandler, true);
     vrRafId = requestAnimationFrame(vrLoop);
   }
 
@@ -793,7 +831,7 @@ body {
         let currentYaw = view.yaw();
         let currentPitch = view.pitch();
         
-        // Lerp (Smooth) hesaplaması
+        // Lerp (Smooth) لتنعيم الحركة
         let dyaw = targetYaw - currentYaw;
         while (dyaw > Math.PI) dyaw -= 2 * Math.PI;
         while (dyaw < -Math.PI) dyaw += 2 * Math.PI;
@@ -811,7 +849,8 @@ body {
   function disableVR() {
     vrActive = false;
     if (vrHandler) {
-      window.removeEventListener('deviceorientation', vrHandler, true);
+      const eventName = ('ondeviceorientationabsolute' in window) ? 'deviceorientationabsolute' : 'deviceorientation';
+      window.removeEventListener(eventName, vrHandler, true);
       vrHandler = null;
     }
     if (vrRafId) {
