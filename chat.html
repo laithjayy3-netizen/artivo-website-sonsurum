@@ -2865,6 +2865,7 @@
 
     /* =========================================================
        ARTIVO CHAT
+       Conversation history enabled
     ========================================================= */
 
     const chatForm =
@@ -2899,6 +2900,17 @@
 
 
     let isSending = false;
+
+
+    /*
+      This array stores the current conversation in the browser.
+
+      Every user message and every Artivo AI reply is added here.
+      The entire current conversation is sent to /api/chat so
+      the backend can give the AI the previous context.
+    */
+
+    let conversationHistory = [];
 
 
     function escapeHtml(text) {
@@ -3181,6 +3193,26 @@
       hideError();
 
 
+      /*
+        Add the user's message to the local conversation history
+        BEFORE sending it to the backend.
+      */
+
+      conversationHistory.push({
+        role: 'user',
+        content: message
+      });
+
+
+      /*
+        Keep the browser-side history aligned with the backend
+        limit. The backend also enforces its own safety limit.
+      */
+
+      conversationHistory =
+        conversationHistory.slice(-20);
+
+
       addMessage(
         'user',
         message
@@ -3213,7 +3245,8 @@
 
               body:
                 JSON.stringify({
-                  message
+                  messages:
+                    conversationHistory
                 })
             }
           );
@@ -3231,6 +3264,15 @@
           !data.success
         ) {
 
+          /*
+            Remove the last user message from the local history
+            if the request failed, so a future retry does not
+            accidentally duplicate it.
+          */
+
+          conversationHistory.pop();
+
+
           throw new Error(
             data.error ||
             'Unable to get a response from Artivo AI.'
@@ -3239,10 +3281,29 @@
         }
 
 
+        const assistantReply =
+          data.reply ||
+          'No response received.';
+
+
+        /*
+          Save Artivo's answer too, so the next user message
+          will include both sides of the conversation.
+        */
+
+        conversationHistory.push({
+          role: 'assistant',
+          content: assistantReply
+        });
+
+
+        conversationHistory =
+          conversationHistory.slice(-20);
+
+
         addMessage(
           'assistant',
-          data.reply ||
-          'No response received.'
+          assistantReply
         );
 
 
@@ -3323,15 +3384,27 @@
       'click',
       () => {
 
+        /*
+          Start a completely new conversation.
+          This clears the browser-side context that will be
+          sent to the AI.
+        */
+
+        conversationHistory =
+          [];
+
+
         chatMessages.innerHTML =
           '';
 
         hideError();
 
+
         addMessage(
           'assistant',
           'Welcome to Artivo AI. Tell me about your space, project, design goal, or any architectural question you have.'
         );
+
 
         messageInput.focus();
 
