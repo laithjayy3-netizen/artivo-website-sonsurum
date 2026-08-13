@@ -1,3 +1,5 @@
+import { ARTIVO_SYSTEM_PROMPT } from "./artivo-personality.js";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -14,7 +16,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Keep only user/assistant messages and limit conversation size.
     const conversation = messages
       .filter(
         (item) =>
@@ -35,12 +36,6 @@ export default async function handler(req, res) {
       });
     }
 
-    const systemMessage = {
-      role: "system",
-      content:
-        "You are Artivo AI, the official AI assistant of Artivo, a platform focused on interior design, architecture, furniture, materials, lighting, spatial planning, and architectural visualization. Respond professionally, clearly, and helpfully. Maintain the context of the current conversation and use previous user and assistant messages when answering."
-    };
-
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -57,7 +52,10 @@ export default async function handler(req, res) {
           model: "nvidia/nemotron-3.5-lightning:free",
 
           messages: [
-            systemMessage,
+            {
+              role: "system",
+              content: ARTIVO_SYSTEM_PROMPT
+            },
             ...conversation
           ]
         })
