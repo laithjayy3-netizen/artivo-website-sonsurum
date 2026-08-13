@@ -6,28 +6,40 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://artivo.tr",
-        "X-Title": "Artivo"
-      },
-      body: JSON.stringify({
-        model: "nvidia/nemotron-3.5-lightning:free",
-        messages: [
-          {
-            role: "system",
-            content: "You are Artivo AI, an AI assistant specialized in interior design and architecture."
-          },
-          {
-            role: "user",
-            content: "Hello Artivo"
-          }
-        ]
-      })
-    });
+    const { message } = req.body || {};
+
+    if (!message || typeof message !== "string" || !message.trim()) {
+      return res.status(400).json({
+        error: "Message is required."
+      });
+    }
+
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://artivo.tr",
+          "X-Title": "Artivo"
+        },
+        body: JSON.stringify({
+          model: "nvidia/nemotron-3.5-lightning:free",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are Artivo AI, the official AI assistant of Artivo, a platform focused on interior design, architecture, furniture, materials, lighting, spatial planning, and architectural visualization. Respond professionally, clearly, and helpfully."
+            },
+            {
+              role: "user",
+              content: message.trim()
+            }
+          ]
+        })
+      }
+    );
 
     const data = await response.json();
 
@@ -39,7 +51,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      reply: data.choices?.[0]?.message?.content || "No response received."
+      reply: data?.choices?.[0]?.message?.content || "No response received."
     });
 
   } catch (error) {
