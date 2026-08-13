@@ -15,7 +15,7 @@ export default async function handler(req, res) {
         "X-Title": "Artivo"
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3.2-3b-instruct:free",
+        model: "nvidia/nemotron-3.5-lightning:free",
         messages: [
           {
             role: "system",
