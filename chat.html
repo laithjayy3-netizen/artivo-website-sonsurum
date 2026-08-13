@@ -1,0 +1,3354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Artivo AI | Architecture & Interior Design</title>
+
+  <!-- Same libraries used by Artivo -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Same fonts used by the existing website -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Same GSAP library used by the existing website -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <style>
+
+    /* =========================================================
+       ARTIVO GLOBAL SYSTEM
+       Same visual language as the existing website
+    ========================================================= */
+
+    :root {
+      --bg: #02030a;
+      --bg-deep: #05030d;
+      --surface: rgba(12, 10, 28, 0.72);
+      --surface-strong: rgba(14, 12, 32, 0.88);
+
+      --muted: #b8abc8;
+      --border: rgba(174, 140, 255, 0.18);
+
+      --accent: #8b5cf6;
+      --accent-light: #38bdf8;
+      --accent-pink: #f472b6;
+      --accent-warm: #fb7185;
+      --glow: #a78bfa;
+
+      --c1: #38bdf8;
+      --c2: #8b5cf6;
+      --c3: #f472b6;
+      --c4: #fb7185;
+
+      --gradient:
+        linear-gradient(
+          120deg,
+          #38bdf8 0%,
+          #8b5cf6 38%,
+          #f472b6 72%,
+          #fb7185 100%
+        );
+
+      --gradient-soft:
+        linear-gradient(
+          135deg,
+          rgba(56,189,248,.92),
+          rgba(139,92,246,.92) 45%,
+          rgba(244,114,182,.92)
+        );
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+
+      background:
+        radial-gradient(circle at 16% 12%, rgba(56,189,248,.10), transparent 26rem),
+        radial-gradient(circle at 84% 18%, rgba(244,114,182,.12), transparent 25rem),
+        radial-gradient(circle at 50% 88%, rgba(139,92,246,.12), transparent 30rem),
+        var(--bg);
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(
+        180deg,
+        var(--c1),
+        var(--c2),
+        var(--c3)
+      );
+      border-radius: 2px;
+    }
+
+    /* =========================================================
+       BACKGROUND
+    ========================================================= */
+
+    #bgCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .ambient-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+
+      background:
+        radial-gradient(
+          ellipse 70% 45% at 50% 0%,
+          rgba(56,189,248,0.10) 0%,
+          transparent 58%
+        ),
+        radial-gradient(
+          ellipse 44% 38% at 78% 20%,
+          rgba(244,114,182,0.08) 0%,
+          transparent 60%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(2,3,10,0.12),
+          rgba(2,3,10,0.38)
+        );
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* =========================================================
+       CUSTOM CURSOR
+    ========================================================= */
+
+    .custom-cursor {
+      width: 25px;
+      height: 25px;
+
+      border: 2px solid rgba(56,189,248,.92);
+      border-radius: 50%;
+
+      position: fixed;
+      pointer-events: none;
+
+      z-index: 9999;
+
+      transform: translate(-50%, -50%);
+
+      transition:
+        width .2s,
+        height .2s,
+        border-color .2s,
+        background-color .2s;
+
+      box-shadow:
+        0 0 16px rgba(56,189,248,.45),
+        0 0 34px rgba(244,114,182,.18);
+
+      mix-blend-mode: normal;
+    }
+
+    .custom-cursor.hover {
+      width: 40px;
+      height: 40px;
+
+      border-color: rgba(244,114,182,.94);
+
+      background: rgba(139,92,246,.10);
+
+      box-shadow:
+        0 0 22px rgba(56,189,248,.45),
+        0 0 46px rgba(244,114,182,.30);
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+
+      z-index: 100;
+
+      padding: 1.5rem 3rem;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      transition:
+        all .5s cubic-bezier(.16,1,.3,1);
+
+      isolation: isolate;
+    }
+
+    .header.scrolled {
+      background: rgba(2,3,10,.62);
+
+      backdrop-filter:
+        blur(18px)
+        saturate(140%);
+
+      -webkit-backdrop-filter:
+        blur(18px)
+        saturate(140%);
+
+      border-bottom:
+        1px solid rgba(174,140,255,.16);
+
+      box-shadow:
+        0 14px 40px rgba(0,0,0,.18);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+
+      cursor: pointer;
+
+      overflow: hidden;
+
+      font-family: 'Syne', sans-serif;
+
+      z-index: 102;
+
+      position: relative;
+
+      text-decoration: none;
+    }
+
+    .logo-main,
+    .logo-short {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent-light);
+    }
+
+    .logo-short {
+      margin-left: .25rem;
+      opacity: 1;
+
+      transition:
+        all .5s cubic-bezier(.16,1,.3,1);
+    }
+
+    .logo-full {
+      font-size: 1.5rem;
+      font-weight: 600;
+
+      color: rgba(255,255,255,.92);
+
+      margin-left: .25rem;
+
+      max-width: 0;
+      opacity: 0;
+
+      overflow: hidden;
+      white-space: nowrap;
+
+      transition:
+        all .5s cubic-bezier(.16,1,.3,1);
+    }
+
+    .logo:hover .logo-short {
+      opacity: 0;
+      max-width: 0;
+    }
+
+    .logo:hover .logo-full {
+      opacity: 1;
+      max-width: 200px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: .75rem;
+      font-weight: 500;
+
+      letter-spacing: .15em;
+
+      text-transform: uppercase;
+
+      color: rgba(184,171,200,.82);
+
+      text-decoration: none;
+
+      position: relative;
+
+      transition:
+        color .28s ease,
+        opacity .28s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+
+      position: absolute;
+
+      bottom: -4px;
+      left: 0;
+
+      width: 0;
+      height: 1px;
+
+      background: var(--gradient);
+
+      box-shadow:
+        0 0 16px rgba(56,189,248,.35);
+
+      transition: width .4s ease;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .lets-talk-btn {
+      font-size: .75rem;
+      font-weight: 600;
+
+      letter-spacing: .1em;
+
+      text-transform: uppercase;
+
+      color: #fff;
+
+      background: rgba(255,255,255,.035);
+
+      border:
+        1.5px solid rgba(56,189,248,.48);
+
+      border-radius: 30px;
+
+      padding: .5rem 1.5rem;
+
+      text-decoration: none;
+
+      transition: all .3s ease;
+
+      margin-left: 1rem;
+
+      backdrop-filter:
+        blur(14px)
+        saturate(130%);
+
+      -webkit-backdrop-filter:
+        blur(14px)
+        saturate(130%);
+
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.035) inset,
+        0 0 22px rgba(56,189,248,.12);
+    }
+
+    .lets-talk-btn:hover {
+      background: var(--gradient);
+
+      border-color: transparent;
+
+      box-shadow:
+        0 14px 45px rgba(139,92,246,.32),
+        0 0 36px rgba(56,189,248,.20);
+
+      transform:
+        translateY(-2px)
+        scale(1.03);
+    }
+
+    .menu-toggle {
+      display: none;
+
+      flex-direction: column;
+
+      gap: 6px;
+
+      cursor: pointer;
+
+      z-index: 10000;
+    }
+
+    .menu-toggle span {
+      width: 28px;
+      height: 1px;
+      background: #fff;
+    }
+
+    /* =========================================================
+       PAGE / CHAT HERO
+    ========================================================= */
+
+    .chat-page {
+      min-height: 100vh;
+
+      padding:
+        9rem
+        3rem
+        7rem;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      position: relative;
+
+      isolation: isolate;
+    }
+
+    .chat-page::before {
+      content: '';
+
+      position: absolute;
+
+      width: 55rem;
+      height: 30rem;
+
+      top: 13rem;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      background:
+        radial-gradient(
+          ellipse,
+          rgba(56,189,248,.08),
+          rgba(139,92,246,.07) 40%,
+          transparent 72%
+        );
+
+      filter: blur(30px);
+
+      z-index: -1;
+
+      pointer-events: none;
+    }
+
+    .chat-shell {
+      width: min(1180px, 100%);
+
+      position: relative;
+    }
+
+    .chat-heading {
+      text-align: center;
+
+      margin-bottom: 2.5rem;
+    }
+
+    .chat-label {
+      display: inline-block;
+
+      font-size: .625rem;
+
+      letter-spacing: .35em;
+
+      text-transform: uppercase;
+
+      color: var(--accent-light);
+
+      margin-bottom: 1.3rem;
+    }
+
+    .chat-title {
+      font-family: 'Syne', sans-serif;
+
+      font-size:
+        clamp(2.7rem, 6vw, 5.2rem);
+
+      font-weight: 300;
+
+      line-height: 1.05;
+
+      letter-spacing: -.05em;
+
+      text-shadow:
+        0 28px 90px rgba(0,0,0,.34);
+
+      margin-bottom: 1.25rem;
+    }
+
+    .chat-title span {
+      background: var(--gradient);
+
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      background-clip: text;
+    }
+
+    .chat-subtitle {
+      max-width: 640px;
+
+      margin: 0 auto;
+
+      color: rgba(184,171,200,.86);
+
+      line-height: 1.8;
+
+      font-size: .95rem;
+    }
+
+    /* =========================================================
+       CHAT CARD
+    ========================================================= */
+
+    .chat-card {
+      min-height: 650px;
+
+      display: grid;
+
+      grid-template-columns:
+        320px
+        minmax(0, 1fr);
+
+      overflow: hidden;
+
+      border:
+        1px solid rgba(174,140,255,.18);
+
+      border-radius: 28px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,.060),
+          rgba(255,255,255,.020)
+        );
+
+      backdrop-filter:
+        blur(18px)
+        saturate(135%);
+
+      -webkit-backdrop-filter:
+        blur(18px)
+        saturate(135%);
+
+      box-shadow:
+        0 24px 80px rgba(0,0,0,.24),
+        inset 0 1px 0 rgba(255,255,255,.05);
+
+      position: relative;
+    }
+
+    .chat-card::before {
+      content: '';
+
+      position: absolute;
+
+      inset: -1px;
+
+      border-radius: 29px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(56,189,248,.24),
+          rgba(139,92,246,.14),
+          rgba(244,114,182,.18),
+          rgba(251,113,133,.12)
+        );
+
+      opacity: .35;
+
+      filter: blur(1px);
+
+      pointer-events: none;
+
+      z-index: -1;
+    }
+
+    /* =========================================================
+       ASSISTANT INFO
+    ========================================================= */
+
+    .chat-side {
+      padding: 2rem;
+
+      border-right:
+        1px solid rgba(174,140,255,.12);
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(56,189,248,.025),
+          rgba(139,92,246,.035),
+          rgba(244,114,182,.025)
+        );
+    }
+
+    .assistant-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      margin-bottom: 2.5rem;
+    }
+
+    .assistant-orb {
+      width: 58px;
+      height: 58px;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-shrink: 0;
+
+      background: var(--gradient);
+
+      box-shadow:
+        0 14px 48px rgba(139,92,246,.32),
+        0 0 34px rgba(56,189,248,.18);
+    }
+
+    .assistant-orb svg {
+      width: 27px;
+      height: 27px;
+
+      color: #fff;
+    }
+
+    .assistant-name {
+      font-family: 'Syne', sans-serif;
+
+      font-size: 1.05rem;
+
+      font-weight: 600;
+    }
+
+    .assistant-status {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+
+      margin-top: .2rem;
+
+      color: rgba(184,171,200,.7);
+
+      font-size: .72rem;
+
+      text-transform: uppercase;
+
+      letter-spacing: .14em;
+    }
+
+    .assistant-status-dot {
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: #4ade80;
+
+      box-shadow:
+        0 0 12px rgba(74,222,128,.7);
+    }
+
+    .side-title {
+      font-family: 'Syne', sans-serif;
+
+      font-size: .72rem;
+
+      letter-spacing: .2em;
+
+      text-transform: uppercase;
+
+      color: var(--accent-light);
+
+      margin-bottom: 1rem;
+    }
+
+    .side-description {
+      color: rgba(184,171,200,.78);
+
+      font-size: .86rem;
+
+      line-height: 1.8;
+
+      margin-bottom: 2rem;
+    }
+
+    .expertise-list {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: .75rem;
+    }
+
+    .expertise-item {
+      display: flex;
+      align-items: center;
+
+      gap: .7rem;
+
+      padding: .75rem .8rem;
+
+      border:
+        1px solid rgba(174,140,255,.11);
+
+      border-radius: 13px;
+
+      background:
+        rgba(255,255,255,.025);
+
+      color: rgba(230,224,239,.82);
+
+      font-size: .76rem;
+    }
+
+    .expertise-item svg {
+      width: 16px;
+      height: 16px;
+
+      color: var(--accent-light);
+
+      flex-shrink: 0;
+    }
+
+    .side-note {
+      margin-top: 2rem;
+
+      padding-top: 1.4rem;
+
+      border-top:
+        1px solid rgba(174,140,255,.11);
+
+      color: rgba(184,171,200,.60);
+
+      font-size: .72rem;
+
+      line-height: 1.7;
+    }
+
+    /* =========================================================
+       CHAT MAIN
+    ========================================================= */
+
+    .chat-main {
+      min-width: 0;
+
+      display: flex;
+
+      flex-direction: column;
+
+      background:
+        rgba(2,3,10,.18);
+    }
+
+    .chat-topbar {
+      min-height: 78px;
+
+      padding:
+        1.2rem 1.5rem;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      border-bottom:
+        1px solid rgba(174,140,255,.11);
+    }
+
+    .chat-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .topbar-icon {
+      width: 38px;
+      height: 38px;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        rgba(255,255,255,.035);
+
+      border:
+        1px solid rgba(174,140,255,.15);
+    }
+
+    .topbar-icon svg {
+      width: 18px;
+      height: 18px;
+
+      color: var(--accent-light);
+    }
+
+    .topbar-title {
+      font-family: 'Syne', sans-serif;
+
+      font-size: .92rem;
+    }
+
+    .topbar-caption {
+      color: rgba(184,171,200,.60);
+
+      font-size: .69rem;
+
+      margin-top: .15rem;
+    }
+
+    .new-chat-btn {
+      background: transparent;
+
+      border:
+        1px solid rgba(174,140,255,.16);
+
+      color: rgba(184,171,200,.75);
+
+      border-radius: 999px;
+
+      padding: .55rem .9rem;
+
+      font-size: .68rem;
+
+      letter-spacing: .08em;
+
+      text-transform: uppercase;
+
+      transition: all .25s ease;
+    }
+
+    .new-chat-btn:hover {
+      color: #fff;
+
+      border-color:
+        rgba(56,189,248,.42);
+
+      background:
+        rgba(56,189,248,.07);
+
+      box-shadow:
+        0 0 22px rgba(56,189,248,.12);
+    }
+
+    /* =========================================================
+       MESSAGES
+    ========================================================= */
+
+    .chat-messages {
+      flex: 1;
+
+      min-height: 0;
+
+      overflow-y: auto;
+
+      padding: 1.5rem;
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 1rem;
+    }
+
+    .message-row {
+      display: flex;
+
+      width: 100%;
+    }
+
+    .message-row.assistant {
+      justify-content: flex-start;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .message {
+      max-width: min(760px, 82%);
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: .4rem;
+    }
+
+    .message-author {
+      font-size: .63rem;
+
+      letter-spacing: .12em;
+
+      text-transform: uppercase;
+
+      color: rgba(184,171,200,.58);
+    }
+
+    .message-row.user .message-author {
+      text-align: right;
+    }
+
+    .message-bubble {
+      padding:
+        .95rem 1.05rem;
+
+      border-radius: 18px;
+
+      font-size: .86rem;
+
+      line-height: 1.75;
+
+      white-space: pre-wrap;
+
+      word-break: break-word;
+    }
+
+    .message-row.assistant .message-bubble {
+      color: rgba(245,241,250,.92);
+
+      background:
+        rgba(255,255,255,.045);
+
+      border:
+        1px solid rgba(174,140,255,.15);
+
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025);
+    }
+
+    .message-row.user .message-bubble {
+      color: #fff;
+
+      background: var(--gradient);
+
+      border:
+        1px solid rgba(255,255,255,.12);
+
+      box-shadow:
+        0 14px 48px rgba(139,92,246,.22),
+        0 0 28px rgba(56,189,248,.10);
+    }
+
+    .message-time {
+      font-size: .60rem;
+
+      color: rgba(184,171,200,.46);
+    }
+
+    .message-row.user .message-time {
+      text-align: right;
+    }
+
+    /* =========================================================
+       TYPING INDICATOR
+    ========================================================= */
+
+    .typing-indicator {
+      display: none;
+
+      align-items: center;
+
+      gap: 5px;
+
+      padding:
+        .8rem 1rem;
+
+      width: max-content;
+
+      border-radius: 16px;
+
+      background:
+        rgba(255,255,255,.045);
+
+      border:
+        1px solid rgba(174,140,255,.15);
+    }
+
+    .typing-indicator.active {
+      display: flex;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+
+      border-radius: 50%;
+
+      background: var(--accent-light);
+
+      animation:
+        typingPulse 1.2s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: .16s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: .32s;
+    }
+
+    @keyframes typingPulse {
+      0%, 60%, 100% {
+        opacity: .28;
+        transform: translateY(0);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translateY(-3px);
+      }
+    }
+
+    /* =========================================================
+       INPUT
+    ========================================================= */
+
+    .chat-input-area {
+      padding:
+        1rem 1.1rem 1.15rem;
+
+      border-top:
+        1px solid rgba(174,140,255,.11);
+    }
+
+    .chat-input-box {
+      position: relative;
+
+      display: flex;
+
+      align-items: flex-end;
+
+      gap: .7rem;
+
+      padding:
+        .65rem;
+
+      border:
+        1px solid rgba(174,140,255,.15);
+
+      border-radius: 20px;
+
+      background:
+        rgba(255,255,255,.035);
+
+      transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+    }
+
+    .chat-input-box:focus-within {
+      border-color:
+        rgba(56,189,248,.38);
+
+      box-shadow:
+        0 0 0 3px rgba(56,189,248,.045),
+        0 0 30px rgba(139,92,246,.10);
+    }
+
+    #messageInput {
+      flex: 1;
+
+      min-height: 48px;
+      max-height: 150px;
+
+      padding:
+        .8rem .9rem;
+
+      resize: none;
+
+      border: none;
+      outline: none;
+
+      background: transparent;
+
+      color: #fff;
+
+      font-family: 'Inter', sans-serif;
+
+      font-size: .86rem;
+
+      line-height: 1.55;
+    }
+
+    #messageInput::placeholder {
+      color: rgba(184,171,200,.46);
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+
+      border: none;
+
+      border-radius: 15px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: var(--gradient);
+
+      color: #fff;
+
+      flex-shrink: 0;
+
+      transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        opacity .25s ease;
+    }
+
+    .send-btn:hover {
+      transform:
+        translateY(-2px)
+        scale(1.04);
+
+      box-shadow:
+        0 12px 35px rgba(139,92,246,.34),
+        0 0 25px rgba(56,189,248,.16);
+    }
+
+    .send-btn:disabled {
+      opacity: .45;
+
+      transform: none;
+
+      box-shadow: none;
+    }
+
+    .send-btn svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .input-hint {
+      margin-top: .6rem;
+
+      text-align: center;
+
+      font-size: .63rem;
+
+      color: rgba(184,171,200,.40);
+    }
+
+    /* =========================================================
+       ERROR MESSAGE
+    ========================================================= */
+
+    .error-note {
+      display: none;
+
+      margin:
+        0 1.5rem 1rem;
+
+      padding: .8rem 1rem;
+
+      border:
+        1px solid rgba(251,113,133,.28);
+
+      background:
+        rgba(251,113,133,.06);
+
+      color:
+        rgba(255,190,202,.92);
+
+      border-radius: 14px;
+
+      font-size: .72rem;
+
+      line-height: 1.6;
+    }
+
+    .error-note.active {
+      display: block;
+    }
+
+    /* =========================================================
+       FOOTER
+       Same structure/style as the existing site
+    ========================================================= */
+
+    .footer {
+      position: relative;
+
+      background:
+        radial-gradient(
+          circle at 18% 0%,
+          rgba(56,189,248,.10),
+          transparent 28rem
+        ),
+        radial-gradient(
+          circle at 84% 22%,
+          rgba(244,114,182,.08),
+          transparent 26rem
+        ),
+        rgba(5,3,13,.96);
+
+      border-top:
+        1px solid rgba(174,140,255,.16);
+
+      padding:
+        6rem 4rem 2rem;
+    }
+
+    .footer::before {
+      content: '';
+
+      position: absolute;
+
+      top: -1px;
+
+      left: 4rem;
+      right: 4rem;
+
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(56,189,248,.45),
+          rgba(244,114,182,.38),
+          transparent
+        );
+
+      pointer-events: none;
+    }
+
+    .footer-content {
+      display: grid;
+
+      grid-template-columns:
+        2fr 1fr 1fr 1fr;
+
+      gap: 4rem;
+
+      margin-bottom: 4rem;
+    }
+
+    .footer-brand p {
+      color:
+        rgba(184,171,200,.86);
+
+      font-size: .875rem;
+
+      margin-top: 1.5rem;
+
+      max-width: 300px;
+
+      line-height: 1.7;
+    }
+
+    .footer-title {
+      font-size: .625rem;
+
+      letter-spacing: .2em;
+
+      text-transform: uppercase;
+
+      color: var(--accent-light);
+
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-links {
+      list-style: none;
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: .75rem;
+    }
+
+    .footer-links a {
+      color:
+        rgba(184,171,200,.86);
+
+      text-decoration: none;
+
+      font-size: .875rem;
+
+      transition:
+        color .3s ease;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+
+    .footer-contact .social-links {
+      display: flex;
+
+      gap: 1rem;
+
+      margin-top: 1rem;
+    }
+
+    .footer-contact .social-links a {
+      width: 36px;
+      height: 36px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      border:
+        1px solid rgba(174,140,255,.18);
+
+      border-radius: 999px;
+
+      color:
+        rgba(184,171,200,.86);
+
+      background:
+        rgba(255,255,255,.025);
+
+      transition: all .3s ease;
+    }
+
+    .footer-contact .social-links a:hover {
+      color: var(--accent-light);
+
+      border-color:
+        rgba(56,189,248,.42);
+
+      background:
+        rgba(56,189,248,.08);
+
+      box-shadow:
+        0 0 24px rgba(56,189,248,.14);
+
+      transform:
+        translateY(-2px);
+    }
+
+    .footer-bottom {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      padding-top: 2rem;
+
+      border-top:
+        1px solid rgba(174,140,255,.18);
+    }
+
+    .footer-copyright {
+      font-size: .75rem;
+
+      color:
+        rgba(184,171,200,.86);
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 1024px) {
+      .chat-card {
+        grid-template-columns: 280px minmax(0, 1fr);
+      }
+
+      .chat-side {
+        padding: 1.5rem;
+      }
+
+      .chat-page {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+
+      .header {
+        padding: 1rem 1.5rem;
+      }
+
+      .nav-links {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 100vw;
+        height: 100vh;
+
+        background-color: #040006;
+
+        z-index: 9999;
+
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 2rem;
+
+        opacity: 0;
+        visibility: hidden;
+
+        transition:
+          opacity .4s ease,
+          visibility .4s ease;
+      }
+
+      .nav-links.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .nav-link {
+        font-size: 1.5rem;
+      }
+
+      .lets-talk-btn {
+        margin-left: 0;
+
+        margin-top: 1rem;
+
+        font-size: 1rem;
+
+        padding:
+          .7rem 2rem;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .custom-cursor {
+        display: none;
+      }
+
+      * {
+        cursor: auto;
+      }
+
+      .chat-page {
+        padding:
+          8rem 1rem 4rem;
+      }
+
+      .chat-heading {
+        margin-bottom: 1.8rem;
+      }
+
+      .chat-title {
+        font-size:
+          clamp(2.4rem, 13vw, 4rem);
+      }
+
+      .chat-subtitle {
+        font-size: .82rem;
+
+        padding: 0 .75rem;
+      }
+
+      .chat-card {
+        display: block;
+
+        min-height: auto;
+
+        border-radius: 22px;
+      }
+
+      .chat-side {
+        display: none;
+      }
+
+      .chat-main {
+        min-height: 650px;
+      }
+
+      .chat-topbar {
+        padding:
+          1rem;
+      }
+
+      .chat-messages {
+        padding:
+          1rem;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+
+      .chat-input-area {
+        padding:
+          .8rem;
+      }
+
+      .input-hint {
+        line-height: 1.5;
+      }
+
+      .footer {
+        padding:
+          4rem 1.5rem 2rem;
+      }
+
+      .footer::before {
+        left: 1.5rem;
+        right: 1.5rem;
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+
+        gap: 2rem;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+
+        gap: 1.5rem;
+
+        text-align: center;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Custom cursor -->
+  <div class="custom-cursor" id="customCursor"></div>
+
+  <!-- Background -->
+  <canvas id="bgCanvas"></canvas>
+  <div class="ambient-overlay"></div>
+
+  <div class="content-wrapper">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header" id="header">
+
+      <a href="index.html" class="logo" id="logo">
+        <span class="logo-main">Artivo</span>
+        <span class="logo-short">A.</span>
+        <span class="logo-full">Architecture</span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+
+        <a href="index.html" class="nav-link">
+          Home
+        </a>
+
+        <a href="projects.html" class="nav-link">
+          Projects
+        </a>
+
+        <a href="about.html" class="nav-link">
+          About
+        </a>
+
+        <a href="contact.html" class="nav-link">
+          Contact
+        </a>
+
+        <a
+          href="https://wa.me/905424318166"
+          class="lets-talk-btn"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Let's Talk
+        </a>
+
+      </nav>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Toggle menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+    </header>
+
+
+    <!-- =====================================================
+         CHAT PAGE
+    ====================================================== -->
+
+    <main class="chat-page">
+
+      <div class="chat-shell">
+
+        <!-- Heading -->
+
+        <div class="chat-heading">
+
+          <span class="chat-label">
+            Artivo Intelligence
+          </span>
+
+          <h1 class="chat-title">
+            Talk with <span>Artivo AI</span>
+          </h1>
+
+          <p class="chat-subtitle">
+            A dedicated AI assistant for architecture, interior design,
+            spatial planning, materials, lighting, furniture and
+            architectural visualization.
+          </p>
+
+        </div>
+
+
+        <!-- Chat Card -->
+
+        <section class="chat-card">
+
+          <!-- =================================================
+               LEFT SIDE
+          ================================================== -->
+
+          <aside class="chat-side">
+
+            <div class="assistant-profile">
+
+              <div class="assistant-orb">
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                >
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M5 20v-2a7 7 0 0 1 14 0v2"></path>
+                </svg>
+
+              </div>
+
+              <div>
+
+                <div class="assistant-name">
+                  Artivo AI
+                </div>
+
+                <div class="assistant-status">
+
+                  <span class="assistant-status-dot"></span>
+
+                  Online
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="side-title">
+              About Artivo AI
+            </div>
+
+            <p class="side-description">
+              Artivo AI is the intelligent assistant inside Artivo.
+              It is designed to help with design decisions,
+              architectural thinking and interior design ideas.
+            </p>
+
+
+            <div class="side-title">
+              Specialized In
+            </div>
+
+            <div class="expertise-list">
+
+              <div class="expertise-item">
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                >
+                  <path d="M3 21h18"></path>
+                  <path d="M5 21V8l7-5 7 5v13"></path>
+                  <path d="M9 21v-6h6v6"></path>
+                </svg>
+
+                Architecture
+
+              </div>
+
+
+              <div class="expertise-item">
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                >
+                  <rect
+                    x="4"
+                    y="4"
+                    width="16"
+                    height="16"
+                    rx="2"
+                  ></rect>
+                  <path d="M8 16l3-3 2 2 3-4"></path>
+                </svg>
+
+                Interior Design
+
+              </div>
+
+
+              <div class="expertise-item">
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                >
+                  <path d="M4 20V10"></path>
+                  <path d="M10 20V4"></path>
+                  <path d="M16 20v-7"></path>
+                  <path d="M22 20H2"></path>
+                </svg>
+
+                Space Planning
+
+              </div>
+
+
+              <div class="expertise-item">
+
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                >
+                  <circle cx="12" cy="12" r="8"></circle>
+                  <path d="M12 8v8"></path>
+                  <path d="M8 12h8"></path>
+                </svg>
+
+                Materials & Lighting
+
+              </div>
+
+            </div>
+
+
+            <div class="side-note">
+              Artivo AI is continuously evolving. Its knowledge,
+              personality and design methodology will be expanded
+              as we build the Artivo intelligence system.
+            </div>
+
+          </aside>
+
+
+          <!-- =================================================
+               CHAT MAIN
+          ================================================== -->
+
+          <div class="chat-main">
+
+            <!-- Top bar -->
+
+            <div class="chat-topbar">
+
+              <div class="chat-topbar-left">
+
+                <div class="topbar-icon">
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+
+                </div>
+
+                <div>
+
+                  <div class="topbar-title">
+                    Artivo Assistant
+                  </div>
+
+                  <div class="topbar-caption">
+                    Ask anything about your design
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <button
+                type="button"
+                class="new-chat-btn"
+                id="newChatBtn"
+              >
+                New Chat
+              </button>
+
+            </div>
+
+
+            <!-- Messages -->
+
+            <div
+              class="chat-messages"
+              id="chatMessages"
+            ></div>
+
+
+            <!-- Error -->
+
+            <div
+              class="error-note"
+              id="errorNote"
+            ></div>
+
+
+            <!-- Input -->
+
+            <div class="chat-input-area">
+
+              <form
+                class="chat-input-box"
+                id="chatForm"
+              >
+
+                <textarea
+                  id="messageInput"
+                  rows="1"
+                  maxlength="4000"
+                  placeholder="Ask Artivo about architecture, interiors, materials, lighting..."
+                  aria-label="Message Artivo AI"
+                ></textarea>
+
+
+                <button
+                  type="submit"
+                  class="send-btn"
+                  id="sendBtn"
+                  aria-label="Send message"
+                >
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path d="M22 2L11 13"></path>
+                    <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+                  </svg>
+
+                </button>
+
+              </form>
+
+
+              <div class="input-hint">
+                Press Enter to send · Shift + Enter for a new line
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+      <div class="footer-content">
+
+        <div class="footer-brand">
+
+          <a
+            href="index.html"
+            class="logo"
+            style="font-size:1.5rem;"
+          >
+            <span class="logo-main">Artivo</span>
+            <span
+              class="logo-full"
+              style="color:var(--muted);"
+            >
+              Architecture
+            </span>
+          </a>
+
+          <p>
+            Creating spaces that inspire, transform, and endure.
+            Architecture for those who see beyond walls.
+          </p>
+
+        </div>
+
+
+        <div>
+
+          <h4 class="footer-title">
+            Navigation
+          </h4>
+
+          <ul class="footer-links">
+
+            <li>
+              <a href="index.html">
+                Home
+              </a>
+            </li>
+
+            <li>
+              <a href="projects.html">
+                Projects
+              </a>
+            </li>
+
+            <li>
+              <a href="about.html">
+                About
+              </a>
+            </li>
+
+            <li>
+              <a href="contact.html">
+                Contact
+              </a>
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <div>
+
+          <h4 class="footer-title">
+            Services
+          </h4>
+
+          <ul class="footer-links">
+
+            <li>
+              <a href="#">
+                Architecture
+              </a>
+            </li>
+
+            <li>
+              <a href="#">
+                Interior Design
+              </a>
+            </li>
+
+            <li>
+              <a href="#">
+                Renovation
+              </a>
+            </li>
+
+            <li>
+              <a href="#">
+                Consulting
+              </a>
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <div class="footer-contact">
+
+          <h4 class="footer-title">
+            Contact
+          </h4>
+
+          <ul class="footer-links">
+
+            <li>
+              <a href="https://wa.me/905424318166">
+                +90 542 431 81 66
+              </a>
+            </li>
+
+            <li>
+              <a href="mailto:info@artivo.tr">
+                info@artivo.tr
+              </a>
+            </li>
+
+            <li>
+              Istanbul, Beylikduzu
+            </li>
+
+          </ul>
+
+
+          <div class="social-links">
+
+            <a
+              href="https://www.facebook.com/artivo.pro"
+              aria-label="Facebook"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+              </svg>
+            </a>
+
+
+            <a
+              href="https://www.instagram.com/artivo.design/"
+              aria-label="Instagram"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <rect
+                  x="2"
+                  y="2"
+                  width="20"
+                  height="20"
+                  rx="5"
+                ></rect>
+
+                <path
+                  d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+                ></path>
+              </svg>
+            </a>
+
+
+            <a
+              href="https://www.behance.net/artivotr"
+              aria-label="Behance"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path d="M1 12h6.5a3.5 3.5 0 0 0 0-7H1v14h7a4 4 0 0 0 0-8"></path>
+                <path d="M15 7h6M15 19h2.5a4.5 4.5 0 1 0 0-9H15v9z"></path>
+              </svg>
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="footer-bottom">
+
+        <span class="footer-copyright">
+          2026 Artivo Architecture. All rights reserved.
+        </span>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+
+  <!-- =======================================================
+       JAVASCRIPT
+  ======================================================== -->
+
+  <script>
+
+    /* =========================================================
+       CUSTOM CURSOR
+    ========================================================= */
+
+    const cursor =
+      document.getElementById('customCursor');
+
+    document.addEventListener('mousemove', (e) => {
+
+      cursor.style.left =
+        e.clientX + 'px';
+
+      cursor.style.top =
+        e.clientY + 'px';
+
+    });
+
+
+    document
+      .querySelectorAll(
+        'a, button, textarea, .chat-input-box, .expertise-item'
+      )
+      .forEach((el) => {
+
+        el.addEventListener(
+          'mouseenter',
+          () => cursor.classList.add('hover')
+        );
+
+        el.addEventListener(
+          'mouseleave',
+          () => cursor.classList.remove('hover')
+        );
+
+      });
+
+
+    /* =========================================================
+       BACKGROUND CANVAS
+       Same particle system used by Artivo
+    ========================================================= */
+
+    const canvas =
+      document.getElementById("bgCanvas");
+
+    const ctx =
+      canvas.getContext("2d");
+
+
+    function resizeCanvas() {
+
+      canvas.width =
+        window.innerWidth;
+
+      canvas.height =
+        window.innerHeight;
+
+    }
+
+
+    resizeCanvas();
+
+    window.addEventListener(
+      "resize",
+      resizeCanvas
+    );
+
+
+    const pointer = {
+      x: null,
+      y: null,
+      active: false
+    };
+
+
+    let lastInteraction =
+      Date.now();
+
+
+    const ripples = [];
+
+
+    document.addEventListener(
+      "mousemove",
+      e => {
+
+        pointer.x =
+          e.clientX;
+
+        pointer.y =
+          e.clientY;
+
+        pointer.active =
+          true;
+
+        lastInteraction =
+          Date.now();
+
+      }
+    );
+
+
+    document.addEventListener(
+      "mouseleave",
+      () => pointer.active = false
+    );
+
+
+    document.addEventListener(
+      "mousedown",
+      e => {
+
+        createRipple(
+          e.clientX,
+          e.clientY
+        );
+
+        lastInteraction =
+          Date.now();
+
+      }
+    );
+
+
+    document.addEventListener(
+      "touchmove",
+      e => {
+
+        pointer.x =
+          e.touches[0].clientX;
+
+        pointer.y =
+          e.touches[0].clientY;
+
+        pointer.active =
+          true;
+
+        lastInteraction =
+          Date.now();
+
+      },
+      { passive: true }
+    );
+
+
+    document.addEventListener(
+      "touchstart",
+      e => {
+
+        createRipple(
+          e.touches[0].clientX,
+          e.touches[0].clientY
+        );
+
+        lastInteraction =
+          Date.now();
+
+      }
+    );
+
+
+    document.addEventListener(
+      "touchend",
+      () => pointer.active = false
+    );
+
+
+    window.addEventListener(
+      "scroll",
+      () => {
+
+        createRipple(
+          window.innerWidth / 2,
+          window.innerHeight / 2
+        );
+
+        lastInteraction =
+          Date.now();
+
+      }
+    );
+
+
+    function createRipple(x, y) {
+
+      ripples.push({
+        x,
+        y,
+        r: 0,
+        alpha: 0.5
+      });
+
+    }
+
+
+    const particles = [];
+
+    const COUNT =
+      window.innerWidth < 768
+        ? 60
+        : 100;
+
+    const MAX_DIST = 130;
+
+    const FORCE_RADIUS = 150;
+
+
+    for (
+      let i = 0;
+      i < COUNT;
+      i++
+    ) {
+
+      particles.push({
+
+        x:
+          Math.random() *
+          canvas.width,
+
+        y:
+          Math.random() *
+          canvas.height,
+
+        vx:
+          (Math.random() - 0.5) *
+          0.3,
+
+        vy:
+          (Math.random() - 0.5) *
+          0.3
+
+      });
+
+    }
+
+
+    function animateCanvas() {
+
+      ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+
+      const bgGradient =
+        ctx.createRadialGradient(
+          canvas.width / 2,
+          0,
+          0,
+          canvas.width / 2,
+          0,
+          canvas.height
+        );
+
+
+      bgGradient.addColorStop(
+        0,
+        '#101a3d'
+      );
+
+      bgGradient.addColorStop(
+        0.46,
+        '#090416'
+      );
+
+      bgGradient.addColorStop(
+        1,
+        '#02030a'
+      );
+
+
+      ctx.fillStyle =
+        bgGradient;
+
+      ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+
+      const idle =
+        Date.now() -
+        lastInteraction >
+        3500;
+
+
+      const activity =
+        idle
+          ? 0.35
+          : 1;
+
+
+      particles.forEach(p => {
+
+        if (
+          pointer.active &&
+          !idle
+        ) {
+
+          const dx =
+            p.x -
+            pointer.x;
+
+          const dy =
+            p.y -
+            pointer.y;
+
+          const dist =
+            Math.sqrt(
+              dx * dx +
+              dy * dy
+            );
+
+
+          if (
+            dist <
+              FORCE_RADIUS &&
+            dist > 1
+          ) {
+
+            const force =
+              (
+                FORCE_RADIUS -
+                dist
+              ) /
+              FORCE_RADIUS;
+
+
+            p.vx +=
+              dx /
+              dist *
+              force *
+              0.38;
+
+            p.vy +=
+              dy /
+              dist *
+              force *
+              0.38;
+
+          }
+
+        }
+
+
+        p.x +=
+          p.vx *
+          activity;
+
+        p.y +=
+          p.vy *
+          activity;
+
+        p.vx *=
+          0.96;
+
+        p.vy *=
+          0.96;
+
+
+        if (
+          p.x < 0 ||
+          p.x > canvas.width
+        ) {
+
+          p.vx *= -1;
+
+        }
+
+
+        if (
+          p.y < 0 ||
+          p.y > canvas.height
+        ) {
+
+          p.vy *= -1;
+
+        }
+
+      });
+
+
+      for (
+        let i = 0;
+        i < COUNT;
+        i++
+      ) {
+
+        for (
+          let j = i + 1;
+          j < COUNT;
+          j++
+        ) {
+
+          const dx =
+            particles[i].x -
+            particles[j].x;
+
+          const dy =
+            particles[i].y -
+            particles[j].y;
+
+          const dist =
+            Math.sqrt(
+              dx * dx +
+              dy * dy
+            );
+
+
+          if (
+            dist <
+            MAX_DIST
+          ) {
+
+            let alpha =
+              1 -
+              dist /
+              MAX_DIST;
+
+
+            if (
+              pointer.active &&
+              !idle
+            ) {
+
+              const mx =
+                (
+                  particles[i].x +
+                  particles[j].x
+                ) / 2 -
+                pointer.x;
+
+
+              const my =
+                (
+                  particles[i].y +
+                  particles[j].y
+                ) / 2 -
+                pointer.y;
+
+
+              const md =
+                Math.sqrt(
+                  mx * mx +
+                  my * my
+                );
+
+
+              alpha +=
+                Math.max(
+                  0,
+                  1 -
+                  md /
+                  200
+                ) *
+                0.6;
+
+            }
+
+
+            ripples.forEach(r => {
+
+              const rd =
+                Math.abs(
+                  Math.sqrt(
+                    (
+                      particles[i].x -
+                      r.x
+                    ) ** 2 +
+                    (
+                      particles[i].y -
+                      r.y
+                    ) ** 2
+                  ) -
+                  r.r
+                );
+
+
+              if (
+                rd < 18
+              ) {
+
+                alpha +=
+                  0.35;
+
+              }
+
+            });
+
+
+            ctx.strokeStyle =
+              `rgba(
+                125,
+                92,
+                255,
+                ${Math.min(
+                  alpha * 0.28,
+                  0.34
+                )}
+              )`;
+
+
+            ctx.lineWidth =
+              0.55;
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+              particles[i].x,
+              particles[i].y
+            );
+
+            ctx.lineTo(
+              particles[j].x,
+              particles[j].y
+            );
+
+            ctx.stroke();
+
+          }
+
+        }
+
+      }
+
+
+      particles.forEach(
+        (p, idx) => {
+
+          const palette = [
+            'rgba(56,189,248,.72)',
+            'rgba(167,139,250,.72)',
+            'rgba(244,114,182,.62)'
+          ];
+
+
+          ctx.fillStyle =
+            palette[
+              idx %
+              palette.length
+            ];
+
+
+          ctx.beginPath();
+
+          ctx.arc(
+            p.x,
+            p.y,
+            1.25,
+            0,
+            Math.PI * 2
+          );
+
+          ctx.fill();
+
+        }
+      );
+
+
+      for (
+        let i =
+          ripples.length - 1;
+        i >= 0;
+        i--
+      ) {
+
+        const r =
+          ripples[i];
+
+        r.r += 3.5;
+
+        r.alpha -= 0.015;
+
+
+        ctx.strokeStyle =
+          `rgba(
+            56,
+            189,
+            248,
+            ${r.alpha * 0.5}
+          )`;
+
+
+        ctx.lineWidth =
+          1.2;
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+          r.x,
+          r.y,
+          r.r,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.stroke();
+
+
+        if (
+          r.alpha <= 0
+        ) {
+
+          ripples.splice(
+            i,
+            1
+          );
+
+        }
+
+      }
+
+
+      requestAnimationFrame(
+        animateCanvas
+      );
+
+    }
+
+
+    animateCanvas();
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    const header =
+      document.getElementById('header');
+
+    const toggle =
+      document.getElementById('menuToggle');
+
+    const navLinks =
+      document.getElementById('navLinks');
+
+
+    toggle.addEventListener(
+      'click',
+      (e) => {
+
+        e.stopPropagation();
+
+        navLinks.classList.toggle(
+          'active'
+        );
+
+      }
+    );
+
+
+    window.addEventListener(
+      'scroll',
+      () => {
+
+        if (
+          window.scrollY > 100
+        ) {
+
+          header.classList.add(
+            'scrolled'
+          );
+
+        } else {
+
+          header.classList.remove(
+            'scrolled'
+          );
+
+        }
+
+
+        if (
+          window.innerWidth <= 768 &&
+          navLinks.classList.contains('active')
+        ) {
+
+          navLinks.classList.remove(
+            'active'
+          );
+
+        }
+
+      }
+    );
+
+
+    document
+      .querySelectorAll(
+        '.nav-links a'
+      )
+      .forEach(link => {
+
+        link.addEventListener(
+          'click',
+          () => {
+
+            if (
+              window.innerWidth <= 768
+            ) {
+
+              navLinks.classList.remove(
+                'active'
+              );
+
+            }
+
+          }
+        );
+
+      });
+
+
+    /* =========================================================
+       ARTIVO CHAT
+    ========================================================= */
+
+    const chatForm =
+      document.getElementById(
+        'chatForm'
+      );
+
+    const messageInput =
+      document.getElementById(
+        'messageInput'
+      );
+
+    const sendBtn =
+      document.getElementById(
+        'sendBtn'
+      );
+
+    const chatMessages =
+      document.getElementById(
+        'chatMessages'
+      );
+
+    const newChatBtn =
+      document.getElementById(
+        'newChatBtn'
+      );
+
+    const errorNote =
+      document.getElementById(
+        'errorNote'
+      );
+
+
+    let isSending = false;
+
+
+    function escapeHtml(text) {
+
+      const div =
+        document.createElement(
+          'div'
+        );
+
+      div.textContent = text;
+
+      return div.innerHTML;
+
+    }
+
+
+    function getTime() {
+
+      return new Date()
+        .toLocaleTimeString(
+          [],
+          {
+            hour: '2-digit',
+            minute: '2-digit'
+          }
+        );
+
+    }
+
+
+    function addMessage(
+      role,
+      text
+    ) {
+
+      const row =
+        document.createElement(
+          'div'
+        );
+
+
+      row.className =
+        `message-row ${role}`;
+
+
+      const message =
+        document.createElement(
+          'div'
+        );
+
+
+      message.className =
+        'message';
+
+
+      const author =
+        document.createElement(
+          'div'
+        );
+
+
+      author.className =
+        'message-author';
+
+
+      author.textContent =
+        role === 'assistant'
+          ? 'Artivo AI'
+          : 'You';
+
+
+      const bubble =
+        document.createElement(
+          'div'
+        );
+
+
+      bubble.className =
+        'message-bubble';
+
+
+      bubble.innerHTML =
+        escapeHtml(text);
+
+
+      const time =
+        document.createElement(
+          'div'
+        );
+
+
+      time.className =
+        'message-time';
+
+
+      time.textContent =
+        getTime();
+
+
+      message.appendChild(
+        author
+      );
+
+      message.appendChild(
+        bubble
+      );
+
+      message.appendChild(
+        time
+      );
+
+      row.appendChild(
+        message
+      );
+
+
+      chatMessages.appendChild(
+        row
+      );
+
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+    }
+
+
+    function showTyping() {
+
+      const row =
+        document.createElement(
+          'div'
+        );
+
+
+      row.className =
+        'message-row assistant';
+
+
+      row.id =
+        'typingRow';
+
+
+      const message =
+        document.createElement(
+          'div'
+        );
+
+
+      message.className =
+        'message';
+
+
+      const author =
+        document.createElement(
+          'div'
+        );
+
+
+      author.className =
+        'message-author';
+
+
+      author.textContent =
+        'Artivo AI';
+
+
+      const typing =
+        document.createElement(
+          'div'
+        );
+
+
+      typing.className =
+        'typing-indicator active';
+
+
+      typing.innerHTML = `
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      `;
+
+
+      message.appendChild(
+        author
+      );
+
+      message.appendChild(
+        typing
+      );
+
+      row.appendChild(
+        message
+      );
+
+
+      chatMessages.appendChild(
+        row
+      );
+
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+    }
+
+
+    function removeTyping() {
+
+      const typing =
+        document.getElementById(
+          'typingRow'
+        );
+
+
+      if (typing) {
+
+        typing.remove();
+
+      }
+
+    }
+
+
+    function showError(text) {
+
+      errorNote.textContent =
+        text;
+
+      errorNote.classList.add(
+        'active'
+      );
+
+    }
+
+
+    function hideError() {
+
+      errorNote.classList.remove(
+        'active'
+      );
+
+      errorNote.textContent =
+        '';
+
+    }
+
+
+    function setSending(state) {
+
+      isSending =
+        state;
+
+      sendBtn.disabled =
+        state;
+
+      messageInput.disabled =
+        state;
+
+    }
+
+
+    async function sendMessage() {
+
+      if (isSending) {
+        return;
+      }
+
+
+      const message =
+        messageInput.value.trim();
+
+
+      if (!message) {
+        return;
+      }
+
+
+      hideError();
+
+
+      addMessage(
+        'user',
+        message
+      );
+
+
+      messageInput.value =
+        '';
+
+      autoResizeTextarea();
+
+
+      showTyping();
+
+      setSending(true);
+
+
+      try {
+
+        const response =
+          await fetch(
+            '/api/chat',
+            {
+              method: 'POST',
+
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+
+              body:
+                JSON.stringify({
+                  message
+                })
+            }
+          );
+
+
+        const data =
+          await response.json();
+
+
+        removeTyping();
+
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          throw new Error(
+            data.error ||
+            'Unable to get a response from Artivo AI.'
+          );
+
+        }
+
+
+        addMessage(
+          'assistant',
+          data.reply ||
+          'No response received.'
+        );
+
+
+      } catch (error) {
+
+        removeTyping();
+
+
+        showError(
+          error.message ||
+          'Something went wrong. Please try again.'
+        );
+
+      } finally {
+
+        setSending(false);
+
+        messageInput.focus();
+
+      }
+
+    }
+
+
+    chatForm.addEventListener(
+      'submit',
+      (e) => {
+
+        e.preventDefault();
+
+        sendMessage();
+
+      }
+    );
+
+
+    messageInput.addEventListener(
+      'keydown',
+      (e) => {
+
+        if (
+          e.key === 'Enter' &&
+          !e.shiftKey
+        ) {
+
+          e.preventDefault();
+
+          sendMessage();
+
+        }
+
+      }
+    );
+
+
+    function autoResizeTextarea() {
+
+      messageInput.style.height =
+        'auto';
+
+
+      messageInput.style.height =
+        Math.min(
+          messageInput.scrollHeight,
+          150
+        ) + 'px';
+
+    }
+
+
+    messageInput.addEventListener(
+      'input',
+      autoResizeTextarea
+    );
+
+
+    newChatBtn.addEventListener(
+      'click',
+      () => {
+
+        chatMessages.innerHTML =
+          '';
+
+        hideError();
+
+        addMessage(
+          'assistant',
+          'Welcome to Artivo AI. Tell me about your space, project, design goal, or any architectural question you have.'
+        );
+
+        messageInput.focus();
+
+      }
+    );
+
+
+    /* =========================================================
+       INITIAL MESSAGE
+    ========================================================= */
+
+    addMessage(
+      'assistant',
+      'Welcome to Artivo AI. I am here to help with architecture, interior design, materials, lighting, spatial planning, furniture and visualization. How can I help you today?'
+    );
+
+  </script>
+
+</body>
+</html>
