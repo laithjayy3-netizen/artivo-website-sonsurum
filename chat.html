@@ -1169,6 +1169,47 @@
       color: rgba(184,171,200,.40);
     }
 
+    .message-bubble h2,
+    .message-bubble h3,
+    .message-bubble h4 {
+      margin: 0 0 .7rem;
+      font-family: 'Syne', sans-serif;
+      color: rgba(255,255,255,.96);
+      line-height: 1.35;
+    }
+
+    .message-bubble h2 {
+      font-size: 1rem;
+    }
+
+    .message-bubble h3 {
+      font-size: .94rem;
+    }
+
+    .message-bubble h4 {
+      font-size: .88rem;
+      color: var(--accent-light);
+    }
+
+    .message-bubble p {
+      margin: 0 0 .75rem;
+    }
+
+    .message-bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-bubble ul,
+    .message-bubble ol {
+      margin: .2rem 0 .85rem;
+      padding-inline-start: 1.25rem;
+    }
+
+    .message-bubble li {
+      margin-bottom: .35rem;
+      padding-inline-start: .15rem;
+    }
+
     /* =========================================================
        ARTIVO SMART ACTION BUTTONS
     ========================================================= */
@@ -1227,12 +1268,6 @@
       box-shadow:
         0 16px 40px rgba(139,92,246,.28),
         0 0 30px rgba(56,189,248,.15);
-    }
-
-    .artivo-action-btn svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
     }
 
     @media (max-width: 768px) {
@@ -3030,6 +3065,112 @@
     }
 
 
+    function formatInlineMarkdown(text) {
+      let html = escapeHtml(String(text || ''));
+
+      // Bold
+      html = html.replace(
+        /\*\*(.+?)\*\*/g,
+        '<strong>$1</strong>'
+      );
+
+      return html;
+    }
+
+
+    function renderAssistantMarkdown(text) {
+      const source = String(text || '').replace(/\r\n/g, '\n');
+      const lines = source.split('\n');
+
+      const output = [];
+      let paragraph = [];
+      let listType = null;
+
+      const closeList = () => {
+        if (listType) {
+          output.push(listType === 'ul' ? '</ul>' : '</ol>');
+          listType = null;
+        }
+      };
+
+      const flushParagraph = () => {
+        if (paragraph.length) {
+          const textBlock = paragraph.join('<br>');
+          output.push(`<p>${textBlock}</p>`);
+          paragraph = [];
+        }
+      };
+
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+
+        if (!line) {
+          flushParagraph();
+          closeList();
+          continue;
+        }
+
+        let match;
+
+        match = line.match(/^###\s+(.+)$/);
+        if (match) {
+          flushParagraph();
+          closeList();
+          output.push(`<h4>${formatInlineMarkdown(match[1])}</h4>`);
+          continue;
+        }
+
+        match = line.match(/^##\s+(.+)$/);
+        if (match) {
+          flushParagraph();
+          closeList();
+          output.push(`<h3>${formatInlineMarkdown(match[1])}</h3>`);
+          continue;
+        }
+
+        match = line.match(/^#\s+(.+)$/);
+        if (match) {
+          flushParagraph();
+          closeList();
+          output.push(`<h2>${formatInlineMarkdown(match[1])}</h2>`);
+          continue;
+        }
+
+        match = line.match(/^[-*]\s+(.+)$/);
+        if (match) {
+          flushParagraph();
+          if (listType !== 'ul') {
+            closeList();
+            output.push('<ul>');
+            listType = 'ul';
+          }
+          output.push(`<li>${formatInlineMarkdown(match[1])}</li>`);
+          continue;
+        }
+
+        match = line.match(/^\d+[.)]\s+(.+)$/);
+        if (match) {
+          flushParagraph();
+          if (listType !== 'ol') {
+            closeList();
+            output.push('<ol>');
+            listType = 'ol';
+          }
+          output.push(`<li>${formatInlineMarkdown(match[1])}</li>`);
+          continue;
+        }
+
+        closeList();
+        paragraph.push(formatInlineMarkdown(line));
+      }
+
+      flushParagraph();
+      closeList();
+
+      return output.join('');
+    }
+
+
     function formatAssistantContent(rawText) {
       const original = String(rawText || '');
 
@@ -3049,29 +3190,8 @@
           .replace(/\[\[ARTIVO_ABOUT\]\]/g, '')
           .trim();
 
-      let html =
-        escapeHtml(cleanText);
-
-      // Small, safe Markdown-like formatting layer.
-      html = html.replace(
-        /^###\s*(.+)$/gm,
-        '<h4>$1</h4>'
-      );
-
-      html = html.replace(
-        /^##\s*(.+)$/gm,
-        '<h4>$1</h4>'
-      );
-
-      html = html.replace(
-        /\*\*(.+?)\*\*/gs,
-        '<strong>$1</strong>'
-      );
-
-      html = html.replace(
-        /\n/g,
-        '<br>'
-      );
+      const html =
+        renderAssistantMarkdown(cleanText);
 
       const arabic =
         detectArabic(cleanText);
@@ -3098,20 +3218,7 @@
             : 'Explore ARTİVO Projects',
           primary: false,
           external: false,
-          icon: `
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              aria-hidden="true"
-            >
-              <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-              <path d="M7 8h10"></path>
-              <path d="M7 12h6"></path>
-              <path d="M7 16h4"></path>
-            </svg>
-          `
+          icon: ''
         });
       }
 
@@ -3123,19 +3230,7 @@
             : 'Discover ARTİVO',
           primary: false,
           external: false,
-          icon: `
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M12 10v6"></path>
-              <path d="M12 7.2v.1"></path>
-            </svg>
-          `
+          icon: ''
         });
       }
 
@@ -3187,6 +3282,8 @@
 
       bubble.className =
         'message-bubble';
+
+      bubble.dir = 'auto';
 
       if (role === 'assistant') {
 
