@@ -902,13 +902,13 @@
     }
 
     .message {
-      max-width: min(760px, 82%);
+      max-width: min(680px, 76%);
 
       display: flex;
 
       flex-direction: column;
 
-      gap: .4rem;
+      gap: .35rem;
     }
 
     .message-author {
@@ -927,13 +927,13 @@
 
     .message-bubble {
       padding:
-        .95rem 1.05rem;
+        .82rem .95rem;
 
-      border-radius: 18px;
+      border-radius: 16px;
 
-      font-size: .86rem;
+      font-size: .82rem;
 
-      line-height: 1.75;
+      line-height: 1.62;
 
       white-space: pre-wrap;
 
@@ -962,8 +962,8 @@
         1px solid rgba(255,255,255,.12);
 
       box-shadow:
-        0 14px 48px rgba(139,92,246,.22),
-        0 0 28px rgba(56,189,248,.10);
+        0 10px 34px rgba(139,92,246,.18),
+        0 0 22px rgba(56,189,248,.08);
     }
 
     .message-time {
@@ -1630,7 +1630,7 @@
       }
 
       .message {
-        max-width: 90%;
+        max-width: 92%;
       }
 
       .chat-input-area {
@@ -3547,64 +3547,314 @@
     }
 
 
-    async function sendMessage() {
+    function createStreamingAssistantMessage() {
+      const row = document.createElement('div');
+      row.className = 'message-row assistant';
 
+      const message = document.createElement('div');
+      message.className = 'message';
+
+      const author = document.createElement('div');
+      author.className = 'message-author';
+      author.textContent = 'Artivo AI';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+      bubble.dir = 'auto';
+
+      const time = document.createElement('div');
+      time.className = 'message-time';
+      time.textContent = getTime();
+
+      message.appendChild(author);
+      message.appendChild(bubble);
+      message.appendChild(time);
+
+      row.appendChild(message);
+      chatMessages.appendChild(row);
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      return { row, message, author, bubble, time };
+    }
+
+    function visibleStreamingText(raw) {
+      let text = raw;
+
+      // Hide complete action tokens while streaming.
+      text = text.replace(/\[\[ARTIVO_(?:WHATSAPP|PROJECTS|ABOUT)\]\]/g, '');
+
+      // Hide a partially streamed action token.
+      const partialIndex = text.lastIndexOf('[[');
+      if (partialIndex !== -1) {
+        const tail = text.slice(partialIndex);
+
+        if (
+          tail.length < 35 &&
+          /^(\[\[ARTIVO_[A-Z]*)?$/.test(tail)
+        ) {
+          text = text.slice(0, partialIndex);
+        }
+      }
+
+      return text;
+    }
+
+    function updateStreamingAssistant(streamMessage, rawText) {
+      const visible = visibleStreamingText(rawText);
+
+      streamMessage.bubble.textContent = visible;
+
+      // Keep Arabic messages right-to-left automatically.
+      streamMessage.bubble.dir = /[\u0600-\u06FF]/.test(visible)
+        ? 'rtl'
+        : 'auto';
+
+      streamMessage.author.textContent =
+        /[\u0600-\u06FF]/.test(visible)
+          ? 'ارتيفو'
+          : 'Artivo AI';
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+    }
+
+    function finalizeStreamingAssistant(streamMessage, rawText) {
+      const rendered = formatAssistantContent(rawText);
+
+      streamMessage.bubble.innerHTML = rendered.html;
+
+      streamMessage.bubble.dir =
+        /[\u0600-\u06FF]/.test(
+          rawText
+        )
+          ? 'rtl'
+          : 'auto';
+
+      streamMessage.author.textContent =
+        /[\u0600-\u06FF]/.test(
+          rawText
+        )
+          ? 'ارتيفو'
+          : 'Artivo AI';
+
+      if (rendered.actions.length) {
+        const actionWrap =
+          document.createElement('div');
+
+        actionWrap.className =
+          'artivo-actions';
+
+        rendered.actions.forEach(
+          (action) => {
+            const link =
+              document.createElement('a');
+
+            link.className =
+              action.primary
+                ? 'artivo-action-btn primary'
+                : 'artivo-action-btn';
+
+            link.href =
+              action.href;
+
+            if (action.external) {
+              link.target = '_blank';
+              link.rel =
+                'noopener noreferrer';
+            }
+
+            link.innerHTML =
+              `${action.icon}<span>${escapeHtml(action.label)}</span>`;
+
+            actionWrap.appendChild(link);
+          }
+        );
+
+        streamMessage.bubble.appendChild(
+          actionWrap
+        );
+
+        streamMessage.bubble
+          .querySelectorAll(
+            'a, button'
+          )
+          .forEach((el) => {
+            el.addEventListener(
+              'mouseenter',
+              () =>
+                cursor.classList.add(
+                  'hover'
+                )
+            );
+
+            el.addEventListener(
+              'mouseleave',
+              () =>
+                cursor.classList.remove(
+                  'hover'
+                )
+            );
+          });
+      }
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+    }
+
+    async function readChatStream(response, streamMessage) {
+      if (!response.body) {
+        throw new Error(
+          'Streaming is not supported by this connection.'
+        );
+      }
+
+      const reader =
+        response.body.getReader();
+
+      const decoder =
+        new TextDecoder(
+          'utf-8'
+        );
+
+      let buffer = '';
+      let rawText = '';
+
+      while (true) {
+        const { value, done } =
+          await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        buffer +=
+          decoder.decode(
+            value,
+            { stream: true }
+          );
+
+        const blocks =
+          buffer.split(
+            /\r?\n\r?\n/
+          );
+
+        buffer =
+          blocks.pop() || '';
+
+        for (const block of blocks) {
+          const lines =
+            block.split(/\r?\n/);
+
+          for (const line of lines) {
+            if (
+              !line.startsWith(
+                'data:'
+              )
+            ) {
+              continue;
+            }
+
+            const payload =
+              line.slice(5).trim();
+
+            if (!payload) {
+              continue;
+            }
+
+            let event;
+
+            try {
+              event =
+                JSON.parse(
+                  payload
+                );
+            } catch (_) {
+              continue;
+            }
+
+            if (event.error) {
+              throw new Error(
+                event.error
+              );
+            }
+
+            if (
+              typeof event.token ===
+              'string'
+            ) {
+              rawText +=
+                event.token;
+
+              updateStreamingAssistant(
+                streamMessage,
+                rawText
+              );
+            }
+
+            if (event.done) {
+              finalizeStreamingAssistant(
+                streamMessage,
+                rawText
+              );
+
+              return rawText;
+            }
+          }
+        }
+      }
+
+      if (!rawText) {
+        throw new Error(
+          'No response received.'
+        );
+      }
+
+      finalizeStreamingAssistant(
+        streamMessage,
+        rawText
+      );
+
+      return rawText;
+    }
+
+    async function sendMessage() {
       if (isSending) {
         return;
       }
 
-
       const message =
         messageInput.value.trim();
-
 
       if (!message) {
         return;
       }
 
-
       hideError();
-
-
-      /*
-        Add the user's message to the local conversation history
-        BEFORE sending it to the backend.
-      */
 
       conversationHistory.push({
         role: 'user',
         content: message
       });
 
-
-      /*
-        Keep the browser-side history aligned with the backend
-        limit. The backend also enforces its own safety limit.
-      */
-
       conversationHistory =
         conversationHistory.slice(-20);
-
 
       addMessage(
         'user',
         message
       );
 
-
       messageInput.value =
         '';
 
       autoResizeTextarea();
 
-
       showTyping();
 
       setSending(true);
 
-
       try {
-
         const response =
           await fetch(
             '/api/chat',
@@ -3624,66 +3874,43 @@
             }
           );
 
+        if (!response.ok) {
+          let data = null;
 
-        const data =
-          await response.json();
+          try {
+            data =
+              await response.json();
+          } catch (_) {}
 
+          throw new Error(
+            data?.error ||
+            'Unable to connect to Artivo AI.'
+          );
+        }
 
         removeTyping();
 
-
-        if (
-          !response.ok ||
-          !data.success
-        ) {
-
-          /*
-            Remove the last user message from the local history
-            if the request failed, so a future retry does not
-            accidentally duplicate it.
-          */
-
-          conversationHistory.pop();
-
-
-          throw new Error(
-            data.error ||
-            'Unable to get a response from Artivo AI.'
-          );
-
-        }
-
+        const streamMessage =
+          createStreamingAssistantMessage();
 
         const assistantReply =
-          data.reply ||
-          'No response received.';
-
-
-        /*
-          Save Artivo's answer too, so the next user message
-          will include both sides of the conversation.
-        */
+          await readChatStream(
+            response,
+            streamMessage
+          );
 
         conversationHistory.push({
           role: 'assistant',
           content: assistantReply
         });
 
-
         conversationHistory =
           conversationHistory.slice(-20);
 
-
-        addMessage(
-          'assistant',
-          assistantReply
-        );
-
-
       } catch (error) {
-
         removeTyping();
 
+        conversationHistory.pop();
 
         showError(
           error.message ||
@@ -3691,108 +3918,82 @@
         );
 
       } finally {
-
         setSending(false);
-
         messageInput.focus();
-
       }
-
     }
-
 
     chatForm.addEventListener(
       'submit',
       (e) => {
-
         e.preventDefault();
-
         sendMessage();
-
       }
     );
-
 
     messageInput.addEventListener(
       'keydown',
       (e) => {
-
         if (
           e.key === 'Enter' &&
           !e.shiftKey
         ) {
-
           e.preventDefault();
-
           sendMessage();
-
         }
-
       }
     );
 
-
     function autoResizeTextarea() {
-
       messageInput.style.height =
         'auto';
-
 
       messageInput.style.height =
         Math.min(
           messageInput.scrollHeight,
           150
         ) + 'px';
-
     }
-
 
     messageInput.addEventListener(
       'input',
       autoResizeTextarea
     );
 
+    function showWelcomeSequence() {
+      addMessage(
+        'assistant',
+        'Welcome to Artivo AI. I’m here for architecture and interior design.'
+      );
+
+      addMessage(
+        'assistant',
+        'How can I help you today?'
+      );
+    }
 
     newChatBtn.addEventListener(
       'click',
       () => {
-
-        /*
-          Start a completely new conversation.
-          This clears the browser-side context that will be
-          sent to the AI.
-        */
-
         conversationHistory =
           [];
-
 
         chatMessages.innerHTML =
           '';
 
         hideError();
 
-
-        addMessage(
-          'assistant',
-          'Welcome to Artivo AI. Tell me about your space, project, design goal, or any architectural question you have.'
-        );
-
+        showWelcomeSequence();
 
         messageInput.focus();
-
       }
     );
-
 
     /* =========================================================
        INITIAL MESSAGE
     ========================================================= */
 
-    addMessage(
-      'assistant',
-      'Welcome to Artivo AI. I am here to help with architecture, interior design, materials, lighting, spatial planning, furniture and visualization. How can I help you today?'
-    );
+    showWelcomeSequence();
 
   </script>
 
