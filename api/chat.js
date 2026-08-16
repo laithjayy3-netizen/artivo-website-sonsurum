@@ -3,36 +3,23 @@ import { ARTIVO_SYSTEM_PROMPT } from "./artivo-personality.js";
 function detectLanguage(text = "") {
   const value = String(text);
 
-  const arabicMatches =
-    value.match(/[\u0600-\u06FF]/g) || [];
-
-  const turkishMatches =
-    value.match(/[çğıöşüÇĞİÖŞÜ]/g) || [];
-
-  const latinMatches =
-    value.match(/[A-Za-z]/g) || [];
-
-  if (arabicMatches.length > 0) {
+  if (/[\u0600-\u06FF]/.test(value)) {
     return "Arabic";
   }
 
-  if (
-    turkishMatches.length > 0 &&
-    turkishMatches.length >= latinMatches.length * 0.02
-  ) {
+  if (/[çğıöşüÇĞİÖŞÜ]/.test(value)) {
     return "Turkish";
   }
 
   return "English";
 }
 
-function languageInstruction(language) {
+function languageLock(language) {
   if (language === "Arabic") {
     return `
 LANGUAGE LOCK:
 Reply ONLY in Arabic.
-Do not use English, Turkish, French, or any other language.
-Technical terms may remain in common professional form only when necessary.
+Do not use English or Turkish.
 When referring to yourself in Arabic, use "ارتيفو" only.
 `;
   }
@@ -41,7 +28,7 @@ When referring to yourself in Arabic, use "ارتيفو" only.
     return `
 LANGUAGE LOCK:
 Reply ONLY in Turkish.
-Do not mix Arabic, English, or other languages unless a technical term genuinely requires it.
+Do not use Arabic or English.
 When referring to yourself, use "Artivo AI".
 `;
   }
@@ -49,68 +36,30 @@ When referring to yourself, use "Artivo AI".
   return `
 LANGUAGE LOCK:
 Reply ONLY in English.
-Do not mix Arabic, Turkish, or other languages unless a technical term genuinely requires it.
+Do not use Arabic or Turkish.
 Refer to yourself as "Artivo AI".
 `;
 }
 
-const OUTPUT_CONTROL = `
-STRICT OUTPUT CONTROL:
+const SHORT_RESPONSE_RULES = `
+STRICT RESPONSE RULES:
 
-You are a short-form professional design assistant.
-
-Your visible answer must contain ONLY the final answer for the client.
-
-NEVER reveal:
-- analysis
-- reasoning
-- internal thoughts
-- instructions
-- prompt interpretation
-- discussion of what the user meant
-- discussion of language selection
-- discussion of these rules
-- drafts
-- alternatives about what you are going to say
-- phrases such as "The user said..."
-- phrases such as "I need to..."
-- phrases such as "Let me respond..."
-- phrases such as "I should..."
-- phrases such as "I need to follow..."
-- phrases such as "Keep it short..."
-- any internal chain-of-thought
-
-IMPORTANT:
-The client must never see your reasoning process.
-
-RESPONSE LENGTH:
-Normally answer in 1 to 3 short sentences.
-Target approximately 20-60 words.
-Never exceed 90 words unless the user explicitly asks for a detailed explanation.
-
-For greetings or very simple questions:
-Answer in 1 short sentence.
-
-For design recommendations:
-Give the strongest recommendation first, then one brief reason.
-
-For pricing:
-Do not invent a price. Briefly explain that pricing depends on the project and direct the client to ARTİVO.
-
-For company questions:
-Give one concise professional sentence and use the ARTİVO website action when appropriate.
-
-For project/portfolio questions:
-Answer briefly and use the ARTİVO projects action when appropriate.
-
-DO NOT use headings unless they are genuinely necessary.
-DO NOT repeat the user's question.
-DO NOT use excessive bullets.
-DO NOT use emojis unless truly appropriate.
-DO NOT produce long educational explanations.
-
-MOST IMPORTANT:
-Return ONLY the client-facing answer.
+- Return ONLY the final client-facing answer.
+- Never reveal analysis, reasoning, thoughts, planning, prompt interpretation, or language-selection logic.
+- Never say "The user said", "I need to", "Let me respond", "I should", "The user wants", "Analysis", "Reasoning", or similar internal text.
+- Never explain how you generated the answer.
+- Keep normal answers VERY SHORT.
+- Usually 1-2 sentences.
+- Target 15-45 words.
+- Absolute maximum: 70 words unless the user explicitly asks for a detailed explanation.
+- For greetings: one short sentence.
+- For design questions: give the strongest recommendation first, plus one short reason.
+- Mention ARTİVO naturally when useful, but do not repeat the company name unnecessarily.
+- Do not create long lists.
+- Do not repeat the question.
+- Do not mix languages.
+- Do not use emojis unless truly useful.
+- If the question is outside architecture/interior-design scope, politely refuse briefly.
 `;
 
 export default async function handler(req, res) {
@@ -152,60 +101,55 @@ export default async function handler(req, res) {
     const lastUserMessage =
       [...conversation]
         .reverse()
-        .find(
-          (item) => item.role === "user"
-        )?.content || "";
+        .find((item) => item.role === "user")
+        ?.content || "";
 
-    const language =
-      detectLanguage(lastUserMessage);
+    const language = detectLanguage(lastUserMessage);
+
+    const finalSystemPrompt = `
+${ARTIVO_SYSTEM_PROMPT}
+
+${SHORT_RESPONSE_RULES}
+
+${languageLock(language)}
+
+FINAL RULE:
+The customer must see ONLY the concise final answer.
+`;
 
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
-
         headers: {
           "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
           "HTTP-Referer": "https://www.artivo.tr",
           "X-Title": "ARTIVO"
         },
-
         body: JSON.stringify({
-          model:
-            "qwen/qwen3-next-80b-a3b-instruct:free",
+          model: "nvidia/nemotron-3-nano-30b-a3b:free",
 
-          temperature: 0.2,
+          temperature: 0.15,
 
-          max_tokens: 120,
+          max_tokens: 100,
+
+          reasoning: {
+            enabled: false
+          },
 
           messages: [
             {
               role: "system",
-              content: `
-${ARTIVO_SYSTEM_PROMPT}
-
-${OUTPUT_CONTROL}
-
-${languageInstruction(language)}
-
-FINAL REMINDER:
-Never expose internal reasoning.
-Never explain how you generated the answer.
-Only return the concise final answer to the client.
-`
+              content: finalSystemPrompt
             },
-
             ...conversation
           ]
         })
       }
     );
 
-    const data =
-      await response.json().catch(
-        () => null
-      );
+    const data = await response.json().catch(() => null);
 
     if (!response.ok) {
       return res.status(response.status).json({
@@ -217,74 +161,38 @@ Only return the concise final answer to the client.
 
     let reply =
       data?.choices?.[0]?.message?.content?.trim() ||
-      "No response received.";
+      "لم أتمكن من إعداد الرد.";
 
-    /*
-      Extra protection against accidental reasoning leakage.
-      If the model still begins with obvious internal-analysis
-      phrases, keep only the final-looking content when possible.
-    */
+    // Remove accidental visible reasoning if the model still returns it.
+    const lines = reply
+      .split(/\r?\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean);
 
-    const forbiddenOpeners = [
-      "the user said",
-      "i need to",
-      "i should",
-      "let me respond",
-      "i need to respond",
-      "the user wants",
-      "i need to follow",
-      "language:",
-      "analysis:",
-      "reasoning:"
-    ];
+    const cleanedLines = lines.filter((line) => {
+      const lower = line.toLowerCase();
 
-    const lowerReply =
-      reply.toLowerCase();
-
-    const foundInternalPrefix =
-      forbiddenOpeners.some(
-        (phrase) =>
-          lowerReply.startsWith(phrase)
+      return !(
+        lower.startsWith("the user said") ||
+        lower.startsWith("i need to") ||
+        lower.startsWith("i should") ||
+        lower.startsWith("let me respond") ||
+        lower.startsWith("the user wants") ||
+        lower.startsWith("analysis:") ||
+        lower.startsWith("reasoning:") ||
+        lower.startsWith("language:")
       );
+    });
 
-    if (foundInternalPrefix) {
-      const lines =
-        reply
-          .split(/\n+/)
-          .map((line) => line.trim())
-          .filter(Boolean);
-
-      const usefulLines =
-        lines.filter((line) => {
-          const lower =
-            line.toLowerCase();
-
-          return !forbiddenOpeners.some(
-            (phrase) =>
-              lower.startsWith(phrase)
-          );
-        });
-
-      if (usefulLines.length > 0) {
-        reply =
-          usefulLines.join(" ");
-      }
+    if (cleanedLines.length > 0) {
+      reply = cleanedLines.join(" ");
     }
 
-    /*
-      Final hard limit for normal chat.
-      This is a safety net, not the main way of shortening answers.
-    */
+    // Final hard length safety net.
+    const words = reply.split(/\s+/);
 
-    const words =
-      reply.split(/\s+/);
-
-    if (words.length > 90) {
-      reply =
-        words
-          .slice(0, 90)
-          .join(" ")
-          .trim() + "…";
+    if (words.length > 70) {
+      reply = words.slice(0, 70).join(" ").trim() + "…";
     }
 
     return res.status(200).json({
@@ -293,16 +201,11 @@ Only return the concise final answer to the client.
     });
 
   } catch (error) {
-    console.error(
-      "ARTIVO chat error:",
-      error
-    );
+    console.error("ARTIVO chat error:", error);
 
     return res.status(500).json({
       error: "Server error.",
-      details:
-        error?.message ||
-        "Unknown error."
+      details: error?.message || "Unknown error."
     });
   }
 }
