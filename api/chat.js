@@ -14,7 +14,7 @@ import { ARTIVO_SYSTEM_PROMPT } from "./artivo-personality.js";
   5. Stream the answer to the existing chat.html.
 */
 
-const MODEL = "qwen/qwen3-30b-a3b:free";
+const MODEL = "openai/gpt-oss-20b:free";
 
 const ACTION_TOKENS = {
   whatsapp: "[[ARTIVO_WHATSAPP]]",
