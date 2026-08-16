@@ -1,4 +1,4 @@
-const HF_API_BASE =
+const HF_BASE =
   "https://stabilityai-stable-fast-3d.hf.space/gradio_api";
 
 export default async function handler(req, res) {
@@ -10,48 +10,129 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(
-      `${HF_API_BASE}/openapi.json`,
+    // --------------------------------------------------
+    // 1) Get the current API schema
+    // --------------------------------------------------
+
+    const infoResponse = await fetch(
+      `${HF_BASE}/info`,
       {
-        method: "GET",
         headers: {
           Accept: "application/json"
         }
       }
     );
 
-    const text = await response.text();
+    const infoText = await infoResponse.text();
 
-    if (!response.ok) {
+    if (!infoResponse.ok) {
       return res.status(502).json({
         success: false,
-        status: response.status,
-        error: text.slice(0, 1000)
+        step: "info",
+        status: infoResponse.status,
+        error: infoText.slice(0, 1500)
       });
     }
 
-    let schema;
+    let info;
 
     try {
-      schema = JSON.parse(text);
+      info = JSON.parse(infoText);
     } catch (_) {
       return res.status(502).json({
         success: false,
-        error: "Hugging Face returned non-JSON data."
+        step: "info",
+        error: "Hugging Face /info did not return valid JSON.",
+        raw: infoText.slice(0, 1500)
       });
     }
 
+    // --------------------------------------------------
+    // 2) Get the Gradio config
+    // --------------------------------------------------
+
+    const configResponse = await fetch(
+      `${HF_BASE.replace("/gradio_api", "")}/config`,
+      {
+        headers: {
+          Accept: "application/json"
+        }
+      }
+    );
+
+    const configText =
+      await configResponse.text();
+
+    if (!configResponse.ok) {
+      return res.status(502).json({
+        success: false,
+        step: "config",
+        status: configResponse.status,
+        error: configText.slice(0, 1500)
+      });
+    }
+
+    let config;
+
+    try {
+      config = JSON.parse(configText);
+    } catch (_) {
+      return res.status(502).json({
+        success: false,
+        step: "config",
+        error: "Hugging Face /config did not return valid JSON.",
+        raw: configText.slice(0, 1500)
+      });
+    }
+
+    // --------------------------------------------------
+    // 3) Extract API information
+    // --------------------------------------------------
+
+    const apiInfo = info?.named_endpoints || {};
+    const apiNames = Object.keys(apiInfo);
+
+    // Gradio dependencies contain numeric IDs.
+    const dependencies =
+      Array.isArray(config?.dependencies)
+        ? config.dependencies
+        : [];
+
+    const matchedEndpoints =
+      dependencies
+        .map((dependency) => ({
+          id: dependency?.id,
+          api_name: dependency?.api_name || null,
+          inputs: dependency?.inputs || [],
+          outputs: dependency?.outputs || []
+        }))
+        .filter((item) => item.api_name);
+
+    // --------------------------------------------------
+    // 4) Return only useful information
+    // --------------------------------------------------
+
     return res.status(200).json({
       success: true,
-      message: "Stable Fast 3D API is reachable.",
-      space: "stabilityai/stable-fast-3d",
-      hasOpenAPI: !!schema,
-      endpoints: Object.keys(schema.paths || {})
+
+      message:
+        "Stable Fast 3D API schema retrieved successfully.",
+
+      space:
+        "stabilityai/stable-fast-3d",
+
+      api_names:
+        apiNames,
+
+      endpoints:
+        matchedEndpoints
+
     });
 
   } catch (error) {
+
     console.error(
-      "ARTIVO Image-to-3D schema test error:",
+      "ARTIVO Stable Fast 3D schema test error:",
       error
     );
 
@@ -59,7 +140,7 @@ export default async function handler(req, res) {
       success: false,
       error:
         error?.message ||
-        "Could not reach Hugging Face."
+        "Could not inspect Stable Fast 3D API."
     });
   }
 }
