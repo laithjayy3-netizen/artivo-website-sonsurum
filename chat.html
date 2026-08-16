@@ -3753,7 +3753,9 @@
       typingCursor.textContent = '▌';
 
       bubble.textContent = '';
-      bubble.appendChild(cursor);
+      // Use a dedicated typing cursor inside the message.
+      // Never reuse the global mouse cursor element.
+      bubble.appendChild(typingCursor);
 
       let visible = '';
       const chars = Array.from(text);
