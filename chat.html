@@ -1667,19 +1667,6 @@
       }
     }
 
-    .typing-cursor {
-      display: inline-block;
-      margin-inline-start: 2px;
-      animation: artivoCaret .8s steps(1) infinite;
-      color: currentColor;
-      font-weight: 500;
-    }
-
-    @keyframes artivoCaret {
-      0%, 45% { opacity: 1; }
-      46%, 100% { opacity: 0; }
-    }
-
   </style>
 </head>
 
@@ -3070,6 +3057,22 @@
       return /[\u0600-\u06FF]/.test(text || '');
     }
 
+    function detectTurkish(text) {
+      const value = String(text || '').toLocaleLowerCase('tr-TR');
+
+      if (/[çğıöşü]/.test(value)) {
+        return true;
+      }
+
+      return /\b(merhaba|nasılsın|nasilsin|selam|teşekkür|tesekkur|mutfak|oda|salon|yatak|renk|tasarım|tasarim|mobilya|aydınlatma|aydinlatma|fiyat|proje|projeler|ev|mekan|iç mekan|ic mekan)\b/i.test(value);
+    }
+
+    function getDisplayLanguage(text) {
+      if (detectArabic(text)) return 'Arabic';
+      if (detectTurkish(text)) return 'Turkish';
+      return 'English';
+    }
+
 
     function getAssistantDisplayName(text) {
       return detectArabic(text)
@@ -3424,6 +3427,193 @@
 
 
 
+    function bindDynamicCursor(root) {
+      if (!root || !cursor) return;
+
+      root
+        .querySelectorAll('a, button')
+        .forEach((el) => {
+          el.addEventListener('mouseenter', () => {
+            cursor.classList.add('hover');
+          });
+
+          el.addEventListener('mouseleave', () => {
+            cursor.classList.remove('hover');
+          });
+        });
+    }
+
+    function createAssistantMessageShell() {
+      const row = document.createElement('div');
+      row.className = 'message-row assistant';
+
+      const message = document.createElement('div');
+      message.className = 'message';
+
+      const author = document.createElement('div');
+      author.className = 'message-author';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+      bubble.dir = 'auto';
+
+      const time = document.createElement('div');
+      time.className = 'message-time';
+      time.textContent = getTime();
+
+      message.appendChild(author);
+      message.appendChild(bubble);
+      message.appendChild(time);
+
+      row.appendChild(message);
+      chatMessages.appendChild(row);
+
+      return {
+        row,
+        message,
+        author,
+        bubble,
+        time
+      };
+    }
+
+    function renderAssistantActions(bubble, actions) {
+      if (!bubble || !actions || !actions.length) {
+        return;
+      }
+
+      const actionWrap = document.createElement('div');
+      actionWrap.className = 'artivo-actions';
+
+      actions.forEach((action) => {
+        const link = document.createElement('a');
+
+        link.className = action.primary
+          ? 'artivo-action-btn primary'
+          : 'artivo-action-btn';
+
+        link.href = action.href;
+
+        if (action.external) {
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+        }
+
+        link.innerHTML =
+          `${action.icon || ''}<span>${escapeHtml(action.label)}</span>`;
+
+        actionWrap.appendChild(link);
+      });
+
+      bubble.appendChild(actionWrap);
+      bindDynamicCursor(actionWrap);
+    }
+
+    function graphemes(text) {
+      const value = String(text || '');
+
+      try {
+        if (window.Intl && Intl.Segmenter) {
+          const segmenter = new Intl.Segmenter(
+            undefined,
+            { granularity: 'grapheme' }
+          );
+
+          return Array.from(
+            segmenter.segment(value),
+            (item) => item.segment
+          );
+        }
+      } catch (_) {}
+
+      return Array.from(value);
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => {
+        window.setTimeout(resolve, ms);
+      });
+    }
+
+    async function typeAssistantReply(text) {
+      const finalText = String(text || '').trim();
+
+      if (!finalText) {
+        addMessage(
+          'assistant',
+          'No response received.'
+        );
+        return;
+      }
+
+      const shell =
+        createAssistantMessageShell();
+
+      shell.author.textContent =
+        getAssistantDisplayName(finalText);
+
+      let typedText = '';
+
+      const parts = graphemes(finalText);
+
+      shell.bubble.textContent = '';
+
+      for (const part of parts) {
+        typedText += part;
+
+        /*
+          Grapheme-by-grapheme typing prevents Arabic
+          characters, emojis and accented characters
+          from being split incorrectly.
+        */
+        shell.bubble.textContent = typedText;
+
+        chatMessages.scrollTop =
+          chatMessages.scrollHeight;
+
+        let delay = 17;
+
+        if (part === ' ') {
+          delay = 9;
+        } else if (
+          part === '.' ||
+          part === '!' ||
+          part === '?' ||
+          part === '؟' ||
+          part === '،' ||
+          part === ','
+        ) {
+          delay = 45;
+        }
+
+        await sleep(delay);
+      }
+
+      /*
+        Replace the temporary plain-text bubble with
+        the exact ARTİVO markdown/action rendering,
+        while keeping the same original layout.
+      */
+      const rendered =
+        formatAssistantContent(finalText);
+
+      shell.author.textContent =
+        getAssistantDisplayName(finalText);
+
+      shell.bubble.innerHTML =
+        rendered.html;
+
+      renderAssistantActions(
+        shell.bubble,
+        rendered.actions
+      );
+
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+    }
+
+
+
     function showTyping() {
 
       const row =
@@ -3560,139 +3750,86 @@
     }
 
 
-    function buildAssistantRow() {
-
-      const row = document.createElement('div');
-      row.className = 'message-row assistant';
-
-      const message = document.createElement('div');
-      message.className = 'message';
-
-      const author = document.createElement('div');
-      author.className = 'message-author';
-      author.textContent = 'Artivo AI';
-
-      const bubble = document.createElement('div');
-      bubble.className = 'message-bubble';
-      bubble.dir = 'auto';
-
-      const time = document.createElement('div');
-      time.className = 'message-time';
-      time.textContent = getTime();
-
-      message.appendChild(author);
-      message.appendChild(bubble);
-      message.appendChild(time);
-      row.appendChild(message);
-      chatMessages.appendChild(row);
-
-      return bubble;
-    }
-
-    async function typeAssistantReply(rawText) {
-      const rendered = formatAssistantContent(rawText);
-      const cleanText = String(rawText || '')
-        .replace(/\[\[ARTIVO_WHATSAPP\]\]/g, '')
-        .replace(/\[\[ARTIVO_PROJECTS\]\]/g, '')
-        .replace(/\[\[ARTIVO_ABOUT\]\]/g, '')
-        .trim();
-
-      const bubble = buildAssistantRow();
-
-      const typingCursor = document.createElement('span');
-      typingCursor.className = 'typing-cursor';
-      typingCursor.textContent = '▌';
-
-      bubble.textContent = '';
-      bubble.appendChild(typingCursor);
-
-      const chars = Array.from(cleanText);
-
-      for (const char of chars) {
-        bubble.textContent += char;
-        bubble.appendChild(typingCursor);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        let delay = 11;
-        if (char === ' ' || char === '\n') delay = 6;
-        if ('.!?؟:؛'.includes(char)) delay = 26;
-
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-
-      typingCursor.remove();
-      bubble.innerHTML = rendered.html || '';
-
-      if (rendered.actions.length) {
-        const actionWrap = document.createElement('div');
-        actionWrap.className = 'artivo-actions';
-
-        rendered.actions.forEach((action) => {
-          const link = document.createElement('a');
-          link.className = action.primary
-            ? 'artivo-action-btn primary'
-            : 'artivo-action-btn';
-          link.href = action.href;
-
-          if (action.external) {
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-          }
-
-          link.innerHTML = `${action.icon}<span>${escapeHtml(action.label)}</span>`;
-          actionWrap.appendChild(link);
-        });
-
-        bubble.appendChild(actionWrap);
-
-        bubble.querySelectorAll('a, button').forEach((el) => {
-          el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-          el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-        });
-      }
-
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
     async function sendMessage() {
 
-      if (isSending) return;
+      if (isSending) {
+        return;
+      }
 
-      const message = messageInput.value.trim();
-      if (!message) return;
+      const message =
+        messageInput.value.trim();
+
+      if (!message) {
+        return;
+      }
 
       hideError();
 
+      /*
+        Save the user message locally before sending.
+      */
       conversationHistory.push({
         role: 'user',
         content: message
       });
 
-      conversationHistory = conversationHistory.slice(-20);
+      conversationHistory =
+        conversationHistory.slice(-20);
 
-      addMessage('user', message);
+      addMessage(
+        'user',
+        message
+      );
 
       messageInput.value = '';
+
       autoResizeTextarea();
+
       showTyping();
       setSending(true);
 
       try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            messages: conversationHistory
-          })
-        });
+        const response =
+          await fetch(
+            '/api/chat',
+            {
+              method: 'POST',
 
-        const data = await response.json().catch(() => null);
+              headers: {
+                'Content-Type':
+                  'application/json',
+                'Accept':
+                  'application/json'
+              },
+
+              body:
+                JSON.stringify({
+                  messages:
+                    conversationHistory
+                })
+            }
+          );
+
+        /*
+          ARTİVO intentionally uses one normal JSON response.
+          The visual streaming is handled locally in the UI.
+          This keeps the design stable and prevents SSE/JSON
+          parsing conflicts.
+        */
+        const data =
+          await response.json().catch(
+            () => null
+          );
+
         removeTyping();
 
-        if (!response.ok || !data?.success) {
+        if (
+          !response.ok ||
+          !data ||
+          data.success !== true
+        ) {
           conversationHistory.pop();
+
           throw new Error(
             data?.error ||
             'Unable to get a response from Artivo AI.'
@@ -3700,26 +3837,49 @@
         }
 
         const assistantReply =
-          data.reply ||
-          'No response received.';
+          String(
+            data.reply || ''
+          ).trim();
+
+        if (!assistantReply) {
+          conversationHistory.pop();
+
+          throw new Error(
+            'Artivo returned an empty response.'
+          );
+        }
 
         conversationHistory.push({
           role: 'assistant',
           content: assistantReply
         });
 
-        conversationHistory = conversationHistory.slice(-20);
+        conversationHistory =
+          conversationHistory.slice(-20);
 
-        await typeAssistantReply(assistantReply);
+        /*
+          Local, smooth, grapheme-safe typing.
+        */
+        await typeAssistantReply(
+          assistantReply
+        );
 
       } catch (error) {
         removeTyping();
+
         showError(
           error?.message ||
           'Something went wrong. Please try again.'
         );
+
       } finally {
         setSending(false);
+
+        /*
+          Restore normal browser input behaviour.
+          The custom cursor remains visible because
+          the page never changes the real cursor state.
+        */
         messageInput.focus();
       }
     }
@@ -3800,6 +3960,11 @@
         addMessage(
           'assistant',
           'Welcome to Artivo AI. I’m here for architecture and interior design.'
+        );
+
+        addMessage(
+          'assistant',
+          'How can I help you today?'
         );
 
 
