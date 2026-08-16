@@ -902,13 +902,13 @@
     }
 
     .message {
-      max-width: min(680px, 76%);
+      max-width: min(760px, 82%);
 
       display: flex;
 
       flex-direction: column;
 
-      gap: .35rem;
+      gap: .4rem;
     }
 
     .message-author {
@@ -927,13 +927,13 @@
 
     .message-bubble {
       padding:
-        .82rem .95rem;
+        .95rem 1.05rem;
 
-      border-radius: 16px;
+      border-radius: 18px;
 
-      font-size: .82rem;
+      font-size: .86rem;
 
-      line-height: 1.62;
+      line-height: 1.75;
 
       white-space: pre-wrap;
 
@@ -962,8 +962,8 @@
         1px solid rgba(255,255,255,.12);
 
       box-shadow:
-        0 10px 34px rgba(139,92,246,.18),
-        0 0 22px rgba(56,189,248,.08);
+        0 14px 48px rgba(139,92,246,.22),
+        0 0 28px rgba(56,189,248,.10);
     }
 
     .message-time {
@@ -1630,7 +1630,7 @@
       }
 
       .message {
-        max-width: 92%;
+        max-width: 90%;
       }
 
       .chat-input-area {
@@ -1667,18 +1667,17 @@
       }
     }
 
-
     .typing-cursor {
       display: inline-block;
-      margin-left: 2px;
-      color: var(--accent-light);
-      animation: typingCursorBlink .75s infinite;
+      margin-inline-start: 2px;
+      animation: artivoCaret .8s steps(1) infinite;
+      color: currentColor;
       font-weight: 500;
     }
 
-    @keyframes typingCursorBlink {
-      0%, 48% { opacity: 1; }
-      49%, 100% { opacity: 0; }
+    @keyframes artivoCaret {
+      0%, 45% { opacity: 1; }
+      46%, 100% { opacity: 0; }
     }
 
   </style>
@@ -3561,7 +3560,8 @@
     }
 
 
-    function createStreamingAssistantMessage() {
+    function buildAssistantRow() {
+
       const row = document.createElement('div');
       row.className = 'message-row assistant';
 
@@ -3583,201 +3583,45 @@
       message.appendChild(author);
       message.appendChild(bubble);
       message.appendChild(time);
-
       row.appendChild(message);
       chatMessages.appendChild(row);
 
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      return { row, message, author, bubble, time };
+      return bubble;
     }
 
-    function visibleStreamingText(raw) {
-      let text = raw;
-
-      // Hide complete action tokens while streaming.
-      text = text.replace(/\[\[ARTIVO_(?:WHATSAPP|PROJECTS|ABOUT)\]\]/g, '');
-
-      // Hide a partially streamed action token.
-      const partialIndex = text.lastIndexOf('[[');
-      if (partialIndex !== -1) {
-        const tail = text.slice(partialIndex);
-
-        if (
-          tail.length < 35 &&
-          /^(\[\[ARTIVO_[A-Z]*)?$/.test(tail)
-        ) {
-          text = text.slice(0, partialIndex);
-        }
-      }
-
-      return text;
-    }
-
-    function updateStreamingAssistant(streamMessage, rawText) {
-      const visible = visibleStreamingText(rawText);
-
-      streamMessage.bubble.textContent = visible;
-
-      // Keep Arabic messages right-to-left automatically.
-      streamMessage.bubble.dir = /[\u0600-\u06FF]/.test(visible)
-        ? 'rtl'
-        : 'auto';
-
-      streamMessage.author.textContent =
-        /[\u0600-\u06FF]/.test(visible)
-          ? 'ارتيفو'
-          : 'Artivo AI';
-
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-    }
-
-    function finalizeStreamingAssistant(streamMessage, rawText) {
+    async function typeAssistantReply(rawText) {
       const rendered = formatAssistantContent(rawText);
+      const cleanText = String(rawText || '')
+        .replace(/\[\[ARTIVO_WHATSAPP\]\]/g, '')
+        .replace(/\[\[ARTIVO_PROJECTS\]\]/g, '')
+        .replace(/\[\[ARTIVO_ABOUT\]\]/g, '')
+        .trim();
 
-      streamMessage.bubble.innerHTML = rendered.html;
+      const bubble = buildAssistantRow();
 
-      streamMessage.bubble.dir =
-        /[\u0600-\u06FF]/.test(
-          rawText
-        )
-          ? 'rtl'
-          : 'auto';
-
-      streamMessage.author.textContent =
-        /[\u0600-\u06FF]/.test(
-          rawText
-        )
-          ? 'ارتيفو'
-          : 'Artivo AI';
-
-      if (rendered.actions.length) {
-        const actionWrap =
-          document.createElement('div');
-
-        actionWrap.className =
-          'artivo-actions';
-
-        rendered.actions.forEach(
-          (action) => {
-            const link =
-              document.createElement('a');
-
-            link.className =
-              action.primary
-                ? 'artivo-action-btn primary'
-                : 'artivo-action-btn';
-
-            link.href =
-              action.href;
-
-            if (action.external) {
-              link.target = '_blank';
-              link.rel =
-                'noopener noreferrer';
-            }
-
-            link.innerHTML =
-              `${action.icon}<span>${escapeHtml(action.label)}</span>`;
-
-            actionWrap.appendChild(link);
-          }
-        );
-
-        streamMessage.bubble.appendChild(
-          actionWrap
-        );
-
-        streamMessage.bubble
-          .querySelectorAll(
-            'a, button'
-          )
-          .forEach((el) => {
-            el.addEventListener(
-              'mouseenter',
-              () =>
-                cursor.classList.add(
-                  'hover'
-                )
-            );
-
-            el.addEventListener(
-              'mouseleave',
-              () =>
-                cursor.classList.remove(
-                  'hover'
-                )
-            );
-          });
-      }
-
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-    }
-
-    function createStreamingAssistantMessage() {
-      const row = document.createElement('div');
-      row.className = 'message-row assistant';
-
-      const message = document.createElement('div');
-      message.className = 'message';
-
-      const author = document.createElement('div');
-      author.className = 'message-author';
-      author.textContent = 'Artivo AI';
-
-      const bubble = document.createElement('div');
-      bubble.className = 'message-bubble';
-      bubble.dir = 'auto';
-
-      const time = document.createElement('div');
-      time.className = 'message-time';
-      time.textContent = getTime();
-
-      message.appendChild(author);
-      message.appendChild(bubble);
-      message.appendChild(time);
-      row.appendChild(message);
-      chatMessages.appendChild(row);
-
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      return { row, bubble };
-    }
-
-    async function typeAssistantReply(target, text) {
-      const bubble = target.bubble;
       const typingCursor = document.createElement('span');
       typingCursor.className = 'typing-cursor';
       typingCursor.textContent = '▌';
 
       bubble.textContent = '';
-      // Use a dedicated typing cursor inside the message.
-      // Never reuse the global mouse cursor element.
       bubble.appendChild(typingCursor);
 
-      let visible = '';
-      const chars = Array.from(text);
-      const baseDelay = 8;
+      const chars = Array.from(cleanText);
 
       for (const char of chars) {
-        visible += char;
-        bubble.textContent = visible;
+        bubble.textContent += char;
         bubble.appendChild(typingCursor);
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        let delay = baseDelay;
-        if (char === ' ' || char === '\n') delay = 5;
-        if ('.!?؟:؛'.includes(char)) delay = 24;
+        let delay = 11;
+        if (char === ' ' || char === '\n') delay = 6;
+        if ('.!?؟:؛'.includes(char)) delay = 26;
 
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
 
       typingCursor.remove();
-
-      const rendered = formatAssistantContent(text);
-      bubble.innerHTML = rendered.html;
+      bubble.innerHTML = rendered.html || '';
 
       if (rendered.actions.length) {
         const actionWrap = document.createElement('div');
@@ -3802,8 +3646,8 @@
         bubble.appendChild(actionWrap);
 
         bubble.querySelectorAll('a, button').forEach((el) => {
-          el.addEventListener('mouseenter', () => document.getElementById('customCursor')?.classList.add('hover'));
-          el.addEventListener('mouseleave', () => document.getElementById('customCursor')?.classList.remove('hover'));
+          el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+          el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
         });
       }
 
@@ -3811,15 +3655,11 @@
     }
 
     async function sendMessage() {
-      if (isSending) {
-        return;
-      }
+
+      if (isSending) return;
 
       const message = messageInput.value.trim();
-
-      if (!message) {
-        return;
-      }
+      if (!message) return;
 
       hideError();
 
@@ -3834,6 +3674,7 @@
 
       messageInput.value = '';
       autoResizeTextarea();
+      showTyping();
       setSending(true);
 
       try {
@@ -3847,31 +3688,20 @@
           })
         });
 
-        let data = null;
-        try {
-          data = await response.json();
-        } catch (_) {}
+        const data = await response.json().catch(() => null);
+        removeTyping();
 
         if (!response.ok || !data?.success) {
+          conversationHistory.pop();
           throw new Error(
             data?.error ||
-            'Unable to connect to Artivo AI.'
+            'Unable to get a response from Artivo AI.'
           );
         }
 
         const assistantReply =
-          typeof data.reply === 'string' && data.reply.trim()
-            ? data.reply.trim()
-            : 'No response received.';
-
-        const streamMessage = createStreamingAssistantMessage();
-
-        // Smooth client-side character streaming. This preserves the
-        // ChatGPT-like typing feel without relying on proxy-side SSE.
-        await typeAssistantReply(
-          streamMessage,
-          assistantReply
-        );
+          data.reply ||
+          'No response received.';
 
         conversationHistory.push({
           role: 'assistant',
@@ -3880,91 +3710,118 @@
 
         conversationHistory = conversationHistory.slice(-20);
 
-      } catch (error) {
-        conversationHistory.pop();
+        await typeAssistantReply(assistantReply);
 
+      } catch (error) {
+        removeTyping();
         showError(
           error?.message ||
           'Something went wrong. Please try again.'
         );
-
       } finally {
         setSending(false);
         messageInput.focus();
       }
     }
 
+
     chatForm.addEventListener(
       'submit',
       (e) => {
+
         e.preventDefault();
+
         sendMessage();
+
       }
     );
+
 
     messageInput.addEventListener(
       'keydown',
       (e) => {
+
         if (
           e.key === 'Enter' &&
           !e.shiftKey
         ) {
+
           e.preventDefault();
+
           sendMessage();
+
         }
+
       }
     );
 
+
     function autoResizeTextarea() {
+
       messageInput.style.height =
         'auto';
+
 
       messageInput.style.height =
         Math.min(
           messageInput.scrollHeight,
           150
         ) + 'px';
+
     }
+
 
     messageInput.addEventListener(
       'input',
       autoResizeTextarea
     );
 
-    function showWelcomeSequence() {
-      addMessage(
-        'assistant',
-        'Welcome to Artivo AI. I’m here for architecture and interior design.'
-      );
-
-      addMessage(
-        'assistant',
-        'How can I help you today?'
-      );
-    }
 
     newChatBtn.addEventListener(
       'click',
       () => {
+
+        /*
+          Start a completely new conversation.
+          This clears the browser-side context that will be
+          sent to the AI.
+        */
+
         conversationHistory =
           [];
+
 
         chatMessages.innerHTML =
           '';
 
         hideError();
 
-        showWelcomeSequence();
+
+        addMessage(
+          'assistant',
+          'Welcome to Artivo AI. I’m here for architecture and interior design.'
+        );
+
 
         messageInput.focus();
+
       }
     );
+
 
     /* =========================================================
        INITIAL MESSAGE
     ========================================================= */
 
-    showWelcomeSequence();
+    addMessage(
+      'assistant',
+      'Welcome to Artivo AI. I’m here for architecture and interior design.'
+    );
+
+    addMessage(
+      'assistant',
+      'How can I help you today?'
+    );
 
   </script>
 
