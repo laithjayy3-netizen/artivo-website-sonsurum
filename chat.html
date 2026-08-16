@@ -1667,6 +1667,20 @@
       }
     }
 
+
+    .typing-cursor {
+      display: inline-block;
+      margin-left: 2px;
+      color: var(--accent-light);
+      animation: typingCursorBlink .75s infinite;
+      font-weight: 500;
+    }
+
+    @keyframes typingCursorBlink {
+      0%, 48% { opacity: 1; }
+      49%, 100% { opacity: 0; }
+    }
+
   </style>
 </head>
 
@@ -3702,120 +3716,96 @@
         chatMessages.scrollHeight;
     }
 
-    async function readChatStream(response, streamMessage) {
-      if (!response.body) {
-        throw new Error(
-          'Streaming is not supported by this connection.'
-        );
+    function createStreamingAssistantMessage() {
+      const row = document.createElement('div');
+      row.className = 'message-row assistant';
+
+      const message = document.createElement('div');
+      message.className = 'message';
+
+      const author = document.createElement('div');
+      author.className = 'message-author';
+      author.textContent = 'Artivo AI';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+      bubble.dir = 'auto';
+
+      const time = document.createElement('div');
+      time.className = 'message-time';
+      time.textContent = getTime();
+
+      message.appendChild(author);
+      message.appendChild(bubble);
+      message.appendChild(time);
+      row.appendChild(message);
+      chatMessages.appendChild(row);
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      return { row, bubble };
+    }
+
+    async function typeAssistantReply(target, text) {
+      const bubble = target.bubble;
+      const typingCursor = document.createElement('span');
+      typingCursor.className = 'typing-cursor';
+      typingCursor.textContent = '▌';
+
+      bubble.textContent = '';
+      bubble.appendChild(cursor);
+
+      let visible = '';
+      const chars = Array.from(text);
+      const baseDelay = 8;
+
+      for (const char of chars) {
+        visible += char;
+        bubble.textContent = visible;
+        bubble.appendChild(typingCursor);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        let delay = baseDelay;
+        if (char === ' ' || char === '\n') delay = 5;
+        if ('.!?؟:؛'.includes(char)) delay = 24;
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
 
-      const reader =
-        response.body.getReader();
+      typingCursor.remove();
 
-      const decoder =
-        new TextDecoder(
-          'utf-8'
-        );
+      const rendered = formatAssistantContent(text);
+      bubble.innerHTML = rendered.html;
 
-      let buffer = '';
-      let rawText = '';
+      if (rendered.actions.length) {
+        const actionWrap = document.createElement('div');
+        actionWrap.className = 'artivo-actions';
 
-      while (true) {
-        const { value, done } =
-          await reader.read();
+        rendered.actions.forEach((action) => {
+          const link = document.createElement('a');
+          link.className = action.primary
+            ? 'artivo-action-btn primary'
+            : 'artivo-action-btn';
+          link.href = action.href;
 
-        if (done) {
-          break;
-        }
-
-        buffer +=
-          decoder.decode(
-            value,
-            { stream: true }
-          );
-
-        const blocks =
-          buffer.split(
-            /\r?\n\r?\n/
-          );
-
-        buffer =
-          blocks.pop() || '';
-
-        for (const block of blocks) {
-          const lines =
-            block.split(/\r?\n/);
-
-          for (const line of lines) {
-            if (
-              !line.startsWith(
-                'data:'
-              )
-            ) {
-              continue;
-            }
-
-            const payload =
-              line.slice(5).trim();
-
-            if (!payload) {
-              continue;
-            }
-
-            let event;
-
-            try {
-              event =
-                JSON.parse(
-                  payload
-                );
-            } catch (_) {
-              continue;
-            }
-
-            if (event.error) {
-              throw new Error(
-                event.error
-              );
-            }
-
-            if (
-              typeof event.token ===
-              'string'
-            ) {
-              rawText +=
-                event.token;
-
-              updateStreamingAssistant(
-                streamMessage,
-                rawText
-              );
-            }
-
-            if (event.done) {
-              finalizeStreamingAssistant(
-                streamMessage,
-                rawText
-              );
-
-              return rawText;
-            }
+          if (action.external) {
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
           }
-        }
+
+          link.innerHTML = `${action.icon}<span>${escapeHtml(action.label)}</span>`;
+          actionWrap.appendChild(link);
+        });
+
+        bubble.appendChild(actionWrap);
+
+        bubble.querySelectorAll('a, button').forEach((el) => {
+          el.addEventListener('mouseenter', () => document.getElementById('customCursor')?.classList.add('hover'));
+          el.addEventListener('mouseleave', () => document.getElementById('customCursor')?.classList.remove('hover'));
+        });
       }
 
-      if (!rawText) {
-        throw new Error(
-          'No response received.'
-        );
-      }
-
-      finalizeStreamingAssistant(
-        streamMessage,
-        rawText
-      );
-
-      return rawText;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     async function sendMessage() {
@@ -3823,8 +3813,7 @@
         return;
       }
 
-      const message =
-        messageInput.value.trim();
+      const message = messageInput.value.trim();
 
       if (!message) {
         return;
@@ -3837,83 +3826,63 @@
         content: message
       });
 
-      conversationHistory =
-        conversationHistory.slice(-20);
+      conversationHistory = conversationHistory.slice(-20);
 
-      addMessage(
-        'user',
-        message
-      );
+      addMessage('user', message);
 
-      messageInput.value =
-        '';
-
+      messageInput.value = '';
       autoResizeTextarea();
-
-      showTyping();
-
       setSending(true);
 
       try {
-        const response =
-          await fetch(
-            '/api/chat',
-            {
-              method: 'POST',
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            messages: conversationHistory
+          })
+        });
 
-              headers: {
-                'Content-Type':
-                  'application/json'
-              },
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (_) {}
 
-              body:
-                JSON.stringify({
-                  messages:
-                    conversationHistory
-                })
-            }
-          );
-
-        if (!response.ok) {
-          let data = null;
-
-          try {
-            data =
-              await response.json();
-          } catch (_) {}
-
+        if (!response.ok || !data?.success) {
           throw new Error(
             data?.error ||
             'Unable to connect to Artivo AI.'
           );
         }
 
-        removeTyping();
-
-        const streamMessage =
-          createStreamingAssistantMessage();
-
         const assistantReply =
-          await readChatStream(
-            response,
-            streamMessage
-          );
+          typeof data.reply === 'string' && data.reply.trim()
+            ? data.reply.trim()
+            : 'No response received.';
+
+        const streamMessage = createStreamingAssistantMessage();
+
+        // Smooth client-side character streaming. This preserves the
+        // ChatGPT-like typing feel without relying on proxy-side SSE.
+        await typeAssistantReply(
+          streamMessage,
+          assistantReply
+        );
 
         conversationHistory.push({
           role: 'assistant',
           content: assistantReply
         });
 
-        conversationHistory =
-          conversationHistory.slice(-20);
+        conversationHistory = conversationHistory.slice(-20);
 
       } catch (error) {
-        removeTyping();
-
         conversationHistory.pop();
 
         showError(
-          error.message ||
+          error?.message ||
           'Something went wrong. Please try again.'
         );
 
