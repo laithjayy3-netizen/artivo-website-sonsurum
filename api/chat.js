@@ -47,7 +47,7 @@ export default async function handler(req, res) {
           "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
           "HTTP-Referer": "https://www.artivo.tr",
-          "X-Title": "ARTİVO"
+          "X-Title": "ARTIVO"
         },
 
         body: JSON.stringify({
