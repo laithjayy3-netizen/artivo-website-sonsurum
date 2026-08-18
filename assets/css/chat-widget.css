@@ -480,3 +480,14 @@
     height: 280px;
   }
 }
+
+
+/* =========================================================
+   ARTIVO CUSTOM CURSOR
+   Keep the website cursor visible above the chat widget
+   ========================================================= */
+
+.custom-cursor {
+  z-index: 1000000 !important;
+  pointer-events: none !important;
+}
