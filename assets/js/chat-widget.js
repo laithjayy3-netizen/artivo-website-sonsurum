@@ -1,145 +1,59 @@
 /* =========================================================
    ARTIVO CHAT WIDGET
-   Shared Chat Component
+   Shared widget + ARTIVO /api/chat integration
    ========================================================= */
 
 (function () {
   "use strict";
 
-  /* =======================================================
-     Configuration
-     ======================================================= */
-
   const ARTIVO_CHAT_CONFIG = {
-
-    /*
-     * سنربط هذا العنوان لاحقًا بالـAPI الحقيقي
-     * الخاص بالمساعد الذكي.
-     *
-     * لا نحتاج لتعديله الآن.
-     */
     apiEndpoint: "/api/chat",
-
-    /*
-     * التخزين المؤقت للمحادثة.
-     *
-     * sessionStorage:
-     * تبقى المحادثة أثناء جلسة المستخدم
-     * وتختفي عند انتهاء جلسة المتصفح.
-     */
     storageKey: "artivo_chat_history_v1",
-
-    /*
-     * الرسالة الأولى الثابتة.
-     */
-    welcomeMessage:
-      "Welcome. How can I assist you today?"
+    maxStoredMessages: 20,
+    welcomeMessage: "Welcome. How can I assist you today?"
   };
 
-
-  /* =======================================================
-     1. Create Widget HTML
-     * ======================================================= */
+  let chatToggle;
+  let chatPanel;
+  let chatMessages;
+  let chatForm;
+  let chatInput;
+  let chatSend;
+  let chatHistory = [];
+  let isSending = false;
 
   function createChatWidget() {
-
-    if (document.getElementById("artivoChatWidget")) {
-      return;
-    }
+    if (document.getElementById("artivoChatWidget")) return;
 
     const widget = document.createElement("div");
-
     widget.id = "artivoChatWidget";
     widget.className = "artivo-chat-widget";
 
     widget.innerHTML = `
-
-      <!-- Chat Toggle -->
-      <button
-        class="artivo-chat-toggle"
-        id="artivoChatToggle"
-        type="button"
-        aria-label="Open Artivo Assistant"
-        aria-expanded="false"
-      >
-
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
+      <button class="artivo-chat-toggle" id="artivoChatToggle" type="button" aria-label="Open Artivo Assistant" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
-
       </button>
 
-
-      <!-- Chat Panel -->
-      <div
-        class="artivo-chat-panel"
-        id="artivoChatPanel"
-        aria-hidden="true"
-      >
-
-        <!-- Header -->
+      <div class="artivo-chat-panel" id="artivoChatPanel" aria-hidden="true">
         <div class="artivo-chat-header">
-
           <div class="artivo-chat-avatar">
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle
-                cx="12"
-                cy="8"
-                r="4"
-              />
-
-              <path
-                d="M5 20v-2a7 7 0 0 1 14 0v2"
-              />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M5 20v-2a7 7 0 0 1 14 0v2" />
             </svg>
-
             <span class="artivo-chat-online"></span>
-
           </div>
-
-
           <div>
-
-            <div class="artivo-chat-name">
-              Artivo-Bot
-            </div>
-
-            <div class="artivo-chat-status">
-              Online
-            </div>
-
+            <div class="artivo-chat-name">Artivo-Bot</div>
+            <div class="artivo-chat-status">Online</div>
           </div>
-
         </div>
 
+        <div class="artivo-chat-messages" id="artivoChatMessages" aria-live="polite"></div>
 
-        <!-- Messages -->
-        <div
-          class="artivo-chat-messages"
-          id="artivoChatMessages"
-          aria-live="polite"
-        ></div>
-
-
-        <!-- Input -->
-        <form
-          class="artivo-chat-input-area"
-          id="artivoChatForm"
-        >
-
+        <form class="artivo-chat-input-area" id="artivoChatForm">
           <input
             type="text"
             class="artivo-chat-input"
@@ -149,514 +63,429 @@
             maxlength="2000"
             aria-label="Type your message"
           />
-
-          <button
-            type="submit"
-            class="artivo-chat-send"
-            id="artivoChatSend"
-            aria-label="Send message"
-          >
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
+          <button type="submit" class="artivo-chat-send" id="artivoChatSend" aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 2L11 13" />
               <path d="M22 2L15 22L11 13L2 9L22 2Z" />
             </svg>
-
           </button>
-
         </form>
-
       </div>
-
     `;
 
     document.body.appendChild(widget);
   }
 
-
-  /* =======================================================
-     2. Elements
-     ======================================================= */
-
-  let chatToggle;
-  let chatPanel;
-  let chatMessages;
-  let chatForm;
-  let chatInput;
-  let chatSend;
-
-
   function getElements() {
-
-    chatToggle =
-      document.getElementById("artivoChatToggle");
-
-    chatPanel =
-      document.getElementById("artivoChatPanel");
-
-    chatMessages =
-      document.getElementById("artivoChatMessages");
-
-    chatForm =
-      document.getElementById("artivoChatForm");
-
-    chatInput =
-      document.getElementById("artivoChatInput");
-
-    chatSend =
-      document.getElementById("artivoChatSend");
+    chatToggle = document.getElementById("artivoChatToggle");
+    chatPanel = document.getElementById("artivoChatPanel");
+    chatMessages = document.getElementById("artivoChatMessages");
+    chatForm = document.getElementById("artivoChatForm");
+    chatInput = document.getElementById("artivoChatInput");
+    chatSend = document.getElementById("artivoChatSend");
   }
 
-
-  /* =======================================================
-     3. Storage
-     ======================================================= */
-
   function loadChatHistory() {
-
     try {
-
-      const saved =
-        sessionStorage.getItem(
-          ARTIVO_CHAT_CONFIG.storageKey
-        );
-
-      if (!saved) {
-        return [];
-      }
-
-      const history =
-        JSON.parse(saved);
-
-      if (!Array.isArray(history)) {
-        return [];
-      }
-
-      return history;
-
-    } catch (error) {
-
-      console.error(
-        "Artivo Chat: Failed to load history.",
-        error
+      const saved = sessionStorage.getItem(ARTIVO_CHAT_CONFIG.storageKey);
+      if (!saved) return [];
+      const history = JSON.parse(saved);
+      if (!Array.isArray(history)) return [];
+      return history.filter(
+        (item) =>
+          item &&
+          (item.role === "user" || item.role === "assistant") &&
+          typeof item.content === "string" &&
+          item.content.trim()
       );
-
+    } catch (error) {
+      console.error("Artivo Chat: Failed to load history.", error);
       return [];
     }
   }
 
-
-  function saveChatHistory(history) {
-
+  function saveChatHistory() {
     try {
-
+      chatHistory = chatHistory.slice(-ARTIVO_CHAT_CONFIG.maxStoredMessages);
       sessionStorage.setItem(
         ARTIVO_CHAT_CONFIG.storageKey,
-        JSON.stringify(history)
+        JSON.stringify(chatHistory)
       );
-
     } catch (error) {
-
-      console.error(
-        "Artivo Chat: Failed to save history.",
-        error
-      );
+      console.error("Artivo Chat: Failed to save history.", error);
     }
   }
 
-
-  /* =======================================================
-     4. Conversation State
-     ======================================================= */
-
-  let chatHistory = [];
-
-
   function initializeConversation() {
-
-    chatHistory =
-      loadChatHistory();
-
-    /*
-     * إذا كانت هذه أول مرة يفتح فيها المستخدم الموقع
-     * نضيف رسالة الترحيب.
-     */
+    chatHistory = loadChatHistory();
 
     if (chatHistory.length === 0) {
-
       chatHistory.push({
         role: "assistant",
-        content:
-          ARTIVO_CHAT_CONFIG.welcomeMessage,
-        time:
-          new Date().toISOString()
+        content: ARTIVO_CHAT_CONFIG.welcomeMessage,
+        time: new Date().toISOString()
       });
-
-      saveChatHistory(chatHistory);
+      saveChatHistory();
     }
 
     renderAllMessages();
   }
 
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = String(text || "");
+    return div.innerHTML;
+  }
 
-  /* =======================================================
-     5. Render Messages
-     ======================================================= */
+  function detectArabic(text) {
+    return /[\u0600-\u06FF]/.test(String(text || ""));
+  }
+
+  function getAssistantDisplayName(text) {
+    return detectArabic(text) ? "ارتيفو" : "Artivo AI";
+  }
+
+  function formatInlineMarkdown(text) {
+    let html = escapeHtml(text);
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    return html;
+  }
+
+  function renderAssistantMarkdown(text) {
+    const source = String(text || "").replace(/\r\n/g, "\n");
+    const lines = source.split("\n");
+    const output = [];
+    let paragraph = [];
+    let listType = null;
+
+    const closeList = () => {
+      if (listType) {
+        output.push(listType === "ul" ? "</ul>" : "</ol>");
+        listType = null;
+      }
+    };
+
+    const flushParagraph = () => {
+      if (paragraph.length) {
+        output.push(`<p>${paragraph.join("<br>")}</p>`);
+        paragraph = [];
+      }
+    };
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+
+      if (!line) {
+        flushParagraph();
+        closeList();
+        continue;
+      }
+
+      let match = line.match(/^###\s+(.+)$/);
+      if (match) {
+        flushParagraph();
+        closeList();
+        output.push(`<h4>${formatInlineMarkdown(match[1])}</h4>`);
+        continue;
+      }
+
+      match = line.match(/^##\s+(.+)$/);
+      if (match) {
+        flushParagraph();
+        closeList();
+        output.push(`<h3>${formatInlineMarkdown(match[1])}</h3>`);
+        continue;
+      }
+
+      match = line.match(/^#\s+(.+)$/);
+      if (match) {
+        flushParagraph();
+        closeList();
+        output.push(`<h2>${formatInlineMarkdown(match[1])}</h2>`);
+        continue;
+      }
+
+      match = line.match(/^[-*]\s+(.+)$/);
+      if (match) {
+        flushParagraph();
+        if (listType !== "ul") {
+          closeList();
+          output.push("<ul>");
+          listType = "ul";
+        }
+        output.push(`<li>${formatInlineMarkdown(match[1])}</li>`);
+        continue;
+      }
+
+      match = line.match(/^\d+[.)]\s+(.+)$/);
+      if (match) {
+        flushParagraph();
+        if (listType !== "ol") {
+          closeList();
+          output.push("<ol>");
+          listType = "ol";
+        }
+        output.push(`<li>${formatInlineMarkdown(match[1])}</li>`);
+        continue;
+      }
+
+      closeList();
+      paragraph.push(formatInlineMarkdown(line));
+    }
+
+    flushParagraph();
+    closeList();
+    return output.join("");
+  }
+
+  function parseAssistantContent(rawText) {
+    const original = String(rawText || "");
+    const hasWhatsApp = original.includes("[[ARTIVO_WHATSAPP]]");
+    const hasProjects = original.includes("[[ARTIVO_PROJECTS]]");
+    const hasAbout = original.includes("[[ARTIVO_ABOUT]]");
+
+    const cleanText = original
+      .replace(/\[\[ARTIVO_WHATSAPP\]\]/g, "")
+      .replace(/\[\[ARTIVO_PROJECTS\]\]/g, "")
+      .replace(/\[\[ARTIVO_ABOUT\]\]/g, "")
+      .trim();
+
+    const arabic = detectArabic(cleanText);
+    const actions = [];
+
+    if (hasWhatsApp) {
+      actions.push({
+        href: "https://wa.me/905424318166",
+        label: arabic
+          ? "للتواصل مع مصممي ARTİVO — اضغط هنا"
+          : "Talk to an ARTİVO Designer — Click Here",
+        primary: true,
+        external: true
+      });
+    }
+
+    if (hasProjects) {
+      actions.push({
+        href: "projects.html",
+        label: arabic ? "استكشف مشاريع ARTİVO" : "Explore ARTİVO Projects",
+        primary: false,
+        external: false
+      });
+    }
+
+    if (hasAbout) {
+      actions.push({
+        href: "about.html",
+        label: arabic ? "تعرف أكثر على ARTİVO" : "Discover ARTİVO",
+        primary: false,
+        external: false
+      });
+    }
+
+    return {
+      cleanText,
+      html: renderAssistantMarkdown(cleanText),
+      actions
+    };
+  }
+
+  function addActions(bubble, actions) {
+    if (!actions.length) return;
+
+    const actionWrap = document.createElement("div");
+    actionWrap.className = "artivo-actions";
+
+    actions.forEach((action) => {
+      const link = document.createElement("a");
+      link.className = action.primary
+        ? "artivo-action-btn primary"
+        : "artivo-action-btn";
+      link.href = action.href;
+
+      if (action.external) {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+
+      link.textContent = action.label;
+      actionWrap.appendChild(link);
+    });
+
+    bubble.appendChild(actionWrap);
+  }
+
+  function getTime(time) {
+    return new Date(time || Date.now()).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function addMessageToUI(role, text, time, shouldScroll = true) {
+    const row = document.createElement("div");
+    row.className = `artivo-chat-message ${role === "user" ? "user" : "bot"}`;
+
+    const bubble = document.createElement("div");
+    bubble.className = "artivo-chat-bubble";
+    bubble.dir = "auto";
+
+    if (role === "assistant") {
+      const rendered = parseAssistantContent(text);
+      bubble.innerHTML = rendered.html;
+      addActions(bubble, rendered.actions);
+    } else {
+      bubble.textContent = text;
+    }
+
+    const timeElement = document.createElement("div");
+    timeElement.className = "artivo-chat-time";
+    timeElement.textContent = getTime(time);
+
+    row.appendChild(bubble);
+    row.appendChild(timeElement);
+    chatMessages.appendChild(row);
+
+    if (shouldScroll) scrollToBottom();
+  }
 
   function renderAllMessages() {
-
     chatMessages.innerHTML = "";
-
-    chatHistory.forEach(message => {
-
+    chatHistory.forEach((message) => {
       addMessageToUI(
         message.role,
         message.content,
         message.time,
         false
       );
-
     });
-
     scrollToBottom();
   }
 
-
-  function addMessageToUI(
-    role,
-    text,
-    time,
-    shouldScroll = true
-  ) {
-
-    const messageWrapper =
-      document.createElement("div");
-
-    messageWrapper.className =
-      "artivo-chat-message " +
-      (role === "user" ? "user" : "bot");
-
-
-    const bubble =
-      document.createElement("div");
-
-    bubble.className =
-      "artivo-chat-bubble";
-
-    /*
-     * textContent بدل innerHTML
-     * لمنع إدخال HTML أو JavaScript
-     * من رسائل المستخدم.
-     */
-    bubble.textContent = text;
-
-
-    const timeElement =
-      document.createElement("div");
-
-    timeElement.className =
-      "artivo-chat-time";
-
-    timeElement.textContent =
-      formatTime(time);
-
-
-    messageWrapper.appendChild(bubble);
-    messageWrapper.appendChild(timeElement);
-
-    chatMessages.appendChild(messageWrapper);
-
-
-    if (shouldScroll) {
-      scrollToBottom();
-    }
-  }
-
-
-  function formatTime(time) {
-
-    const date =
-      time
-        ? new Date(time)
-        : new Date();
-
-    return date.toLocaleTimeString(
-      [],
-      {
-        hour: "2-digit",
-        minute: "2-digit"
-      }
-    );
-  }
-
-
   function scrollToBottom() {
-
     requestAnimationFrame(() => {
-
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     });
   }
 
-
-  /* =======================================================
-     6. Add Messages
-     ======================================================= */
-
-  function addUserMessage(text) {
-
-    const message = {
-
-      role: "user",
-
-      content: text,
-
-      time:
-        new Date().toISOString()
-    };
-
-    chatHistory.push(message);
-
-    saveChatHistory(chatHistory);
-
-    addMessageToUI(
-      message.role,
-      message.content,
-      message.time
-    );
-  }
-
-
-  function addBotMessage(text) {
-
-    const message = {
-
-      role: "assistant",
-
-      content: text,
-
-      time:
-        new Date().toISOString()
-    };
-
-    chatHistory.push(message);
-
-    saveChatHistory(chatHistory);
-
-    addMessageToUI(
-      message.role,
-      message.content,
-      message.time
-    );
-  }
-
-
-  /* =======================================================
-     7. Typing Indicator
-     ======================================================= */
-
   function showTypingIndicator() {
-
     removeTypingIndicator();
 
-    const wrapper =
-      document.createElement("div");
-
-    wrapper.id =
-      "artivoTypingIndicator";
-
-    wrapper.className =
-      "artivo-chat-message bot";
-
+    const wrapper = document.createElement("div");
+    wrapper.id = "artivoTypingIndicator";
+    wrapper.className = "artivo-chat-message bot";
 
     wrapper.innerHTML = `
-
       <div class="artivo-chat-typing">
-
         <span></span>
         <span></span>
         <span></span>
-
       </div>
-
     `;
 
     chatMessages.appendChild(wrapper);
-
     scrollToBottom();
   }
 
-
   function removeTypingIndicator() {
-
-    const indicator =
-      document.getElementById(
-        "artivoTypingIndicator"
-      );
-
-    if (indicator) {
-      indicator.remove();
-    }
+    document.getElementById("artivoTypingIndicator")?.remove();
   }
 
+  function setLoading(state) {
+    isSending = state;
+    chatSend.disabled = state;
+    chatInput.disabled = state;
+  }
 
-  /* =======================================================
-     8. Send Message
-     ======================================================= */
+  function addUserMessage(text) {
+    const message = {
+      role: "user",
+      content: text,
+      time: new Date().toISOString()
+    };
+
+    chatHistory.push(message);
+    saveChatHistory();
+    addMessageToUI(message.role, message.content, message.time);
+  }
+
+  function addAssistantMessage(text) {
+    const message = {
+      role: "assistant",
+      content: text,
+      time: new Date().toISOString()
+    };
+
+    chatHistory.push(message);
+    saveChatHistory();
+    addMessageToUI(message.role, message.content, message.time);
+  }
 
   async function sendMessage(text) {
+    if (isSending) return;
 
-    const cleanText =
-      text.trim();
-
-    if (!cleanText) {
-      return;
-    }
-
+    const cleanText = String(text || "").trim();
+    if (!cleanText) return;
 
     addUserMessage(cleanText);
-
     chatInput.value = "";
-
     setLoading(true);
-
     showTypingIndicator();
 
-
     try {
+      const apiMessages = chatHistory
+        .slice(-ARTIVO_CHAT_CONFIG.maxStoredMessages)
+        .map((message) => ({
+          role: message.role,
+          content: message.content
+        }));
 
-      /*
-       * هنا سيتم الاتصال بالمساعد الذكي.
-       *
-       * سيتم ربط هذا الجزء لاحقًا
-       * بالـAPI الحقيقي الموجود لديك.
-       */
+      const response = await fetch(
+        ARTIVO_CHAT_CONFIG.apiEndpoint,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            messages: apiMessages
+          })
+        }
+      );
 
-      const response =
-        await fetch(
-          ARTIVO_CHAT_CONFIG.apiEndpoint,
-          {
-            method: "POST",
+      const data = await response.json().catch(() => null);
+      removeTypingIndicator();
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-
-              messages:
-                chatHistory.map(message => ({
-                  role: message.role,
-                  content: message.content
-                }))
-
-            })
-          }
-        );
-
-
-      if (!response.ok) {
-
+      if (!response.ok || !data || !data.success) {
+        chatHistory.pop();
+        saveChatHistory();
         throw new Error(
-          `HTTP ${response.status}`
+          data?.error || "Unable to get a response from Artivo AI."
         );
       }
-
-
-      const data =
-        await response.json();
-
-
-      /*
-       * نحاول دعم أكثر من شكل للـAPI.
-       */
 
       const reply =
-        data.reply ||
-        data.message ||
-        data.content ||
-        data.response ||
-        data?.choices?.[0]?.message?.content;
+        typeof data.reply === "string" && data.reply.trim()
+          ? data.reply.trim()
+          : "No response received.";
 
-
-      if (!reply) {
-
-        throw new Error(
-          "No response text returned from API."
-        );
-      }
-
-
-      removeTypingIndicator();
-
-      addBotMessage(reply);
-
+      addAssistantMessage(reply);
     } catch (error) {
-
-      console.error(
-        "Artivo Chat API Error:",
-        error
-      );
-
       removeTypingIndicator();
+      console.error("Artivo Chat API Error:", error);
 
-      /*
-       * هذه رسالة مؤقتة فقط حتى نربط
-       * الـAPI الحقيقي في الخطوة التالية.
-       */
-
-      addBotMessage(
+      addAssistantMessage(
         "I'm having trouble connecting right now. Please try again in a moment."
       );
-
     } finally {
-
       setLoading(false);
-
       chatInput.focus();
     }
   }
 
-
-  /* =======================================================
-     9. Loading State
-     ======================================================= */
-
-  function setLoading(isLoading) {
-
-    chatSend.disabled =
-      isLoading;
-
-    chatInput.disabled =
-      isLoading;
-  }
-
-
-  /* =======================================================
-     10. Open / Close Chat
-     ======================================================= */
-
   function openChat() {
-
     chatPanel.classList.add("active");
-
-    chatPanel.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    chatToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
+    chatPanel.setAttribute("aria-hidden", "false");
+    chatToggle.setAttribute("aria-expanded", "true");
 
     setTimeout(() => {
       chatInput.focus();
@@ -664,153 +493,56 @@
     }, 100);
   }
 
-
   function closeChat() {
-
     chatPanel.classList.remove("active");
-
-    chatPanel.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    chatToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
+    chatPanel.setAttribute("aria-hidden", "true");
+    chatToggle.setAttribute("aria-expanded", "false");
   }
-
 
   function toggleChat() {
-
-    if (
-      chatPanel.classList.contains("active")
-    ) {
-
-      closeChat();
-
-    } else {
-
-      openChat();
-
-    }
+    if (chatPanel.classList.contains("active")) closeChat();
+    else openChat();
   }
-
-
-  /* =======================================================
-     11. Events
-     ======================================================= */
 
   function setupEvents() {
+    chatToggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleChat();
+    });
 
-    chatToggle.addEventListener(
-      "click",
-      function (event) {
+    chatPanel.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
 
-        event.stopPropagation();
-
-        toggleChat();
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest("#artivoChatWidget")) {
+        closeChat();
       }
-    );
+    });
 
+    chatForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      sendMessage(chatInput.value);
+    });
 
-    chatPanel.addEventListener(
-      "click",
-      function (event) {
-
-        event.stopPropagation();
-      }
-    );
-
-
-    document.addEventListener(
-      "click",
-      function (event) {
-
-        if (
-          !event.target.closest(
-            "#artivoChatWidget"
-          )
-        ) {
-
-          closeChat();
-
-        }
-      }
-    );
-
-
-    chatForm.addEventListener(
-      "submit",
-      function (event) {
-
+    chatInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
         event.preventDefault();
-
-        sendMessage(
-          chatInput.value
-        );
+        chatForm.requestSubmit();
       }
-    );
-
-
-    /*
-     * Enter = إرسال
-     *
-     * Shift + Enter = سطر جديد
-     *
-     * حاليًا صندوق الإدخال input لذلك
-     * Enter سيقوم بالإرسال مباشرة.
-     */
-
-    chatInput.addEventListener(
-      "keydown",
-      function (event) {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          event.preventDefault();
-
-          chatForm.requestSubmit();
-        }
-      }
-    );
+    });
   }
 
-
-  /* =======================================================
-     12. Start
-     ======================================================= */
-
   function initArtivoChat() {
-
     createChatWidget();
-
     getElements();
-
     initializeConversation();
-
     setupEvents();
   }
 
-
-  /*
-   * انتظر حتى يتم تحميل الصفحة بالكامل.
-   */
-
-  if (
-    document.readyState === "loading"
-  ) {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      initArtivoChat
-    );
-
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initArtivoChat);
   } else {
-
     initArtivoChat();
   }
-
 })();
