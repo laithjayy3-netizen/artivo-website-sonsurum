@@ -2205,7 +2205,52 @@
       }
     }
 
-  </style>
+  
+
+    /* =========================================================
+       ARTIVO HOMEPAGE - FINAL MICRO ADJUSTMENTS
+       Only spacing and the outer philosophy frame are changed.
+       ========================================================= */
+
+    /* Selected Works: bring the project images/cards much closer together */
+    .featured .project-grid {
+      gap: 0.35rem !important;
+    }
+
+    /* Keep the image/card corners perfectly sharp, including mobile */
+    .featured .project-card,
+    .featured .project-card:nth-child(1),
+    .featured .project-card:nth-child(2),
+    .featured .project-card:nth-child(3),
+    .featured .project-card:nth-child(4),
+    .featured .project-card::after {
+      border-radius: 0 !important;
+    }
+
+    /* Keep the information panel rounded as before */
+    .featured .project-info {
+      border-radius: 17px !important;
+    }
+
+    /* Philosophy: remove the rounded outer frame/background behind the video too */
+    .philosophy-visual,
+    .philosophy-visual::before,
+    .philosophy-visual::after,
+    .philosophy-visual video {
+      border-radius: 0 !important;
+    }
+
+    .philosophy-visual video {
+      clip-path: inset(0) !important;
+    }
+
+    @media (max-width: 768px) {
+      .featured .project-grid {
+        gap: 0.35rem !important;
+      }
+    }
+
+</style>
 </head>
 <body>
   <!-- مؤشر الفأرة المخصص -->
