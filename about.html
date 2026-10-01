@@ -1484,6 +1484,30 @@ body{
   }
 }
 
+
+
+    /* Mobile hero spacing fix: remove the oversized empty area above the headline.
+       Keep the existing full-screen hero treatment and all content/animations. */
+    @media (max-width: 768px) {
+      .about-hero {
+        min-height: 100svh !important;
+        min-height: 100vh !important;
+        box-sizing: border-box !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+        padding: 112px 23px 62px !important;
+      }
+      .about-statement {
+        margin-top: 0 !important;
+      }
+    }
+    @media (max-width: 420px) {
+      .about-hero {
+        padding-top: 104px !important;
+        padding-bottom: 46px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
