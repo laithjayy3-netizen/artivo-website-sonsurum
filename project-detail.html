@@ -11,6 +11,9 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <link rel="stylesheet" href="assets/css/chat-widget.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg: #040006;
@@ -919,6 +922,1261 @@
     }
 
   </style>
+
+<style id="artivo-project-detail-ivory-olive">
+/* =========================================================
+   ARTIVO PROJECT DETAIL — APPROVED IVORY / OLIVE SYSTEM
+   Visual language synchronized with the approved homepage.
+   Content, project data, image paths and interactions remain intact.
+   ========================================================= */
+
+:root{
+  --ink:#191b17;
+  --ink-2:#242720;
+  --paper:#e9e6dc;
+  --ivory:#f5f3eb;
+  --paper-2:#f2f0e8;
+  --sand:#e8e4d7;
+  --white:#faf9f4;
+  --muted:#7d8176;
+  --muted-dark:#65685e;
+  --line-dark:rgba(25,27,23,.16);
+  --line-light:rgba(245,243,235,.18);
+  --border-olive:rgba(127,143,100,.32);
+  --olive-deep:#22271e;
+  --olive:#7f8f64;
+  --olive-soft:#cfd7b7;
+  --sage:#aeb99a;
+  --accent:#c9d2a4;
+  --accent-2:#d7a779;
+  --serif:"Playfair Display",Georgia,serif;
+  --display:"Manrope","DM Sans",Inter,sans-serif;
+  --sans:"DM Sans",Inter,sans-serif;
+}
+
+html{
+  background:var(--ivory);
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:var(--sans);
+  background:
+    radial-gradient(circle at 9% 10%,rgba(201,210,164,.10),transparent 26rem),
+    radial-gradient(circle at 90% 42%,rgba(215,167,121,.055),transparent 30rem),
+    linear-gradient(180deg,var(--ivory),var(--paper-2));
+  color:var(--ink);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+#bgCanvas{
+  opacity:.085 !important;
+  mix-blend-mode:multiply;
+}
+
+.ambient-overlay{
+  background:
+    radial-gradient(ellipse 70% 44% at 50% 0%,rgba(127,143,100,.075) 0%,transparent 60%),
+    linear-gradient(180deg,rgba(245,243,235,.02),rgba(25,27,23,.025)) !important;
+}
+
+.content-wrapper{
+  position:relative;
+  z-index:10;
+}
+
+.custom-cursor{
+  width:24px !important;
+  height:24px !important;
+  border:1.5px solid rgba(127,143,100,.82) !important;
+  box-shadow:0 0 16px rgba(127,143,100,.16) !important;
+  z-index:1000000 !important;
+  background:transparent !important;
+}
+
+.custom-cursor.hover{
+  width:38px !important;
+  height:38px !important;
+  border-color:var(--olive) !important;
+  background:rgba(201,210,164,.07) !important;
+  box-shadow:0 0 28px rgba(127,143,100,.22) !important;
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--ivory)}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#8b986f,#7f8f64,#a9b28d) !important;
+  border-radius:2px;
+}
+
+/* ---------- Header ---------- */
+.header{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  padding:22px clamp(22px,5vw,82px) !important;
+  display:grid !important;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:28px;
+  background:linear-gradient(180deg,rgba(20,23,17,.28),transparent) !important;
+  border-bottom:1px solid rgba(245,243,235,.11) !important;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  z-index:1000 !important;
+}
+
+.header.scrolled{
+  background:rgba(34,39,30,.82) !important;
+  backdrop-filter:blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter:blur(16px) saturate(120%) !important;
+  border-bottom-color:rgba(207,215,183,.17) !important;
+  box-shadow:0 14px 40px rgba(22,26,19,.12) !important;
+}
+
+.logo{
+  display:flex !important;
+  align-items:center;
+  overflow:hidden;
+  font-family:var(--display) !important;
+  color:var(--white) !important;
+  z-index:12 !important;
+}
+
+.logo-main{
+  color:var(--white) !important;
+  font-size:1.45rem !important;
+  font-weight:700 !important;
+  letter-spacing:-.07em;
+}
+
+.logo-short{
+  color:var(--olive-soft) !important;
+  font-size:1.45rem !important;
+  font-weight:700 !important;
+}
+
+.logo-full{
+  color:var(--white) !important;
+  font-size:1.45rem !important;
+  font-weight:700 !important;
+}
+
+.nav-links{
+  justify-self:center;
+  display:flex !important;
+  align-items:center;
+  gap:clamp(18px,3vw,48px) !important;
+}
+
+.nav-link{
+  color:rgba(250,249,244,.73) !important;
+  font-size:.67rem !important;
+  letter-spacing:.17em !important;
+  text-transform:uppercase;
+  transition:color .25s ease,opacity .25s ease !important;
+}
+
+.nav-link::after{
+  background:var(--olive-soft) !important;
+  box-shadow:0 0 12px rgba(207,215,183,.18);
+}
+
+.nav-link:hover,
+.nav-link.active{
+  color:var(--olive-soft) !important;
+}
+
+.lets-talk-btn{
+  border:1px solid rgba(201,210,164,.70) !important;
+  background:rgba(255,255,255,.025) !important;
+  color:var(--white) !important;
+  border-radius:0 !important;
+  padding:12px 18px !important;
+  box-shadow:none !important;
+  margin-left:4px !important;
+  transition:background .25s ease,color .25s ease,transform .25s ease,border-color .25s ease !important;
+}
+
+.lets-talk-btn:hover{
+  background:var(--accent) !important;
+  color:var(--ink) !important;
+  border-color:var(--accent) !important;
+  transform:translateY(-2px) !important;
+  box-shadow:0 12px 30px rgba(58,66,43,.15) !important;
+}
+
+.back-link{
+  justify-self:end;
+  color:rgba(250,249,244,.76) !important;
+  border-bottom:1px solid rgba(250,249,244,.25);
+  padding-bottom:6px;
+  font-size:.63rem !important;
+  letter-spacing:.14em !important;
+  gap:9px !important;
+  transition:color .25s ease,border-color .25s ease,transform .25s ease !important;
+}
+
+.back-link:hover{
+  color:var(--olive-soft) !important;
+  border-bottom-color:var(--olive-soft);
+  transform:translateX(-3px);
+}
+
+.menu-toggle{
+  justify-self:end;
+  border:0 !important;
+  background:none !important;
+  padding:7px !important;
+  color:var(--white) !important;
+}
+
+.menu-toggle span{
+  width:28px !important;
+  height:1px !important;
+  background:currentColor !important;
+}
+
+/* ---------- Project Hero ---------- */
+.project-hero{
+  min-height:max(720px,92svh) !important;
+  height:92vh !important;
+  background:var(--olive-deep) !important;
+  isolation:isolate;
+  overflow:hidden !important;
+  display:flex;
+  align-items:flex-end;
+}
+
+.project-hero::before{
+  content:"PROJECT / ARTIVO";
+  position:absolute;
+  top:50%;
+  right:clamp(18px,5vw,82px);
+  z-index:3;
+  writing-mode:vertical-rl;
+  transform:translateY(-50%);
+  color:rgba(245,243,235,.38);
+  font:600 .54rem var(--sans);
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  pointer-events:none;
+}
+
+.project-hero img{
+  position:absolute !important;
+  inset:-2.5% !important;
+  width:105% !important;
+  height:105% !important;
+  object-fit:cover !important;
+  opacity:.57 !important;
+  filter:saturate(.72) contrast(1.03) brightness(.73) !important;
+  transform:scale(1.04);
+  transition:transform 1.5s cubic-bezier(.16,1,.3,1),filter 1s ease,opacity 1s ease;
+  will-change:transform;
+}
+
+.project-hero.loaded img{
+  transform:scale(1.015);
+  opacity:.63 !important;
+}
+
+.project-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(24,29,20,.95) 0%,rgba(24,29,20,.67) 34%,rgba(24,29,20,.20) 70%,rgba(24,29,20,.08) 100%),
+    linear-gradient(180deg,rgba(14,17,11,.12) 0%,rgba(14,17,11,0) 38%,rgba(14,17,11,.88) 100%),
+    radial-gradient(ellipse at 74% 42%,rgba(207,215,183,.11),transparent 38%);
+}
+
+.project-hero-content{
+  left:clamp(22px,8vw,132px) !important;
+  right:clamp(22px,8vw,132px) !important;
+  bottom:clamp(32px,5vw,70px) !important;
+  z-index:4 !important;
+  max-width:1200px;
+  animation:projectHeroIn 1s cubic-bezier(.16,1,.3,1) both;
+}
+
+.project-category{
+  color:var(--olive-soft) !important;
+  font:700 .61rem var(--sans) !important;
+  letter-spacing:.24em !important;
+  margin-bottom:16px !important;
+}
+
+.project-title{
+  font-family:var(--display) !important;
+  font-weight:600 !important;
+  font-size:clamp(3.2rem,8.6vw,8.4rem) !important;
+  line-height:.90 !important;
+  letter-spacing:-.095em !important;
+  color:var(--white) !important;
+  text-shadow:0 22px 70px rgba(0,0,0,.28);
+  max-width:1150px;
+}
+
+@keyframes projectHeroIn{
+  from{opacity:0;transform:translateY(34px)}
+  to{opacity:1;transform:none}
+}
+
+/* ---------- Project Information ---------- */
+.project-info-section{
+  background:linear-gradient(180deg,var(--ivory),var(--paper-2)) !important;
+  color:var(--ink) !important;
+  padding:clamp(80px,11vw,155px) clamp(22px,7vw,110px) !important;
+  grid-template-columns:.74fr 1.26fr !important;
+  gap:clamp(42px,7vw,110px) !important;
+  border-top:1px solid rgba(25,27,23,.07);
+}
+
+.project-meta{
+  border-right:1px solid rgba(25,27,23,.14) !important;
+  padding-right:clamp(24px,4vw,58px) !important;
+  gap:1rem !important;
+}
+
+.meta-item{
+  border-left:1px solid rgba(127,143,100,.28) !important;
+  padding:14px 0 14px 18px !important;
+  transition:border-color .3s ease,transform .35s ease !important;
+}
+
+.meta-item:hover{
+  border-left-color:var(--olive) !important;
+  transform:translateX(4px);
+}
+
+.meta-label{
+  color:#7a8565 !important;
+  font:700 .58rem var(--sans) !important;
+  letter-spacing:.18em !important;
+  text-transform:uppercase;
+  margin-bottom:7px !important;
+}
+
+.meta-value{
+  color:#30352c !important;
+  font:500 1rem var(--display) !important;
+  line-height:1.35;
+}
+
+.project-description{
+  max-width:820px;
+}
+
+.project-description h3{
+  color:var(--ink) !important;
+  font:500 clamp(2rem,4vw,3.7rem)/.98 var(--display) !important;
+  letter-spacing:-.065em !important;
+  margin-bottom:25px !important;
+}
+
+.project-description p{
+  color:#60675c !important;
+  font:400 clamp(.98rem,1.15vw,1.08rem)/1.95 var(--sans) !important;
+  margin-bottom:21px !important;
+  max-width:760px;
+}
+
+/* ---------- Gallery ---------- */
+.project-gallery{
+  background:var(--paper-2);
+  padding:0 clamp(18px,5vw,82px) clamp(82px,11vw,150px) !important;
+}
+
+.gallery-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+
+.gallery-item{
+  aspect-ratio:1.1 !important;
+  border-radius:0 !important;
+  border:1px solid rgba(25,27,23,.09) !important;
+  background:#ddd9cc !important;
+  box-shadow:0 12px 38px rgba(36,39,32,.08) !important;
+  transition:transform .55s cubic-bezier(.16,1,.3,1),box-shadow .55s ease,border-color .4s ease !important;
+  overflow:hidden;
+}
+
+.gallery-item::before{
+  content:"";
+  position:absolute;
+  inset:11px;
+  border:1px solid rgba(207,215,183,.42);
+  z-index:2;
+  opacity:0;
+  transform:scale(.985);
+  transition:opacity .45s ease,transform .65s cubic-bezier(.16,1,.3,1);
+  pointer-events:none;
+}
+
+.gallery-item:hover{
+  transform:translateY(-6px) !important;
+  box-shadow:0 24px 54px rgba(36,39,32,.15) !important;
+  border-color:rgba(127,143,100,.30) !important;
+}
+
+.gallery-item:hover::before{
+  opacity:1;
+  transform:scale(1);
+}
+
+.gallery-item img{
+  filter:saturate(.82) contrast(1.02);
+  transition:transform .8s cubic-bezier(.16,1,.3,1),filter .65s ease !important;
+}
+
+.gallery-item:hover img{
+  transform:scale(1.045);
+  filter:saturate(.96) contrast(1.04);
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox{
+  background:rgba(25,29,22,.95) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+}
+
+.lightbox-content img{
+  border-radius:0 !important;
+  box-shadow:0 25px 90px rgba(0,0,0,.38);
+}
+
+.lightbox-close,
+.lightbox-nav,
+.lightbox-counter{
+  background:rgba(34,39,30,.75) !important;
+  border-color:rgba(207,215,183,.42) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.lightbox-close:hover,
+.lightbox-nav:hover{
+  background:var(--accent) !important;
+  color:var(--ink) !important;
+  border-color:var(--accent) !important;
+}
+
+.lightbox-counter{
+  color:var(--white) !important;
+}
+
+/* ---------- Footer ---------- */
+.footer{
+  background:var(--ink) !important;
+  color:var(--paper) !important;
+  padding:76px clamp(22px,6vw,95px) 25px !important;
+  border-top:1px solid rgba(201,210,164,.13) !important;
+}
+
+.footer-brand p{
+  color:rgba(233,230,220,.58) !important;
+}
+
+.footer-title{
+  color:var(--olive-soft) !important;
+}
+
+.footer-links a,
+.footer-links li{
+  color:rgba(233,230,220,.67) !important;
+}
+
+.footer-links a:hover{
+  color:var(--olive-soft) !important;
+}
+
+.footer-contact .social-links a{
+  border-color:rgba(233,230,220,.22) !important;
+  color:var(--paper) !important;
+  background:transparent !important;
+}
+
+.footer-contact .social-links a:hover{
+  background:var(--accent) !important;
+  color:var(--ink) !important;
+  border-color:var(--accent) !important;
+}
+
+/* ---------- Shared Chat: same icon, approved palette ---------- */
+#artivoChatWidget{
+  z-index:1000002 !important;
+}
+
+#artivoChatWidget .artivo-chat-toggle{
+  width:64px !important;
+  height:64px !important;
+  background:linear-gradient(145deg,#dbe2c3 0%,#a8b58a 100%) !important;
+  color:#283123 !important;
+  border:1px solid rgba(47,58,37,.28) !important;
+  box-shadow:0 12px 30px rgba(34,39,30,.22),0 0 0 8px rgba(207,215,183,.10) !important;
+  animation:artivoChatFloat 4s ease-in-out infinite;
+}
+
+#artivoChatWidget .artivo-chat-toggle::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border:1px solid rgba(142,157,111,.28);
+  border-radius:50%;
+  animation:artivoChatPulse 2.8s ease-out infinite;
+  pointer-events:none;
+}
+
+#artivoChatWidget .artivo-chat-toggle:hover{
+  transform:scale(1.06) translateY(-2px) !important;
+  box-shadow:0 16px 34px rgba(34,39,30,.26),0 0 0 10px rgba(207,215,183,.12) !important;
+}
+
+#artivoChatWidget .artivo-chat-toggle svg{
+  width:27px !important;
+  height:27px !important;
+  color:#283123 !important;
+  filter:none !important;
+}
+
+#artivoChatWidget .artivo-chat-panel{
+  background:rgba(28,33,24,.97) !important;
+  border:1px solid rgba(207,215,183,.24) !important;
+  border-radius:22px !important;
+  box-shadow:0 24px 70px rgba(17,20,14,.34),0 0 0 1px rgba(207,215,183,.06) inset !important;
+}
+
+#artivoChatWidget .artivo-chat-avatar,
+#artivoChatWidget .artivo-chat-send{
+  background:linear-gradient(145deg,#dbe2c3,#a8b58a) !important;
+  color:#283123 !important;
+}
+
+#artivoChatWidget .artivo-chat-avatar svg,
+#artivoChatWidget .artivo-chat-send svg{
+  color:#283123 !important;
+}
+
+#artivoChatWidget .artivo-chat-online{
+  border-color:#1c2118 !important;
+  background:#94d37b !important;
+}
+
+#artivoChatWidget .artivo-chat-name{color:#f5f3eb !important}
+#artivoChatWidget .artivo-chat-status{color:#aebd93 !important}
+
+#artivoChatWidget .artivo-chat-message.bot .artivo-chat-bubble{
+  background:rgba(127,143,100,.15) !important;
+  border-color:rgba(177,192,148,.20) !important;
+}
+
+#artivoChatWidget .artivo-chat-message.user .artivo-chat-bubble{
+  background:linear-gradient(145deg,#84936a,#687451) !important;
+}
+
+#artivoChatWidget .artivo-chat-input{
+  border-color:rgba(207,215,183,.20) !important;
+  background:rgba(255,255,255,.045) !important;
+}
+
+#artivoChatWidget .artivo-chat-input:focus{
+  border-color:rgba(207,215,183,.55) !important;
+}
+
+#artivoChatWidget .artivo-chat-typing{
+  background:rgba(127,143,100,.15) !important;
+  border-color:rgba(177,192,148,.20) !important;
+}
+
+#artivoChatWidget .artivo-chat-typing span{background:#cfd7b7 !important}
+
+#artivoChatWidget .artivo-chat-messages::-webkit-scrollbar-thumb{
+  background:rgba(207,215,183,.28) !important;
+}
+
+@keyframes artivoChatFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+@keyframes artivoChatPulse{
+  0%{transform:scale(.92);opacity:.65}
+  72%,100%{transform:scale(1.18);opacity:0}
+}
+
+/* ---------- Motion ---------- */
+.project-meta .meta-item,
+.project-description h3,
+.project-description p,
+.gallery-item{
+  animation:detailReveal .85s cubic-bezier(.16,1,.3,1) both;
+}
+
+.project-meta .meta-item:nth-child(1){animation-delay:.06s}
+.project-meta .meta-item:nth-child(2){animation-delay:.12s}
+.project-meta .meta-item:nth-child(3){animation-delay:.18s}
+.project-meta .meta-item:nth-child(4){animation-delay:.24s}
+.project-description h3{animation-delay:.14s}
+.project-description p:nth-of-type(1){animation-delay:.22s}
+.project-description p:nth-of-type(2){animation-delay:.29s}
+.project-description p:nth-of-type(3){animation-delay:.36s}
+
+@keyframes detailReveal{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:none}
+}
+
+/* ---------- Responsive desktop / tablet ---------- */
+@media (max-width:1200px){
+  .header{
+    grid-template-columns:auto auto;
+    justify-content:space-between;
+  }
+  .nav-links{
+    display:none !important;
+  }
+  .menu-toggle{
+    display:flex !important;
+  }
+  .back-link{
+    display:none !important;
+  }
+
+  .project-hero{
+    height:86vh !important;
+    min-height:680px !important;
+  }
+
+  .project-info-section{
+    grid-template-columns:1fr !important;
+    gap:42px !important;
+  }
+
+  .project-meta{
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    border-right:0 !important;
+    border-bottom:1px solid rgba(25,27,23,.14);
+    padding-right:0 !important;
+    padding-bottom:26px !important;
+  }
+
+  .meta-item{
+    border-left:1px solid rgba(127,143,100,.28) !important;
+  }
+}
+
+@media (max-width:900px){
+  .gallery-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width:768px){
+  html{scroll-padding-top:74px}
+
+  .header{
+    padding:17px 20px !important;
+    grid-template-columns:auto 1fr auto;
+    gap:10px;
+    background:rgba(25,29,22,.30) !important;
+  }
+
+  .header.scrolled{
+    background:rgba(34,39,30,.92) !important;
+  }
+
+  .logo-main,
+  .logo-short,
+  .logo-full{
+    font-size:1.32rem !important;
+  }
+
+  .back-link{
+    display:flex !important;
+    justify-self:center;
+    grid-column:2;
+    white-space:nowrap;
+    border:0;
+    padding:0;
+    font-size:.51rem !important;
+    letter-spacing:.13em !important;
+  }
+
+  .menu-toggle{
+    grid-column:3;
+    display:flex !important;
+  }
+
+  .nav-links{
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    width:100vw !important;
+    height:100svh !important;
+    background:rgba(29,34,25,.985) !important;
+    backdrop-filter:blur(18px) !important;
+    -webkit-backdrop-filter:blur(18px) !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:26px !important;
+    opacity:0 !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+    transition:opacity .35s ease,visibility .35s ease !important;
+    z-index:9999 !important;
+  }
+
+  .nav-links.active{
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+
+  .nav-link{
+    font-size:1.05rem !important;
+    letter-spacing:.16em !important;
+    color:rgba(250,249,244,.82) !important;
+  }
+
+  .lets-talk-btn{
+    margin-top:4px !important;
+    padding:12px 18px !important;
+    font-size:.67rem !important;
+  }
+
+  .project-hero{
+    min-height:calc(100svh - 0px) !important;
+    height:auto !important;
+  }
+
+  .project-hero::before{
+    right:16px;
+    top:46%;
+    font-size:.48rem;
+    letter-spacing:.20em;
+    opacity:.72;
+  }
+
+  .project-hero img{
+    object-position:56% center;
+    inset:-3% !important;
+    width:106% !important;
+    height:106% !important;
+    opacity:.51 !important;
+    filter:saturate(.68) contrast(1.02) brightness(.68) !important;
+  }
+
+  .project-hero::after{
+    background:
+      linear-gradient(180deg,rgba(18,22,15,.57) 0%,rgba(18,22,15,.14) 28%,rgba(18,22,15,.48) 61%,rgba(18,22,15,.95) 100%),
+      linear-gradient(90deg,rgba(18,22,15,.36),rgba(18,22,15,.06));
+  }
+
+  .project-hero-content{
+    left:22px !important;
+    right:22px !important;
+    bottom:30px !important;
+  }
+
+  .project-category{
+    font-size:.51rem !important;
+    letter-spacing:.18em !important;
+    margin-bottom:11px !important;
+    max-width:78%;
+    line-height:1.5;
+  }
+
+  .project-title{
+    font-size:clamp(3rem,14vw,5.4rem) !important;
+    line-height:.92 !important;
+    letter-spacing:-.09em !important;
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+
+  .project-info-section{
+    padding:74px 22px 84px !important;
+    gap:38px !important;
+  }
+
+  .project-meta{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0 !important;
+    border-bottom:1px solid rgba(25,27,23,.13);
+    padding-bottom:19px !important;
+  }
+
+  .meta-item{
+    min-width:0;
+    padding:15px 12px 15px 14px !important;
+    border-left:1px solid rgba(127,143,100,.25) !important;
+    border-bottom:1px solid rgba(25,27,23,.07);
+  }
+
+  .meta-item:nth-child(odd){
+    border-left:0 !important;
+    padding-left:0 !important;
+  }
+
+  .meta-item:nth-child(3),
+  .meta-item:nth-child(4){
+    border-bottom:0;
+  }
+
+  .meta-label{
+    font-size:.51rem !important;
+    letter-spacing:.14em !important;
+  }
+
+  .meta-value{
+    font-size:.88rem !important;
+    overflow-wrap:anywhere;
+  }
+
+  .project-description h3{
+    font-size:clamp(2rem,9.4vw,3.5rem) !important;
+    line-height:1 !important;
+    margin-bottom:20px !important;
+  }
+
+  .project-description p{
+    font-size:.92rem !important;
+    line-height:1.88 !important;
+    margin-bottom:18px !important;
+  }
+
+  .project-gallery{
+    padding:0 14px 82px !important;
+  }
+
+  .gallery-grid{
+    grid-template-columns:1fr !important;
+    gap:9px !important;
+  }
+
+  .gallery-item{
+    aspect-ratio:1.04 !important;
+  }
+
+  .gallery-item::before{
+    inset:8px;
+  }
+
+  .footer{
+    padding:58px 22px 22px !important;
+  }
+
+  .footer-content{
+    grid-template-columns:1fr !important;
+  }
+
+  .footer-bottom{
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:10px !important;
+  }
+
+  #artivoChatWidget .artivo-chat-toggle{
+    width:58px !important;
+    height:58px !important;
+  }
+
+  #artivoChatWidget .artivo-chat-toggle svg{
+    width:24px !important;
+    height:24px !important;
+  }
+}
+
+@media (max-width:390px){
+  .logo-main,
+  .logo-short,
+  .logo-full{
+    font-size:1.22rem !important;
+  }
+
+  .back-link{
+    font-size:.47rem !important;
+  }
+
+  .project-title{
+    font-size:clamp(2.72rem,14.1vw,4.5rem) !important;
+  }
+
+  .meta-value{
+    font-size:.82rem !important;
+  }
+
+  .project-description p{
+    font-size:.88rem !important;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto !important}
+  .project-hero img,
+  .gallery-item,
+  .project-meta .meta-item,
+  .project-description h3,
+  .project-description p{
+    animation:none !important;
+    transition:none !important;
+  }
+  #artivoChatWidget .artivo-chat-toggle,
+  #artivoChatWidget .artivo-chat-toggle::before{
+    animation:none !important;
+  }
+}
+
+/* Hide custom cursor on touch devices, as in the approved homepage. */
+@media (hover:none),(max-width:700px){
+  .custom-cursor{display:none !important;}
+  *,a,button{cursor:auto !important;}
+}
+</style>
+
+
+<style id="artivo-final-header-layout-sync">
+/* =========================================================
+   ARTIVO FINAL HEADER + SPACING SYNC
+   Matches the approved homepage header exactly.
+   Keeps page data, paths, functionality and chat intact.
+   ========================================================= */
+:root{
+  --page-x:clamp(22px,8vw,132px);
+  --header-line:rgba(255,255,255,.16);
+  --header-olive:#c9d2a4;
+  --header-ink:#191b17;
+  --header-white:#faf9f4;
+}
+
+html{scroll-padding-top:88px;}
+
+/* ---------- Exact homepage header geometry ---------- */
+.site-header.header{
+  position:absolute !important;
+  top:0 !important;
+  left:0 !important;
+  right:auto !important;
+  width:100% !important;
+  z-index:30 !important;
+  padding:25px clamp(22px,5vw,82px) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:0 !important;
+  color:var(--header-white) !important;
+  border-bottom:1px solid var(--header-line) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.site-header.header.scrolled{
+  background:rgba(25,27,23,.78) !important;
+  border-bottom-color:rgba(201,210,164,.20) !important;
+  box-shadow:0 14px 40px rgba(25,27,23,.16) !important;
+  backdrop-filter:blur(18px) saturate(125%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(125%) !important;
+}
+
+.site-header.header .brand{
+  display:inline-flex !important;
+  align-items:baseline !important;
+  gap:0 !important;
+  flex:0 0 auto !important;
+  font:700 1.45rem/1 var(--display, "Manrope", "DM Sans", sans-serif) !important;
+  letter-spacing:-.07em !important;
+  color:var(--header-white) !important;
+  overflow:hidden !important;
+  text-decoration:none !important;
+  position:relative !important;
+  z-index:32 !important;
+}
+
+.site-header.header .logo-main{
+  color:var(--header-white) !important;
+  font-size:inherit !important;
+  font-weight:700 !important;
+}
+.site-header.header .logo-short{
+  color:var(--header-olive) !important;
+  font-size:1.45rem !important;
+  margin-left:7px !important;
+  max-width:40px !important;
+  opacity:1 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .5s cubic-bezier(.16,1,.3,1) !important;
+}
+.site-header.header .logo-full{
+  color:var(--header-white) !important;
+  font-size:1.45rem !important;
+  margin-left:7px !important;
+  max-width:0 !important;
+  opacity:0 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .5s cubic-bezier(.16,1,.3,1) !important;
+}
+.site-header.header .brand:hover .logo-short,
+.site-header.header .brand:focus-visible .logo-short{max-width:0 !important;opacity:0 !important}
+.site-header.header .brand:hover .logo-full,
+.site-header.header .brand:focus-visible .logo-full{max-width:210px !important;opacity:1 !important}
+
+.site-header.header .nav{
+  display:flex !important;
+  align-items:center !important;
+  gap:clamp(20px,3vw,52px) !important;
+  position:static !important;
+  width:auto !important;
+  height:auto !important;
+  padding:0 !important;
+  margin:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  flex-direction:row !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.site-header.header .nav a{
+  font-family:"DM Sans","Inter",sans-serif !important;
+  font-size:.68rem !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.17em !important;
+  color:rgba(250,249,244,.74) !important;
+  text-decoration:none !important;
+  white-space:nowrap !important;
+  position:relative !important;
+  transition:color .25s ease !important;
+}
+.site-header.header .nav a:hover,
+.site-header.header .nav a:focus-visible{color:var(--header-olive) !important}
+.site-header.header .nav .nav-cta{
+  border:1px solid rgba(201,210,164,.75) !important;
+  padding:13px 19px !important;
+  color:var(--header-white) !important;
+  background:transparent !important;
+  border-radius:0 !important;
+  transition:background .25s ease,color .25s ease,transform .25s ease !important;
+}
+.site-header.header .nav .nav-cta:hover,
+.site-header.header .nav .nav-cta:focus-visible{
+  background:var(--header-olive) !important;
+  color:var(--header-ink) !important;
+  border-color:var(--header-olive) !important;
+  transform:translateY(-2px) !important;
+}
+.site-header.header .nav-link::after{display:none !important}
+
+.site-header.header .menu-button,
+.site-header.header .menu-toggle{
+  display:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  width:28px !important;
+  height:24px !important;
+  border:0 !important;
+  background:transparent !important;
+  color:var(--header-white) !important;
+  position:relative !important;
+  z-index:32 !important;
+  cursor:pointer !important;
+}
+.site-header.header .menu-button span,
+.site-header.header .menu-toggle span{
+  display:block !important;
+  width:28px !important;
+  height:1px !important;
+  margin:0 0 6px !important;
+  background:currentColor !important;
+}
+.site-header.header .menu-button span:last-child,
+.site-header.header .menu-toggle span:last-child{margin-bottom:0 !important}
+
+/* ---------- Shared editorial alignment ---------- */
+.about-content,
+.team-section,
+.contact-container,
+.project-info-section,
+.project-gallery{
+  padding-left:var(--page-x) !important;
+  padding-right:var(--page-x) !important;
+}
+.about-hero,
+.contact-container,
+.project-hero,
+.project-info-section,
+.project-gallery,
+.team-section{box-sizing:border-box !important}
+
+/* ---------- Mobile: same header dimensions as homepage ---------- */
+@media (max-width:700px){
+  html{scroll-padding-top:72px !important}
+  .site-header.header{
+    position:absolute !important;
+    padding:18px 20px !important;
+  }
+  .site-header.header .brand{font-size:1.34rem !important}
+  .site-header.header .logo-short,
+  .site-header.header .logo-full{font-size:1.34rem !important}
+  .site-header.header .nav{
+    display:none !important;
+    position:absolute !important;
+    top:100% !important;
+    left:0 !important;
+    width:100% !important;
+    height:auto !important;
+    padding:25px 22px 30px !important;
+    background:rgba(25,29,22,.985) !important;
+    border-bottom:1px solid rgba(233,230,220,.18) !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:24px !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    backdrop-filter:blur(18px) !important;
+    -webkit-backdrop-filter:blur(18px) !important;
+    box-sizing:border-box !important;
+  }
+  .site-header.header .nav.is-open,
+  .site-header.header .nav.active{
+    display:flex !important;
+  }
+  .site-header.header .nav a{
+    font-size:.72rem !important;
+    letter-spacing:.16em !important;
+  }
+  .site-header.header .nav .nav-cta{
+    margin-top:3px !important;
+    padding:13px 19px !important;
+  }
+  .site-header.header .menu-button,
+  .site-header.header .menu-toggle{display:block !important}
+
+  /* Remove excessive vertical gaps on all inner pages */
+  .about-hero{
+    min-height:0 !important;
+    height:auto !important;
+    padding:118px 22px 58px !important;
+    align-items:flex-start !important;
+    justify-content:flex-start !important;
+  }
+  .about-statement{
+    margin:0 !important;
+    max-width:100% !important;
+  }
+  .about-content{
+    padding-top:58px !important;
+    padding-bottom:64px !important;
+    gap:30px !important;
+  }
+  .about-sidebar{top:auto !important;margin-bottom:0 !important}
+  .team-section{
+    padding-top:64px !important;
+    padding-bottom:68px !important;
+  }
+
+  .contact-container{
+    padding-top:112px !important;
+    padding-bottom:58px !important;
+    gap:34px !important;
+  }
+  .contact-info{min-width:0 !important}
+  .contact-title{margin-bottom:18px !important}
+  .contact-text{margin-bottom:20px !important}
+  .contact-details{margin-bottom:20px !important}
+  .map-section{margin-top:0 !important}
+
+  .project-hero{
+    height:min(78svh,720px) !important;
+    min-height:520px !important;
+  }
+  .project-info-section{
+    padding-top:58px !important;
+    padding-bottom:62px !important;
+    gap:34px !important;
+  }
+  .project-gallery{
+    padding-top:0 !important;
+    padding-bottom:62px !important;
+  }
+
+  .footer{
+    padding-top:58px !important;
+    padding-bottom:22px !important;
+  }
+}
+
+@media (min-width:701px){
+  .about-hero{padding-left:var(--page-x) !important;padding-right:var(--page-x) !important}
+  .about-content{padding-top:clamp(72px,8vw,120px) !important;padding-bottom:clamp(78px,9vw,130px) !important}
+  .team-section{padding-top:clamp(76px,8vw,128px) !important;padding-bottom:clamp(78px,8vw,125px) !important}
+  .contact-container{padding-top:154px !important;padding-bottom:82px !important}
+  .project-info-section{padding-top:clamp(82px,9vw,140px) !important;padding-bottom:clamp(82px,9vw,140px) !important}
+  .project-gallery{padding-bottom:clamp(80px,8vw,130px) !important}
+}
+
+/* Keep about's section numbering sequential: Hero 01, content 02, team 03. */
+.team-section::before{content:"03 / The people behind the work" !important}
+
+/* Project detail back link is kept, but never alters the homepage-matched header geometry. */
+.project-back-link{
+  position:absolute !important;
+  top:94px !important;
+  left:var(--page-x) !important;
+  z-index:8 !important;
+  margin:0 !important;
+  color:rgba(250,249,244,.72) !important;
+  font-size:.68rem !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase !important;
+  text-decoration:none !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding-bottom:7px !important;
+  border-bottom:1px solid rgba(250,249,244,.28) !important;
+}
+.project-back-link:hover{color:var(--header-olive) !important;border-bottom-color:var(--header-olive) !important}
+
+@media (max-width:700px){
+  .project-back-link{top:88px !important;left:22px !important;font-size:.54rem !important;letter-spacing:.11em !important}
+}
+
+/* Make all chat surfaces use the same quiet approved olive language. */
+#artivoChatWidget{z-index:1000002 !important}
+#artivoChatWidget .artivo-chat-toggle{
+  background:linear-gradient(145deg,#dbe2c3 0%,#a8b58a 100%) !important;
+  color:#283123 !important;
+  border:1px solid rgba(47,58,37,.28) !important;
+  box-shadow:0 12px 30px rgba(34,39,30,.22),0 0 0 8px rgba(207,215,183,.10) !important;
+}
+#artivoChatWidget .artivo-chat-toggle svg{color:#283123 !important}
+
+@media (prefers-reduced-motion:reduce){
+  .site-header.header *, .project-back-link{transition:none !important}
+}
+</style>
+
 </head>
 <body>
   <!-- مؤشر الفأرة المخصص -->
@@ -929,34 +2187,29 @@
 
   <div class="content-wrapper">
     <!-- Header -->
-    <header class="header" id="header">
-      <div class="logo" id="logo">
-        <span class="logo-main">Artivo</span>
-        <span class="logo-short">A.</span>
-        <span class="logo-full">Architecture</span>
-      </div>
+    <header class="site-header header" id="header">
+  <a aria-label="Artivo Architecture home" class="brand logo" href="index.html">
+    <span class="logo-main">Artivo</span>
+    <span class="logo-short">A.</span>
+    <span class="logo-full">Architecture</span>
+  </a>
 
-      <nav class="nav-links" id="navLinks">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="projects.html" class="nav-link">Projects</a>
-        <a href="about.html" class="nav-link">About</a>
-        <a href="contact.html" class="nav-link">Contact</a>
-        <!-- زر LET'S TALK الجديد -->
-        <a href="https://wa.me/905424318166" class="lets-talk-btn" target="_blank">Let's Talk</a>
-      </nav>
+  <nav aria-label="Main navigation" class="nav nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="projects.html" class="nav-link">Projects</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a class="nav-cta lets-talk-btn" href="https://wa.me/905424318166" rel="noopener" target="_blank">Let's Talk ↗</a>
+  </nav>
 
-      <a href="projects.html" class="back-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back
-      </a>
-
-      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-      </button>
-    </header>
+  <button class="menu-button menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-label="Open navigation">
+    <span></span><span></span><span></span>
+  </button>
+</header>
 
     <!-- Project Hero (سيتم ملؤها بالجافاسكريبت) -->
     <section class="project-hero">
+      <a href="projects.html" class="back-link project-back-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Back</span></a>
       <img src="" alt="" id="heroImage">
       <div class="project-hero-content">
         <span class="project-category" id="projectCategory"></span>
@@ -1928,6 +3181,31 @@
       });
     }
   </script>
+
+<script>
+/* ARTIVO Project Detail — subtle motion only, no data changes. */
+document.addEventListener('DOMContentLoaded', () => {
+  const hero = document.querySelector('.project-hero');
+  const heroImage = document.getElementById('heroImage');
+
+  requestAnimationFrame(() => {
+    if (hero) hero.classList.add('loaded');
+  });
+
+  if (hero && heroImage && window.matchMedia('(pointer:fine)').matches) {
+    hero.addEventListener('mousemove', (e) => {
+      const rect = hero.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width - .5;
+      const ny = (e.clientY - rect.top) / rect.height - .5;
+      heroImage.style.transform = `scale(1.015) translate3d(${nx * 5}px, ${ny * 3}px, 0)`;
+    });
+    hero.addEventListener('mouseleave', () => {
+      heroImage.style.transform = 'scale(1.015) translate3d(0,0,0)';
+    });
+  }
+});
+</script>
+
   <script src="assets/js/chat-widget.js"></script>
 </body>
 </html>
