@@ -1509,6 +1509,338 @@ body{
     }
 
   </style>
+
+<style id="artivo-final-header-layout-sync">
+/* =========================================================
+   ARTIVO FINAL HEADER + SPACING SYNC
+   Matches the approved homepage header exactly.
+   Keeps page data, paths, functionality and chat intact.
+   ========================================================= */
+:root{
+  --page-x:clamp(22px,8vw,132px);
+  --header-line:rgba(255,255,255,.16);
+  --header-olive:#c9d2a4;
+  --header-ink:#191b17;
+  --header-white:#faf9f4;
+}
+
+html{scroll-padding-top:88px;}
+
+/* ---------- Exact homepage header geometry ---------- */
+.site-header.header{
+  position:absolute !important;
+  top:0 !important;
+  left:0 !important;
+  right:auto !important;
+  width:100% !important;
+  z-index:30 !important;
+  padding:25px clamp(22px,5vw,82px) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:0 !important;
+  color:var(--header-white) !important;
+  border-bottom:1px solid var(--header-line) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.site-header.header.scrolled{
+  background:rgba(25,27,23,.78) !important;
+  border-bottom-color:rgba(201,210,164,.20) !important;
+  box-shadow:0 14px 40px rgba(25,27,23,.16) !important;
+  backdrop-filter:blur(18px) saturate(125%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(125%) !important;
+}
+
+.site-header.header .brand{
+  display:inline-flex !important;
+  align-items:baseline !important;
+  gap:0 !important;
+  flex:0 0 auto !important;
+  font:700 1.45rem/1 var(--display, "Manrope", "DM Sans", sans-serif) !important;
+  letter-spacing:-.07em !important;
+  color:var(--header-white) !important;
+  overflow:hidden !important;
+  text-decoration:none !important;
+  position:relative !important;
+  z-index:32 !important;
+}
+
+.site-header.header .logo-main{
+  color:var(--header-white) !important;
+  font-size:inherit !important;
+  font-weight:700 !important;
+}
+.site-header.header .logo-short{
+  color:var(--header-olive) !important;
+  font-size:1.45rem !important;
+  margin-left:7px !important;
+  max-width:40px !important;
+  opacity:1 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .5s cubic-bezier(.16,1,.3,1) !important;
+}
+.site-header.header .logo-full{
+  color:var(--header-white) !important;
+  font-size:1.45rem !important;
+  margin-left:7px !important;
+  max-width:0 !important;
+  opacity:0 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .5s cubic-bezier(.16,1,.3,1) !important;
+}
+.site-header.header .brand:hover .logo-short,
+.site-header.header .brand:focus-visible .logo-short{max-width:0 !important;opacity:0 !important}
+.site-header.header .brand:hover .logo-full,
+.site-header.header .brand:focus-visible .logo-full{max-width:210px !important;opacity:1 !important}
+
+.site-header.header .nav{
+  display:flex !important;
+  align-items:center !important;
+  gap:clamp(20px,3vw,52px) !important;
+  position:static !important;
+  width:auto !important;
+  height:auto !important;
+  padding:0 !important;
+  margin:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  flex-direction:row !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.site-header.header .nav a{
+  font-family:"DM Sans","Inter",sans-serif !important;
+  font-size:.68rem !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.17em !important;
+  color:rgba(250,249,244,.74) !important;
+  text-decoration:none !important;
+  white-space:nowrap !important;
+  position:relative !important;
+  transition:color .25s ease !important;
+}
+.site-header.header .nav a:hover,
+.site-header.header .nav a:focus-visible{color:var(--header-olive) !important}
+.site-header.header .nav .nav-cta{
+  border:1px solid rgba(201,210,164,.75) !important;
+  padding:13px 19px !important;
+  color:var(--header-white) !important;
+  background:transparent !important;
+  border-radius:0 !important;
+  transition:background .25s ease,color .25s ease,transform .25s ease !important;
+}
+.site-header.header .nav .nav-cta:hover,
+.site-header.header .nav .nav-cta:focus-visible{
+  background:var(--header-olive) !important;
+  color:var(--header-ink) !important;
+  border-color:var(--header-olive) !important;
+  transform:translateY(-2px) !important;
+}
+.site-header.header .nav-link::after{display:none !important}
+
+.site-header.header .menu-button,
+.site-header.header .menu-toggle{
+  display:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  width:28px !important;
+  height:24px !important;
+  border:0 !important;
+  background:transparent !important;
+  color:var(--header-white) !important;
+  position:relative !important;
+  z-index:32 !important;
+  cursor:pointer !important;
+}
+.site-header.header .menu-button span,
+.site-header.header .menu-toggle span{
+  display:block !important;
+  width:28px !important;
+  height:1px !important;
+  margin:0 0 6px !important;
+  background:currentColor !important;
+}
+.site-header.header .menu-button span:last-child,
+.site-header.header .menu-toggle span:last-child{margin-bottom:0 !important}
+
+/* ---------- Shared editorial alignment ---------- */
+.about-content,
+.team-section,
+.contact-container,
+.project-info-section,
+.project-gallery{
+  padding-left:var(--page-x) !important;
+  padding-right:var(--page-x) !important;
+}
+.about-hero,
+.contact-container,
+.project-hero,
+.project-info-section,
+.project-gallery,
+.team-section{box-sizing:border-box !important}
+
+/* ---------- Mobile: same header dimensions as homepage ---------- */
+@media (max-width:700px){
+  html{scroll-padding-top:72px !important}
+  .site-header.header{
+    position:absolute !important;
+    padding:18px 20px !important;
+  }
+  .site-header.header .brand{font-size:1.34rem !important}
+  .site-header.header .logo-short,
+  .site-header.header .logo-full{font-size:1.34rem !important}
+  .site-header.header .nav{
+    display:none !important;
+    position:absolute !important;
+    top:100% !important;
+    left:0 !important;
+    width:100% !important;
+    height:auto !important;
+    padding:25px 22px 30px !important;
+    background:rgba(25,29,22,.985) !important;
+    border-bottom:1px solid rgba(233,230,220,.18) !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:24px !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    backdrop-filter:blur(18px) !important;
+    -webkit-backdrop-filter:blur(18px) !important;
+    box-sizing:border-box !important;
+  }
+  .site-header.header .nav.is-open,
+  .site-header.header .nav.active{
+    display:flex !important;
+  }
+  .site-header.header .nav a{
+    font-size:.72rem !important;
+    letter-spacing:.16em !important;
+  }
+  .site-header.header .nav .nav-cta{
+    margin-top:3px !important;
+    padding:13px 19px !important;
+  }
+  .site-header.header .menu-button,
+  .site-header.header .menu-toggle{display:block !important}
+
+  /* Remove excessive vertical gaps on all inner pages */
+  .about-hero{
+    min-height:0 !important;
+    height:auto !important;
+    padding:118px 22px 58px !important;
+    align-items:flex-start !important;
+    justify-content:flex-start !important;
+  }
+  .about-statement{
+    margin:0 !important;
+    max-width:100% !important;
+  }
+  .about-content{
+    padding-top:58px !important;
+    padding-bottom:64px !important;
+    gap:30px !important;
+  }
+  .about-sidebar{top:auto !important;margin-bottom:0 !important}
+  .team-section{
+    padding-top:64px !important;
+    padding-bottom:68px !important;
+  }
+
+  .contact-container{
+    padding-top:112px !important;
+    padding-bottom:58px !important;
+    gap:34px !important;
+  }
+  .contact-info{min-width:0 !important}
+  .contact-title{margin-bottom:18px !important}
+  .contact-text{margin-bottom:20px !important}
+  .contact-details{margin-bottom:20px !important}
+  .map-section{margin-top:0 !important}
+
+  .project-hero{
+    height:min(78svh,720px) !important;
+    min-height:520px !important;
+  }
+  .project-info-section{
+    padding-top:58px !important;
+    padding-bottom:62px !important;
+    gap:34px !important;
+  }
+  .project-gallery{
+    padding-top:0 !important;
+    padding-bottom:62px !important;
+  }
+
+  .footer{
+    padding-top:58px !important;
+    padding-bottom:22px !important;
+  }
+}
+
+@media (min-width:701px){
+  .about-hero{padding-left:var(--page-x) !important;padding-right:var(--page-x) !important}
+  .about-content{padding-top:clamp(72px,8vw,120px) !important;padding-bottom:clamp(78px,9vw,130px) !important}
+  .team-section{padding-top:clamp(76px,8vw,128px) !important;padding-bottom:clamp(78px,8vw,125px) !important}
+  .contact-container{padding-top:154px !important;padding-bottom:82px !important}
+  .project-info-section{padding-top:clamp(82px,9vw,140px) !important;padding-bottom:clamp(82px,9vw,140px) !important}
+  .project-gallery{padding-bottom:clamp(80px,8vw,130px) !important}
+}
+
+/* Keep about's section numbering sequential: Hero 01, content 02, team 03. */
+.team-section::before{content:"03 / The people behind the work" !important}
+
+/* Project detail back link is kept, but never alters the homepage-matched header geometry. */
+.project-back-link{
+  position:absolute !important;
+  top:94px !important;
+  left:var(--page-x) !important;
+  z-index:8 !important;
+  margin:0 !important;
+  color:rgba(250,249,244,.72) !important;
+  font-size:.68rem !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase !important;
+  text-decoration:none !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding-bottom:7px !important;
+  border-bottom:1px solid rgba(250,249,244,.28) !important;
+}
+.project-back-link:hover{color:var(--header-olive) !important;border-bottom-color:var(--header-olive) !important}
+
+@media (max-width:700px){
+  .project-back-link{top:88px !important;left:22px !important;font-size:.54rem !important;letter-spacing:.11em !important}
+}
+
+/* Make all chat surfaces use the same quiet approved olive language. */
+#artivoChatWidget{z-index:1000002 !important}
+#artivoChatWidget .artivo-chat-toggle{
+  background:linear-gradient(145deg,#dbe2c3 0%,#a8b58a 100%) !important;
+  color:#283123 !important;
+  border:1px solid rgba(47,58,37,.28) !important;
+  box-shadow:0 12px 30px rgba(34,39,30,.22),0 0 0 8px rgba(207,215,183,.10) !important;
+}
+#artivoChatWidget .artivo-chat-toggle svg{color:#283123 !important}
+
+@media (prefers-reduced-motion:reduce){
+  .site-header.header *, .project-back-link{transition:none !important}
+}
+</style>
+
 </head>
 <body>
   <!-- مؤشر الفأرة المخصص -->
@@ -1519,26 +1851,25 @@ body{
 
   <div class="content-wrapper">
     <!-- Header -->
-    <header class="header" id="header">
-      <div class="logo" id="logo">
-        <span class="logo-main">Artivo</span>
-        <span class="logo-short">A.</span>
-        <span class="logo-full">Architecture</span>
-      </div>
+    <header class="site-header header" id="header">
+  <a aria-label="Artivo Architecture home" class="brand logo" href="index.html">
+    <span class="logo-main">Artivo</span>
+    <span class="logo-short">A.</span>
+    <span class="logo-full">Architecture</span>
+  </a>
 
-      <nav class="nav-links" id="navLinks">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="projects.html" class="nav-link">Projects</a>
-        <a href="about.html" class="nav-link active">About</a>
-        <a href="contact.html" class="nav-link">Contact</a>
-        <!-- زر LET'S TALK الجديد -->
-        <a href="https://wa.me/905424318166" class="lets-talk-btn" target="_blank">Let's Talk</a>
-      </nav>
+  <nav aria-label="Main navigation" class="nav nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="projects.html" class="nav-link">Projects</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a class="nav-cta lets-talk-btn" href="https://wa.me/905424318166" rel="noopener" target="_blank">Let's Talk ↗</a>
+  </nav>
 
-      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-      </button>
-    </header>
+  <button class="menu-button menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-label="Open navigation">
+    <span></span><span></span><span></span>
+  </button>
+</header>
 
     <!-- About Hero -->
     <section class="about-hero">
