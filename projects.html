@@ -9,7 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/chat-widget.css">
 
   <!-- GSAP -->
@@ -1118,6 +1118,632 @@
     }
 
   </style>
+
+<style id="artivo-projects-final-sync">
+/* =========================================================
+   ARTIVO PROJECTS — FINAL VISUAL SYNC
+   Match the approved homepage identity without changing
+   project data or the existing snap/transition system.
+   ========================================================= */
+
+:root{
+  --ink:#191b17;
+  --ink-2:#242720;
+  --paper:#e9e6dc;
+  --paper-2:#f2f0e8;
+  --white:#faf9f4;
+  --muted:#a9aa9e;
+  --muted-dark:#65685e;
+  --line:#d6d2c5;
+  --line-dark:rgba(25,27,23,.18);
+  --accent:#c9d2a4;
+  --accent-2:#d7a779;
+  --olive-deep:#22271e;
+  --olive:#7f8f64;
+  --olive-soft:#cfd7b7;
+  --sage:#aeb99a;
+  --ivory:#f5f3eb;
+  --sand:#e8e4d7;
+  --ink-soft:#3f453a;
+  --serif:"Playfair Display",Georgia,serif;
+  --sans:"DM Sans",sans-serif;
+  --display:"Manrope",sans-serif;
+}
+
+html{
+  background:var(--paper);
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:var(--sans);
+  background:
+    radial-gradient(circle at 12% 18%,rgba(127,143,100,.055),transparent 22rem),
+    radial-gradient(circle at 86% 52%,rgba(215,167,121,.045),transparent 24rem),
+    var(--paper) !important;
+  color:var(--ink);
+  overflow-x:hidden;
+}
+
+/* ---------- Background canvas ---------- */
+#bgCanvas{opacity:.18;}
+.ambient-overlay{
+  background:
+    radial-gradient(ellipse 60% 38% at 50% 0%,rgba(127,143,100,.07) 0%,transparent 62%),
+    linear-gradient(180deg,rgba(245,243,235,.02),rgba(245,243,235,.16)) !important;
+}
+
+/* ---------- Cursor ---------- */
+.custom-cursor{
+  border-color:rgba(127,143,100,.84) !important;
+  box-shadow:0 0 12px rgba(127,143,100,.24) !important;
+}
+.custom-cursor.hover{
+  width:40px;height:40px;
+  border-color:rgba(215,167,121,.72) !important;
+  background:rgba(201,210,164,.08) !important;
+  box-shadow:0 0 22px rgba(127,143,100,.23) !important;
+}
+
+/* ---------- Header: exact homepage proportions ---------- */
+.header{
+  position:absolute !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  z-index:1000 !important;
+  padding:25px clamp(22px,5vw,82px) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  color:var(--white) !important;
+  background:transparent !important;
+  border-bottom:1px solid rgba(255,255,255,.16) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  box-shadow:none !important;
+}
+.header.scrolled{
+  background:transparent !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  border-bottom:1px solid rgba(255,255,255,.16) !important;
+  box-shadow:none !important;
+}
+.header .logo{
+  display:inline-flex !important;
+  align-items:baseline !important;
+  gap:7px !important;
+  overflow:visible !important;
+  font-family:var(--display) !important;
+  font-size:1.45rem !important;
+  font-weight:700 !important;
+  letter-spacing:-.07em !important;
+  color:var(--white) !important;
+}
+.header .logo-main{
+  color:var(--white) !important;
+  font-size:1.45rem !important;
+  font-weight:700 !important;
+}
+.header .logo-short{
+  color:var(--accent) !important;
+  font-family:var(--display) !important;
+  font-size:1.45rem !important;
+  font-weight:700 !important;
+  margin-left:7px !important;
+  max-width:40px !important;
+  opacity:1 !important;
+}
+.header .logo-full{
+  color:var(--white) !important;
+  font-family:var(--display) !important;
+  font-size:1.45rem !important;
+  font-weight:700 !important;
+  margin-left:7px !important;
+  max-width:0 !important;
+  opacity:0 !important;
+}
+.header .logo:hover .logo-short{max-width:0 !important;opacity:0 !important;}
+.header .logo:hover .logo-full{max-width:210px !important;opacity:1 !important;}
+
+.header .nav-links{
+  display:flex !important;
+  align-items:center !important;
+  gap:clamp(20px,3vw,52px) !important;
+}
+.header .nav-link{
+  font-family:var(--sans) !important;
+  font-size:.68rem !important;
+  font-weight:500 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.17em !important;
+  color:rgba(250,249,244,.74) !important;
+  text-decoration:none !important;
+  position:relative;
+  transition:color .25s ease !important;
+}
+.header .nav-link::after{
+  display:none !important;
+}
+.header .nav-link:hover{color:var(--accent) !important;}
+.header .nav-link.active{color:var(--accent) !important;}
+
+.header .lets-talk-btn{
+  border:1px solid rgba(201,210,164,.75) !important;
+  border-radius:0 !important;
+  padding:13px 19px !important;
+  color:var(--white) !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  margin-left:0 !important;
+  font-family:var(--sans) !important;
+  font-size:.68rem !important;
+  font-weight:500 !important;
+  letter-spacing:.17em !important;
+  text-transform:uppercase !important;
+  transition:background .25s ease,color .25s ease,border-color .25s ease !important;
+}
+.header .lets-talk-btn:hover{
+  background:var(--accent) !important;
+  border-color:var(--accent) !important;
+  color:var(--ink) !important;
+  transform:none !important;
+  box-shadow:none !important;
+}
+.menu-toggle{
+  background:none !important;
+  border:0 !important;
+  color:var(--white) !important;
+}
+.menu-toggle span{background:var(--white) !important;}
+
+/* ---------- Dark editorial page opening ---------- */
+.page-header{
+  position:relative !important;
+  min-height:470px;
+  padding:clamp(150px,18vh,190px) clamp(22px,5vw,82px) 64px !important;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:flex-start;
+  text-align:left !important;
+  color:var(--white) !important;
+  background:
+    radial-gradient(circle at 72% 34%,rgba(127,143,100,.16),transparent 25rem),
+    radial-gradient(circle at 22% 16%,rgba(207,215,183,.08),transparent 20rem),
+    linear-gradient(135deg,#242a20 0%,#191d16 72%,#151812 100%) !important;
+  overflow:hidden;
+}
+.page-header::before{
+  content:"ARTIVO / PROJECTS";
+  position:absolute;
+  right:clamp(22px,5vw,82px);
+  top:52%;
+  transform:translateY(-50%);
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  color:rgba(245,243,235,.28);
+  font:500 .56rem var(--sans);
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  pointer-events:none;
+}
+.page-header::after{
+  content:"";
+  position:absolute;
+  width:42vw;height:42vw;
+  right:-16vw;bottom:-25vw;
+  border:1px solid rgba(207,215,183,.08);
+  border-radius:50%;
+  box-shadow:
+    0 0 0 60px rgba(207,215,183,.018),
+    0 0 0 120px rgba(207,215,183,.012);
+  pointer-events:none;
+}
+.page-title{
+  position:relative;
+  z-index:2;
+  margin:0 0 18px !important;
+  max-width:1100px;
+  font-family:var(--display) !important;
+  font-size:clamp(4rem,9vw,8rem) !important;
+  line-height:.88 !important;
+  font-weight:700 !important;
+  letter-spacing:-.09em !important;
+  color:var(--white) !important;
+  text-shadow:0 18px 55px rgba(0,0,0,.18) !important;
+}
+.page-title span{
+  background:none !important;
+  -webkit-text-fill-color:initial !important;
+  color:var(--olive-soft) !important;
+}
+.page-subtitle{
+  position:relative;
+  z-index:2;
+  margin:0 !important;
+  color:rgba(245,243,235,.68) !important;
+  font:500 .64rem var(--sans) !important;
+  letter-spacing:.28em !important;
+  text-transform:uppercase !important;
+}
+
+/* ---------- Snap grid container ---------- */
+.snap-grid-container{
+  position:relative;
+  background:var(--paper);
+  border-top:1px solid rgba(25,27,23,.10);
+}
+.snap-grid-wrapper{
+  background:
+    linear-gradient(180deg,#efede5 0%,#e9e6dc 100%);
+}
+.snap-section{
+  min-height:100vh;
+  padding:clamp(36px,4vw,64px) clamp(22px,5vw,82px) !important;
+  position:relative;
+}
+.snap-section::before{
+  background:
+    radial-gradient(circle at 50% 40%,rgba(127,143,100,.095),transparent 32rem),
+    radial-gradient(circle at 78% 62%,rgba(215,167,121,.065),transparent 28rem) !important;
+}
+.snap-section.active::before{opacity:1;}
+
+.project-row{
+  gap:10px !important;
+  max-width:1600px !important;
+}
+.project-row.blurred{
+  /* preserve original blur/opacity/scale values exactly */
+  filter:blur(8px);
+  opacity:.3;
+  transform:scale(.88) translateZ(-50px);
+}
+.project-row.focused{
+  filter:blur(0);
+  opacity:1;
+  transform:scale(1) translateZ(0);
+}
+.project-row.partially-visible-up{
+  filter:blur(4px);
+  opacity:.5;
+  transform:scale(.94) translateY(20px) translateZ(-25px);
+}
+.project-row.partially-visible-down{
+  filter:blur(4px);
+  opacity:.5;
+  transform:scale(.94) translateY(-20px) translateZ(-25px);
+}
+
+/* ---------- Project cards ---------- */
+.project-item{
+  aspect-ratio:3/4 !important;
+  border:1px solid rgba(25,27,23,.14) !important;
+  border-radius:0 !important;
+  background:#cbc7ba !important;
+  box-shadow:0 14px 42px rgba(25,27,23,.08) !important;
+  overflow:hidden !important;
+}
+.project-item::before{
+  background:linear-gradient(135deg,rgba(201,210,164,.92),rgba(127,143,100,.92),rgba(215,167,121,.52)) !important;
+  border-radius:0 !important;
+}
+.project-row.focused .project-item:hover{
+  transform:scale(1.025) translateZ(18px) !important;
+  box-shadow:0 26px 58px rgba(25,27,23,.18) !important;
+}
+.project-item img{
+  filter:saturate(.83) contrast(1.02) !important;
+  transition:transform .7s cubic-bezier(.16,1,.3,1),filter .5s ease !important;
+}
+.project-row.focused .project-item:hover img{
+  transform:scale(1.055) !important;
+  filter:saturate(.96) contrast(1.04) !important;
+}
+.project-overlay{
+  background:
+    linear-gradient(to top,rgba(20,23,17,.88) 0%,rgba(20,23,17,.38) 42%,rgba(20,23,17,.04) 76%,transparent 100%) !important;
+}
+.project-static-title{
+  left:12px !important;
+  right:12px !important;
+  bottom:12px !important;
+  padding:11px 13px !important;
+  border:1px solid rgba(245,243,235,.18) !important;
+  border-radius:0 !important;
+  background:rgba(25,29,22,.22) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+  font-family:var(--display) !important;
+  font-size:.9rem !important;
+  letter-spacing:-.015em !important;
+  color:var(--white) !important;
+  text-shadow:none !important;
+}
+.project-category{
+  color:var(--olive-soft) !important;
+  font-family:var(--sans) !important;
+}
+.project-name{
+  font-family:var(--display) !important;
+  letter-spacing:-.03em !important;
+}
+.project-view{
+  color:rgba(245,243,235,.62) !important;
+}
+.project-view svg{color:var(--olive-soft) !important;}
+.project-row.focused .project-item:hover .project-view{color:var(--white) !important;}
+
+/* ---------- Collection labels / indicator ---------- */
+.row-label{
+  left:clamp(10px,2vw,32px) !important;
+  color:#7b806f !important;
+  font-size:.58rem !important;
+  letter-spacing:.24em !important;
+}
+.snap-section.active .row-label{opacity:.78 !important;}
+.row-indicator{
+  right:clamp(14px,2vw,30px) !important;
+}
+.row-dot{
+  width:7px !important;height:7px !important;
+  background:rgba(127,143,100,.16) !important;
+  border:1px solid rgba(127,143,100,.42) !important;
+}
+.row-dot.active{
+  background:var(--olive) !important;
+  box-shadow:0 0 12px rgba(127,143,100,.30) !important;
+}
+
+/* ---------- Scroll hint ---------- */
+.scroll-hint{
+  bottom:1.65rem !important;
+}
+.scroll-hint-text{
+  color:#7a7d72 !important;
+  font-family:var(--sans) !important;
+  font-size:.58rem !important;
+  letter-spacing:.22em !important;
+}
+.scroll-hint-icon{
+  border-color:rgba(127,143,100,.30) !important;
+  background:rgba(245,243,235,.55) !important;
+}
+.scroll-hint-dot{background:var(--olive) !important;}
+
+/* ---------- Footer ---------- */
+.footer{
+  background:#1a1e17 !important;
+  border-top:1px solid rgba(245,243,235,.12) !important;
+  padding:6rem clamp(22px,5vw,82px) 2rem !important;
+  position:relative;
+}
+.footer::before{
+  content:"";
+  position:absolute;
+  left:clamp(22px,5vw,82px);
+  right:clamp(22px,5vw,82px);
+  top:-1px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(207,215,183,.40),rgba(215,167,121,.20),transparent);
+}
+.footer-content{
+  max-width:1600px;
+  margin:0 auto 4rem !important;
+}
+.footer-title{color:var(--olive-soft) !important;}
+.footer-brand p,
+.footer-links a,
+.footer-copyright{
+  color:rgba(245,243,235,.62) !important;
+}
+.footer-links a:hover{color:#dce3c9 !important;}
+.footer-contact .social-links a{
+  border-color:rgba(207,215,183,.20) !important;
+  color:rgba(245,243,235,.62) !important;
+}
+.footer-contact .social-links a:hover{
+  border-color:rgba(207,215,183,.50) !important;
+  color:#dce3c9 !important;
+  background:rgba(207,215,183,.07) !important;
+}
+
+/* ---------- Chat: homepage palette ---------- */
+#artivoChatWidget{z-index:1000002 !important;}
+#artivoChatWidget .artivo-chat-toggle{
+  width:64px;height:64px;
+  background:linear-gradient(145deg,#dbe2c3 0%,#a8b58a 100%);
+  color:#263022;
+  border:1px solid rgba(47,58,37,.28);
+  box-shadow:0 12px 30px rgba(34,39,30,.22),0 0 0 8px rgba(207,215,183,.10);
+  animation:artivoProjectsChatFloat 4s ease-in-out infinite;
+}
+#artivoChatWidget .artivo-chat-toggle::before{
+  content:"";
+  position:absolute;inset:-6px;
+  border:1px solid rgba(142,157,111,.28);
+  border-radius:50%;
+  animation:artivoProjectsChatPulse 2.8s ease-out infinite;
+  pointer-events:none;
+}
+#artivoChatWidget .artivo-chat-toggle:hover{
+  transform:scale(1.06) translateY(-2px);
+  box-shadow:0 16px 34px rgba(34,39,30,.26),0 0 0 10px rgba(207,215,183,.12);
+}
+#artivoChatWidget .artivo-chat-toggle svg{width:27px;height:27px;color:#283123 !important;}
+#artivoChatWidget .artivo-chat-panel{
+  background:rgba(28,33,24,.97);
+  border:1px solid rgba(207,215,183,.24);
+  box-shadow:0 24px 70px rgba(17,20,14,.34),0 0 0 1px rgba(207,215,183,.06) inset;
+  border-radius:22px;
+}
+#artivoChatWidget .artivo-chat-avatar,
+#artivoChatWidget .artivo-chat-send{
+  background:linear-gradient(145deg,#dbe2c3,#a8b58a);
+  color:#283123;
+}
+#artivoChatWidget .artivo-chat-online{border-color:#1c2118;background:#94d37b;}
+#artivoChatWidget .artivo-chat-name{color:#f5f3eb;}
+#artivoChatWidget .artivo-chat-status{color:#aebd93;}
+#artivoChatWidget .artivo-chat-message.bot .artivo-chat-bubble{
+  background:rgba(127,143,100,.15);
+  border-color:rgba(177,192,148,.20);
+}
+#artivoChatWidget .artivo-chat-message.user .artivo-chat-bubble{
+  background:linear-gradient(145deg,#84936a,#687451);
+}
+#artivoChatWidget .artivo-chat-input{
+  border-color:rgba(207,215,183,.20);
+  background:rgba(255,255,255,.045);
+}
+#artivoChatWidget .artivo-chat-input:focus{border-color:rgba(207,215,183,.55);}
+#artivoChatWidget .artivo-chat-typing{
+  background:rgba(127,143,100,.15);
+  border-color:rgba(177,192,148,.20);
+}
+#artivoChatWidget .artivo-chat-typing span{background:#cfd7b7;}
+#artivoChatWidget .artivo-chat-messages::-webkit-scrollbar-thumb{background:rgba(207,215,183,.28);}
+
+@keyframes artivoProjectsChatFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+@keyframes artivoProjectsChatPulse{
+  0%{transform:scale(.92);opacity:.65}
+  70%{transform:scale(1.14);opacity:0}
+  100%{transform:scale(1.14);opacity:0}
+}
+
+/* ---------- Mobile: remove excess vertical empty space ---------- */
+@media (max-width: 768px){
+  .header{
+    padding:18px 20px !important;
+    border-bottom-color:rgba(255,255,255,.13) !important;
+  }
+  .header .logo,
+  .header .logo-main,
+  .header .logo-short,
+  .header .logo-full{font-size:1.28rem !important;}
+  .header .nav-links{
+    top:0 !important;
+    left:0 !important;
+    width:100vw !important;
+    height:100svh !important;
+    background:#20251d !important;
+    gap:1.55rem !important;
+  }
+  .header .nav-link{
+    font-size:1.15rem !important;
+    color:rgba(245,243,235,.82) !important;
+  }
+  .header .lets-talk-btn{
+    padding:12px 18px !important;
+    font-size:.72rem !important;
+  }
+  .page-header{
+    min-height:360px;
+    padding:122px 20px 42px !important;
+  }
+  .page-header::before{
+    right:18px;
+    top:58%;
+    font-size:.50rem;
+  }
+  .page-title{
+    max-width:92vw;
+    font-size:clamp(3.65rem,18vw,5.4rem) !important;
+    line-height:.88 !important;
+    letter-spacing:-.085em !important;
+    margin-bottom:16px !important;
+  }
+  .page-subtitle{
+    max-width:290px;
+    line-height:1.6;
+    font-size:.56rem !important;
+    letter-spacing:.20em !important;
+  }
+  .snap-section{
+    min-height:auto;
+    padding:24px 14px !important;
+  }
+  .project-row{
+    gap:8px !important;
+  }
+  .project-row.blurred{
+    filter:blur(3px) !important;
+    opacity:.58 !important;
+    transform:scale(.96) !important;
+  }
+  .project-row.partially-visible-up,
+  .project-row.partially-visible-down{
+    filter:blur(2px) !important;
+    opacity:.66 !important;
+    transform:scale(.98) !important;
+  }
+  .project-item{
+    aspect-ratio:4/3 !important;
+    border-radius:0 !important;
+  }
+  .project-static-title{
+    left:9px !important;
+    right:9px !important;
+    bottom:9px !important;
+    padding:8px 9px !important;
+    font-size:.74rem !important;
+  }
+  .project-content{padding:12px !important;}
+  .project-name{font-size:.92rem !important;}
+  .project-category{font-size:.52rem !important;letter-spacing:.16em !important;}
+  .project-view{font-size:.54rem !important;}
+  .row-indicator{display:none !important;}
+  .scroll-hint{bottom:1rem !important;}
+  .scroll-hint-text{font-size:.50rem !important;}
+  .scroll-hint-icon{width:20px;height:32px;}
+  .footer{
+    padding:52px 20px 20px !important;
+  }
+  .footer::before{left:20px;right:20px;}
+}
+
+@media (max-width: 480px){
+  .page-header{
+    min-height:320px;
+    padding-top:116px !important;
+    padding-bottom:34px !important;
+  }
+  .snap-section{
+    padding:20px 12px !important;
+  }
+  .project-row{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+  .project-item{
+    aspect-ratio:4/3 !important;
+  }
+}
+
+@media (hover:none) and (pointer:coarse){
+  /* Keep snap interaction intact, but don't let touch "hover" alter the layout. */
+  .project-row.focused .project-overlay{opacity:.68 !important;}
+  .project-row.focused .project-content{
+    transform:translateY(0) !important;
+    opacity:1 !important;
+  }
+  .project-row.focused .project-item::before{display:none !important;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #artivoChatWidget .artivo-chat-toggle,
+  #artivoChatWidget .artivo-chat-toggle::before,
+  .scroll-hint-dot{
+    animation:none !important;
+  }
+}
+</style>
+
 </head>
 <body>
   <!-- مؤشر الفأرة المخصص -->
