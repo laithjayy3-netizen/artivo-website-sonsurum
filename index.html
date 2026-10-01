@@ -255,7 +255,7 @@ body{background:var(--ivory);}
   text-shadow:0 18px 60px rgba(0,0,0,.24);
 }
 .hero h1 .serif{color:#d5ddba;text-shadow:0 10px 36px rgba(201,210,164,.16);}
-.hero-typewriter{color:rgba(250,249,244,.72);letter-spacing:.015em;}
+.hero-typewriter{color:rgba(250,249,244,.74);letter-spacing:.028em;font-size:clamp(1.02rem,1.45vw,1.24rem);font-weight:500;line-height:1.35;}
 .hero-typewriter .caret{background:#d5ddba;box-shadow:0 0 10px rgba(207,215,183,.35);}
 .hero-bottom{max-width:1280px;}
 .hero-copy{max-width:465px;color:rgba(250,249,244,.76);}
@@ -538,7 +538,7 @@ body{background:var(--ivory);}
   .hero .eyebrow{font-size:.53rem;letter-spacing:.19em;gap:9px;white-space:nowrap;}
   .hero .eyebrow::before{width:24px;}
   .hero h1{font-size:clamp(3.45rem,17.2vw,5.4rem);line-height:.88;letter-spacing:-.092em;margin-top:23px;max-width:100%;}
-  .hero-typewriter{font-size:.84rem;min-height:2em;margin-top:18px;max-width:95%;line-height:1.4;}
+  .hero-typewriter{font-size:clamp(.96rem,4.2vw,1.08rem);min-height:2em;margin-top:18px;max-width:95%;line-height:1.42;}
   .hero-bottom{margin-top:26px;}
   .hero-copy{font-size:.86rem;line-height:1.72;max-width:500px;}
   .hero-actions{margin-top:22px;gap:15px;align-items:center;}
@@ -623,6 +623,58 @@ body{background:var(--ivory);}
   #artivoChatWidget .artivo-chat-toggle::before{animation:none;}
 }
 </style>
+<style id="artivo-requested-final-tweaks">
+  /* References heading: same editorial language as the numbered sections */
+  .references-section{
+    background:var(--ivory);
+    padding-top:clamp(54px,6vw,82px);
+    border-top:1px solid rgba(42,47,35,.06);
+  }
+  .references-header{
+    max-width:1600px;
+    margin:0 auto;
+    padding:0 clamp(22px,8vw,132px) clamp(18px,2.2vw,28px);
+  }
+  .references-header .section-index{
+    color:#767b70;
+  }
+  .ticker{
+    padding:15px 0;
+    background:linear-gradient(180deg,#e9e6dc 0%,#e3e0d6 100%);
+    border-top:1px solid rgba(47,52,41,.09);
+    border-bottom:1px solid rgba(47,52,41,.11);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .ticker-line{
+    animation-duration:44s;
+  }
+  .ticker-group{
+    gap:clamp(17px,2.4vw,34px);
+    padding-right:clamp(24px,3.6vw,50px);
+  }
+  .ticker-group span{
+    color:#4d5349;
+    font-size:clamp(.92rem,1.08vw,1.08rem);
+  }
+  .ticker-group span:nth-child(even){
+    color:#7f8f64;
+    font-size:.78rem;
+  }
+  @media (hover:none){
+    .ticker:hover .ticker-line,
+    .ticker.is-hovered .ticker-line{
+      animation-play-state:running !important;
+    }
+  }
+  @media (max-width:700px){
+    .references-section{padding-top:48px;}
+    .references-header{padding:0 22px 16px;}
+    .ticker{padding:12px 0;}
+    .ticker-group{gap:14px;padding-right:24px;}
+    .ticker-group span{font-size:.84rem;}
+    .ticker-group span:nth-child(even){font-size:.66rem;}
+  }
+</style>
 <style id="artivo-direct-replacement-refinements">
   html, body { max-width: 100%; overflow-x: hidden; }
   .ticker, .ticker-line, .ticker-group { user-select: none; }
@@ -677,22 +729,24 @@ body{background:var(--ivory);}
 <h1>We shape<br/>space into<br/><span class="serif">feeling.</span></h1>
 <div class="hero-typewriter"><span id="heroTypewriter">Where vision becomes structure.</span><span aria-hidden="true" class="caret"></span></div>
 <div class="hero-bottom">
-<p class="hero-copy">Architecture shaped with intention. Spaces designed to be experienced, remembered, and lived in.</p>
 <div class="hero-actions"><a class="button-solid" href="projects.html">Explore our work <span aria-hidden="true">↗</span></a><a class="text-link" href="#philosophy"><span>Discover our approach</span> ↓</a></div>
 </div>
-<div class="hero-meta"><span>Architecture · Interiors · Spatial Experiences</span><span class="scroll-cue"><i></i> Scroll to explore</span></div>
+<div class="hero-meta"><span>Architecture · Interiors · Spatial Experiences</span></div>
 </div>
 </section>
 <section class="intro-band">
 <div class="intro-side"><span class="section-index">01 / The Artivo point of view</span></div>
-<div class="intro-main reveal"><h2>We don't design spaces.<br/>We craft <em>experiences</em><br/>that breathe, move, and inspire.</h2><p>Every line we draw carries intention. Every space we create tells a story. We believe architecture should not just be seen, it should be felt.</p></div>
+<div class="intro-main reveal"><h2>We don't design spaces.<br/>We craft <em>experiences</em><br/>that breathe, move, and inspire.</h2></div>
 </section>
-<div aria-label="Artivo reference ticker" class="ticker"><div class="ticker-line">
-<div class="ticker-group"><b>REFERANS</b><span>Nova Living</span><span>✳</span><span>Mira Design Group</span><span>✳</span><span>Linea Homes</span><span>✳</span><span>Urban Nest</span><span>✳</span><span>Luma Studio</span><span>✳</span><span>Verde Space</span><span>✳</span><span>Arcora Developments</span><span>✳</span><span>Terra Residence</span><span>✳</span><span>Aura Build</span><span>✳</span><span>Vista Interiors</span><span>✳</span></div>
-<div aria-hidden="true" class="ticker-group"><b>REFERANS</b><span>Nova Living</span><span>✳</span><span>Mira Design Group</span><span>✳</span><span>Linea Homes</span><span>✳</span><span>Urban Nest</span><span>✳</span><span>Luma Studio</span><span>✳</span><span>Verde Space</span><span>✳</span><span>Arcora Developments</span><span>✳</span><span>Terra Residence</span><span>✳</span><span>Aura Build</span><span>✳</span><span>Vista Interiors</span><span>✳</span></div>
-</div></div>
+<section class="references-section" aria-labelledby="references-title">
+<div class="references-header"><span class="section-index" id="references-title">03 / Client references</span></div>
+<div aria-label="Artivo client references" class="ticker"><div class="ticker-line">
+<div class="ticker-group"><span>Nova Living</span><span>✳</span><span>Mira Design Group</span><span>✳</span><span>Linea Homes</span><span>✳</span><span>Urban Nest</span><span>✳</span><span>Luma Studio</span><span>✳</span><span>Verde Space</span><span>✳</span><span>Arcora Developments</span><span>✳</span><span>Terra Residence</span><span>✳</span><span>Aura Build</span><span>✳</span><span>Vista Interiors</span><span>✳</span></div>
+<div aria-hidden="true" class="ticker-group"><span>Nova Living</span><span>✳</span><span>Mira Design Group</span><span>✳</span><span>Linea Homes</span><span>✳</span><span>Urban Nest</span><span>✳</span><span>Luma Studio</span><span>✳</span><span>Verde Space</span><span>✳</span><span>Arcora Developments</span><span>✳</span><span>Terra Residence</span><span>✳</span><span>Aura Build</span><span>✳</span><span>Vista Interiors</span><span>✳</span></div>
+</div></div></div>
+</section>
 <section class="projects-section" id="featured">
-<div class="section-top reveal"><div><div class="kicker">02 / A selection of our work</div><h2>Selected <em>Works.</em></h2></div><a class="dark-link" href="projects.html">View all projects <span>↗</span></a></div>
+<div class="section-top reveal"><div><div class="kicker">04 / A selection of our work</div><h2>Selected <em>Works.</em></h2></div><a class="dark-link" href="projects.html">View all projects <span>↗</span></a></div>
 <div class="project-grid">
 <a class="project-card reveal" href="project-detail.html?id=3"><img alt="Modern Master Bedroom" loading="eager" src="assets/images/home/project1.jpg"/><span class="project-count">01 — 04</span><div class="project-info"><span class="project-category">Residential</span><h3 class="project-name">Modern Master Bedroom</h3><span class="project-enter">Enter project</span></div></a>
 <a class="project-card reveal delay-1" href="project-detail.html?id=6"><img alt="Luxury Living Room" loading="eager" src="assets/images/home/project2.jpg"/><span class="project-count">02 — 04</span><div class="project-info"><span class="project-category">Residential</span><h3 class="project-name">Luxury Living Room</h3><span class="project-enter">Enter project</span></div></a>
@@ -702,11 +756,11 @@ body{background:var(--ivory);}
 <div class="project-footnote"><span>Selected residential projects</span><span>Concept · Detail · Atmosphere</span></div>
 </section>
 <section class="philosophy-section" id="philosophy">
-<div class="philosophy-copy reveal"><div class="eyebrow">03 / Our philosophy</div><h2>Architecture as <em>Poetry in Stone</em></h2><p>Our approach marries bold vision with quiet restraint, creating spaces that speak softly but leave lasting impressions.</p></div>
-<div class="philosophy-visual reveal delay-1"><video autoplay="" loop="" muted="" playsinline="" poster="assets/images/home/project2.jpg"><source src="assets/videos/home-video.mp4" type="video/mp4"/></video><div class="video-label">Design in Motion</div><div class="philosophy-note"><span>Vision into reality</span><span>Artivo Architecture</span></div></div>
+<div class="philosophy-copy reveal"><div class="eyebrow">05 / Our philosophy</div><h2>Architecture as <em>Poetry in Stone</em></h2><p>Our approach marries bold vision with quiet restraint, creating spaces that speak softly but leave lasting impressions.</p></div>
+<div class="philosophy-visual reveal delay-1"><video autoplay="" loop="" muted="" playsinline="" poster="assets/images/home/project2.jpg"><source src="assets/videos/home-video.mp4" type="video/mp4"/></video><div class="philosophy-note"><span>Vision into reality</span><span>Artivo Architecture</span></div></div>
 </section>
 <section class="stats-section">
-<div class="stats-heading"><h2>Built on ideas. Defined by execution.</h2><span>04 / Artivo in numbers</span></div>
+<div class="stats-heading"><h2>Built on ideas. Defined by execution.</h2><span>06 / Artivo in numbers</span></div>
 <div class="stats-grid">
 <div class="stat-item reveal"><div class="stat-number">300+</div><div class="stat-label">Completed Projects</div></div>
 <div class="stat-item reveal delay-1"><div class="stat-number">6+</div><div class="stat-label">Ongoing Projects</div></div>
@@ -715,7 +769,7 @@ body{background:var(--ivory);}
 </div>
 </section>
 <section class="cta-section" id="newProjectCta">
-<div class="cta-top"><span class="section-index">05 / Have a project in mind?</span><span class="section-index">Let's make it meaningful ↘</span></div>
+<div class="cta-top"><span class="section-index">07 / Have a project in mind?</span><span class="section-index">Let's make it meaningful ↘</span></div>
 <h2>Let's create places<br/>people <em>feel.</em></h2>
 <div class="cta-bottom"><p>From the first sketch to the final detail, we shape the vision into a place of its own.</p><a class="button-solid" href="contact.html">Talk new project <span>↗</span></a></div>
 </section>
