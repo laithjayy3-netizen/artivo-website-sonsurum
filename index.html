@@ -705,7 +705,22 @@ body{background:var(--ivory);}
     }
   }
 </style>
-<link rel="preload" as="video" href="assets/videos/home-video.mp4" type="video/mp4"></head>
+<link rel="preload" as="video" href="assets/videos/home-video.mp4" type="video/mp4">
+<style id="artivo-mobile-hero-top-gap-fix">
+/* Mobile-only correction: remove the extra vertical centering gap above the hero eyebrow.
+   Desktop layout, video, typography, animations, content and all other sections remain unchanged. */
+@media (max-width: 700px) {
+  .hero-inner {
+    margin: 0 auto !important;
+    padding-top: 145px !important;
+    padding-bottom: 28px !important;
+  }
+}
+@media (max-width: 390px) {
+  .hero-inner { padding-top: 138px !important; }
+}
+</style>
+</head>
 <body><div class="custom-cursor" id="customCursor"></div><canvas aria-hidden="true" id="bgCanvas"></canvas><div aria-hidden="true" class="ambient-overlay"></div><div aria-hidden="true" class="intro-preserved" id="intro">
 <div class="intro-orbit intro-orbit-a"></div>
 <div class="intro-orbit intro-orbit-b"></div>
