@@ -854,6 +854,636 @@
       .glass-card { border-radius: 20px !important; }
     }
 
+  
+/* =========================================================
+   ARTIVO ABOUT — HOMEPAGE VISUAL SYSTEM
+   Matches the approved ARTIVO ivory / olive identity.
+   Content, links, image paths and existing page functionality
+   remain untouched.
+   ========================================================= */
+
+:root{
+  --bg:#171914;
+  --bg-deep:#1a1e17;
+  --surface:#f0eee6;
+  --muted:#6b7065;
+  --border:rgba(50,57,43,.15);
+  --accent:#7f8f64;
+  --accent-light:#cfd7b7;
+  --glow:#aeb99a;
+  --olive-deep:#22271e;
+  --olive:#7f8f64;
+  --olive-soft:#cfd7b7;
+  --sage:#aeb99a;
+  --ivory:#f5f3eb;
+  --sand:#e8e4d7;
+  --ink-soft:#3f453a;
+  --paper:#e9e6dc;
+}
+
+html{
+  scroll-behavior:smooth;
+  background:var(--ivory);
+}
+
+body{
+  font-family:"DM Sans","Inter",sans-serif !important;
+  background:
+    radial-gradient(circle at 12% 10%,rgba(207,215,183,.16),transparent 24rem),
+    radial-gradient(circle at 86% 18%,rgba(174,185,154,.10),transparent 28rem),
+    var(--ivory) !important;
+  color:#24291f !important;
+  -webkit-font-smoothing:antialiased;
+}
+
+#bgCanvas{
+  opacity:.16 !important;
+}
+
+.ambient-overlay{
+  background:
+    radial-gradient(ellipse 75% 48% at 50% 0%,rgba(207,215,183,.16) 0%,transparent 58%),
+    radial-gradient(ellipse 42% 34% at 78% 20%,rgba(174,185,154,.10) 0%,transparent 60%) !important;
+}
+
+.custom-cursor{
+  width:24px !important;
+  height:24px !important;
+  border:1px solid rgba(127,143,100,.70) !important;
+  box-shadow:0 0 0 4px rgba(207,215,183,.08),0 0 18px rgba(127,143,100,.18) !important;
+  background:rgba(245,243,235,.03);
+}
+.custom-cursor.hover{
+  width:38px !important;
+  height:38px !important;
+  border-color:#7f8f64 !important;
+  background:rgba(207,215,183,.10) !important;
+  box-shadow:0 0 0 6px rgba(207,215,183,.08),0 0 28px rgba(127,143,100,.22) !important;
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--ivory)}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#7f8f64,#aeb99a) !important;
+  border-radius:2px;
+}
+
+/* Header — visually consistent with the approved homepage */
+.header{
+  position:absolute !important;
+  color:#f8f6ef;
+  padding:25px clamp(22px,5vw,82px) !important;
+  border-bottom:1px solid rgba(245,243,235,.16) !important;
+}
+.header.scrolled{
+  background:rgba(34,39,30,.74) !important;
+  backdrop-filter:blur(18px) saturate(125%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(125%) !important;
+  border-bottom-color:rgba(207,215,183,.17) !important;
+  box-shadow:0 14px 40px rgba(22,26,18,.16) !important;
+}
+
+.logo-main,.logo-short{
+  color:#cfd7b7 !important;
+}
+.logo-full{
+  color:#faf8f1 !important;
+}
+.nav-links{gap:clamp(20px,3vw,52px)}
+.nav-link{
+  font-family:"DM Sans","Inter",sans-serif !important;
+  color:rgba(250,249,244,.72) !important;
+}
+.nav-link::after{
+  background:linear-gradient(90deg,#cfd7b7,#aeb99a) !important;
+  box-shadow:0 0 14px rgba(207,215,183,.20) !important;
+}
+.nav-link:hover,.nav-link.active{color:#cfd7b7 !important}
+.lets-talk-btn{
+  color:#f7f5ee !important;
+  border-color:rgba(207,215,183,.58) !important;
+  background:rgba(255,255,255,.035) !important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.035) inset,0 0 20px rgba(127,143,100,.12) !important;
+}
+.lets-talk-btn:hover{
+  background:linear-gradient(135deg,#cfd7b7,#a5b184) !important;
+  color:#23291f !important;
+  border-color:transparent !important;
+  box-shadow:0 14px 40px rgba(34,39,30,.20) !important;
+  transform:translateY(-2px) scale(1.03) !important;
+}
+.menu-toggle span{background:#f6f3eb !important}
+
+/* About Hero — same cinematic hierarchy as the homepage */
+.about-hero{
+  position:relative;
+  min-height:max(760px,90svh) !important;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-end !important;
+  justify-content:flex-start !important;
+  padding:170px clamp(22px,8vw,132px) 90px !important;
+  text-align:left !important;
+  color:#f8f6ef !important;
+  background:
+    radial-gradient(circle at 76% 40%,rgba(174,185,154,.13),transparent 30rem),
+    linear-gradient(135deg,#20261d 0%,#171b15 56%,#11140f 100%) !important;
+  isolation:isolate;
+}
+.about-hero::before{
+  content:"ABOUT / ARTIVO";
+  position:absolute;
+  right:clamp(22px,5vw,82px);
+  top:50%;
+  transform:translateY(-50%);
+  writing-mode:vertical-rl;
+  color:rgba(245,243,235,.30);
+  font-family:"DM Sans",sans-serif;
+  font-size:.55rem;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  pointer-events:none;
+}
+.about-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(17,20,14,.74) 0%,rgba(17,20,14,.35) 48%,rgba(17,20,14,.10) 100%),
+    linear-gradient(180deg,rgba(17,20,14,.12) 0%,transparent 48%,rgba(10,12,9,.68) 100%);
+  pointer-events:none;
+  z-index:0;
+}
+.about-statement{
+  position:relative;
+  z-index:2;
+  max-width:1050px !important;
+  font-family:"Manrope","DM Sans",sans-serif !important;
+  font-size:clamp(3.4rem,8.2vw,8.4rem) !important;
+  font-weight:500 !important;
+  line-height:.95 !important;
+  letter-spacing:-.085em !important;
+  text-wrap:balance;
+  text-shadow:0 18px 60px rgba(0,0,0,.26);
+  animation:aboutHeroIn 1s cubic-bezier(.16,1,.3,1) both;
+}
+.about-statement span{
+  background:linear-gradient(135deg,#cfd7b7,#a7b58c) !important;
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  background-clip:text !important;
+}
+@keyframes aboutHeroIn{
+  from{opacity:0;transform:translateY(32px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* A quiet editorial divider under the hero */
+.about-content{
+  background:linear-gradient(180deg,#f5f3eb,#efede5) !important;
+  padding:clamp(78px,9vw,128px) clamp(22px,7vw,110px) clamp(92px,10vw,150px) !important;
+  grid-template-columns:minmax(240px,.72fr) minmax(0,1.28fr) !important;
+  gap:clamp(40px,7vw,110px) !important;
+}
+.about-sidebar{
+  position:sticky !important;
+  top:110px !important;
+  padding:28px 26px 18px !important;
+  border:1px solid rgba(55,62,47,.13) !important;
+  background:rgba(255,255,255,.42) !important;
+  border-radius:24px !important;
+  box-shadow:0 20px 55px rgba(39,44,33,.07),inset 0 1px 0 rgba(255,255,255,.75) !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+}
+.about-label{
+  display:block;
+  color:#7b8962 !important;
+  margin-bottom:28px !important;
+  font-size:.62rem !important;
+  letter-spacing:.22em !important;
+}
+.stat-item{
+  border-left:1px solid rgba(127,143,100,.34) !important;
+  padding:12px 0 12px 20px !important;
+  margin-bottom:16px !important;
+  transition:transform .35s ease,border-color .35s ease,background .35s ease !important;
+}
+.stat-item:hover{
+  transform:translateX(4px);
+  border-left-color:#7f8f64 !important;
+}
+.stat-number{
+  font-family:"Manrope","DM Sans",sans-serif !important;
+  color:#252b20 !important;
+  background:none !important;
+  -webkit-text-fill-color:initial !important;
+  font-size:clamp(2.8rem,4.4vw,4.8rem) !important;
+  font-weight:500 !important;
+  letter-spacing:-.08em !important;
+}
+.stat-label{
+  color:#6a7065 !important;
+  font-size:.63rem !important;
+  letter-spacing:.12em !important;
+  text-transform:uppercase;
+  margin-top:8px !important;
+}
+
+.about-main h3{
+  font-family:"Manrope","DM Sans",sans-serif !important;
+  color:#20241e !important;
+  font-size:clamp(2.4rem,4.4vw,4.2rem) !important;
+  line-height:.98 !important;
+  letter-spacing:-.07em !important;
+  margin-bottom:28px !important;
+  text-wrap:balance;
+}
+.about-main p{
+  max-width:760px !important;
+  color:#65695e !important;
+  font-size:clamp(.98rem,1.25vw,1.12rem) !important;
+  line-height:1.95 !important;
+  margin-bottom:22px !important;
+  text-wrap:pretty;
+}
+
+/* Philosophy cards — light, architectural, restrained */
+.philosophy-cards{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:14px !important;
+  margin-top:42px !important;
+}
+.glass-card{
+  min-height:250px;
+  padding:30px !important;
+  border:1px solid rgba(62,69,52,.12) !important;
+  border-radius:22px !important;
+  background:linear-gradient(145deg,rgba(255,255,255,.74),rgba(238,236,227,.84)) !important;
+  box-shadow:0 18px 50px rgba(41,46,35,.06),inset 0 1px 0 rgba(255,255,255,.72) !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+}
+.glass-card::before{
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  height:2px !important;
+  background:linear-gradient(90deg,transparent,#7f8f64,transparent) !important;
+  opacity:.80 !important;
+  transform:translateX(-100%) !important;
+}
+.glass-card:hover{
+  transform:translateY(-8px) !important;
+  border-color:rgba(127,143,100,.30) !important;
+  box-shadow:0 28px 70px rgba(41,46,35,.11),inset 0 1px 0 rgba(255,255,255,.82) !important;
+}
+.glass-card:hover::before{transform:translateX(0) !important}
+.card-icon{
+  width:50px !important;
+  height:50px !important;
+  border:1px solid rgba(127,143,100,.48) !important;
+  color:#6f7e59 !important;
+  background:rgba(207,215,183,.22) !important;
+  box-shadow:none !important;
+  margin-bottom:24px !important;
+}
+.card-title{
+  font-family:"Manrope","DM Sans",sans-serif !important;
+  color:#252a21 !important;
+  font-size:1.22rem !important;
+  letter-spacing:-.025em;
+}
+.card-text{
+  color:#6b7065 !important;
+  line-height:1.75 !important;
+}
+
+/* Team — same editorial light section rhythm */
+.team-section{
+  position:relative;
+  padding:clamp(84px,10vw,140px) clamp(22px,7vw,110px) !important;
+  border-top:1px solid rgba(43,49,37,.10) !important;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(207,215,183,.15),transparent 28rem),
+    linear-gradient(180deg,#e9e6dc,#efede5) !important;
+}
+.team-section::before{
+  content:"04 / The people behind the work";
+  display:block;
+  margin-bottom:24px;
+  color:#777d70;
+  font-size:.62rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+}
+.team-section > h2{
+  margin-bottom:54px !important;
+  color:#20241e !important;
+  font-family:"Manrope","DM Sans",sans-serif !important;
+  font-size:clamp(2.8rem,6vw,6rem) !important;
+  line-height:.95 !important;
+  letter-spacing:-.08em !important;
+}
+.team-section > h2 span{
+  color:#7b8962 !important;
+}
+.team-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:clamp(20px,3vw,44px) !important;
+}
+.team-member{
+  text-align:left !important;
+}
+.member-image{
+  width:100% !important;
+  height:auto !important;
+  aspect-ratio:4/5;
+  border-radius:0 !important;
+  margin:0 0 18px !important;
+  border:1px solid rgba(54,61,47,.14) !important;
+  background:#d9d5c9;
+  box-shadow:0 20px 55px rgba(42,47,38,.09) !important;
+  transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .6s ease,border-color .4s ease !important;
+}
+.member-image::after{
+  inset:10px !important;
+  border-radius:0 !important;
+  border:1px solid rgba(207,215,183,.65) !important;
+  opacity:0 !important;
+}
+.member-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .8s cubic-bezier(.16,1,.3,1),filter .8s ease !important;
+}
+.team-member:hover .member-image{
+  transform:translateY(-8px) !important;
+  border-color:rgba(127,143,100,.36) !important;
+  box-shadow:0 28px 72px rgba(42,47,38,.13) !important;
+}
+.team-member:hover .member-image img{
+  transform:scale(1.035);
+  filter:saturate(.92) contrast(1.02);
+}
+.team-member:hover .member-image::after{opacity:1 !important}
+.member-name{
+  color:#262b22 !important;
+  font-family:"Manrope","DM Sans",sans-serif !important;
+  font-size:1.18rem !important;
+  letter-spacing:-.025em;
+}
+.member-role{
+  color:#7b8962 !important;
+  font-size:.60rem !important;
+  letter-spacing:.17em !important;
+}
+
+/* Footer — same dark olive anchor as homepage */
+.footer{
+  position:relative;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(207,215,183,.10),transparent 28rem),
+    radial-gradient(circle at 82% 18%,rgba(174,185,154,.07),transparent 25rem),
+    #1a1e17 !important;
+  color:#e9e6dc !important;
+  border-top:1px solid rgba(207,215,183,.12) !important;
+  padding:76px clamp(22px,6vw,95px) 25px !important;
+}
+.footer::before{
+  content:"";
+  position:absolute;
+  top:0;left:clamp(22px,6vw,95px);right:clamp(22px,6vw,95px);
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(207,215,183,.42),transparent);
+}
+.footer-brand p,
+.footer-links a,
+.footer-copyright{
+  color:rgba(233,230,220,.64) !important;
+}
+.footer-title{color:#cfd7b7 !important}
+.footer-links a:hover{color:#e0e6ca !important}
+.footer-contact .social-links a{
+  border-color:rgba(233,230,220,.20) !important;
+  color:#dddacf !important;
+  background:rgba(255,255,255,.025) !important;
+  border-radius:50% !important;
+}
+.footer-contact .social-links a:hover{
+  border-color:rgba(207,215,183,.46) !important;
+  color:#cfd7b7 !important;
+  background:rgba(207,215,183,.08) !important;
+  transform:translateY(-2px);
+}
+
+/* Shared Chat — exact homepage palette */
+#artivoChatWidget{z-index:1000002 !important}
+#artivoChatWidget .artivo-chat-toggle{
+  width:64px !important;
+  height:64px !important;
+  background:linear-gradient(145deg,#dbe2c3 0%,#a8b58a 100%) !important;
+  color:#263022 !important;
+  border:1px solid rgba(47,58,37,.28) !important;
+  box-shadow:0 12px 30px rgba(34,39,30,.22),0 0 0 8px rgba(207,215,183,.10) !important;
+}
+#artivoChatWidget .artivo-chat-toggle::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border:1px solid rgba(142,157,111,.28);
+  border-radius:50%;
+  animation:aboutChatPulse 2.8s ease-out infinite;
+  pointer-events:none;
+}
+#artivoChatWidget .artivo-chat-toggle:hover{
+  transform:scale(1.06) translateY(-2px);
+  box-shadow:0 16px 34px rgba(34,39,30,.26),0 0 0 10px rgba(207,215,183,.12) !important;
+}
+#artivoChatWidget .artivo-chat-toggle svg{
+  width:27px !important;
+  height:27px !important;
+  color:#283123 !important;
+  filter:none !important;
+}
+#artivoChatWidget .artivo-chat-panel{
+  background:rgba(28,33,24,.97) !important;
+  border:1px solid rgba(207,215,183,.24) !important;
+  box-shadow:0 24px 70px rgba(17,20,14,.34),0 0 0 1px rgba(207,215,183,.06) inset !important;
+  border-radius:22px !important;
+}
+#artivoChatWidget .artivo-chat-avatar,
+#artivoChatWidget .artivo-chat-send{
+  background:linear-gradient(145deg,#dbe2c3,#a8b58a) !important;
+  color:#283123 !important;
+}
+#artivoChatWidget .artivo-chat-avatar svg{color:#283123 !important}
+#artivoChatWidget .artivo-chat-online{border-color:#1c2118 !important;background:#94d37b !important}
+#artivoChatWidget .artivo-chat-name{color:#f5f3eb !important}
+#artivoChatWidget .artivo-chat-status{color:#aebd93 !important}
+#artivoChatWidget .artivo-chat-message.bot .artivo-chat-bubble{
+  background:rgba(127,143,100,.15) !important;
+  border-color:rgba(177,192,148,.20) !important;
+}
+#artivoChatWidget .artivo-chat-message.user .artivo-chat-bubble{
+  background:linear-gradient(145deg,#84936a,#687451) !important;
+}
+#artivoChatWidget .artivo-chat-input{
+  border-color:rgba(207,215,183,.20) !important;
+  background:rgba(255,255,255,.045) !important;
+}
+#artivoChatWidget .artivo-chat-input:focus{border-color:rgba(207,215,183,.55) !important}
+#artivoChatWidget .artivo-chat-send svg{color:#273022 !important}
+#artivoChatWidget .artivo-chat-typing{
+  background:rgba(127,143,100,.15) !important;
+  border-color:rgba(177,192,148,.20) !important;
+}
+#artivoChatWidget .artivo-chat-typing span{background:#cfd7b7 !important}
+#artivoChatWidget .artivo-chat-messages::-webkit-scrollbar-thumb{background:rgba(207,215,183,.28) !important}
+
+@keyframes aboutChatPulse{
+  0%{transform:scale(.92);opacity:.65}
+  72%,100%{transform:scale(1.18);opacity:0}
+}
+
+/* Responsive: careful typography and spacing for mobile */
+@media (max-width:1024px){
+  .about-content{
+    grid-template-columns:1fr !important;
+    gap:42px !important;
+  }
+  .about-sidebar{
+    position:relative !important;
+    top:auto !important;
+  }
+  .philosophy-cards{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+  .team-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+@media (max-width:768px){
+  .header{
+    position:fixed !important;
+    padding:18px 22px !important;
+  }
+  .header.scrolled{
+    background:rgba(34,39,30,.88) !important;
+  }
+  .nav-links{
+    background:#22271e !important;
+  }
+  .nav-link{color:rgba(245,243,235,.78) !important}
+  .lets-talk-btn{
+    border-color:rgba(207,215,183,.55) !important;
+    color:#f6f3eb !important;
+  }
+
+  .about-hero{
+    min-height:100svh !important;
+    padding:150px 23px 62px !important;
+    align-items:flex-end !important;
+  }
+  .about-hero::before{
+    right:22px;
+    top:47%;
+    font-size:.48rem;
+  }
+  .about-statement{
+    font-size:clamp(3rem,14vw,5.4rem) !important;
+    line-height:.94 !important;
+    max-width:100% !important;
+  }
+
+  .about-content{
+    padding:78px 23px 90px !important;
+    gap:28px !important;
+  }
+  .about-sidebar{
+    border-radius:20px !important;
+    padding:24px 20px 14px !important;
+  }
+  .stat-item{
+    padding-left:16px !important;
+  }
+  .stat-number{
+    font-size:clamp(2.65rem,12vw,4.1rem) !important;
+  }
+  .about-main h3{
+    font-size:clamp(2.7rem,12vw,4.8rem) !important;
+    line-height:.96 !important;
+  }
+  .about-main p{
+    font-size:.94rem !important;
+    line-height:1.9 !important;
+  }
+  .philosophy-cards{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    margin-top:30px !important;
+  }
+  .glass-card{
+    min-height:0 !important;
+    padding:25px !important;
+    border-radius:18px !important;
+  }
+  .team-section{
+    padding:78px 23px 90px !important;
+  }
+  .team-section::before{
+    margin-bottom:18px;
+  }
+  .team-section > h2{
+    font-size:clamp(3rem,14vw,5.2rem) !important;
+    margin-bottom:38px !important;
+  }
+  .team-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:28px 13px !important;
+  }
+  .member-image{
+    aspect-ratio:4/5;
+    margin-bottom:14px !important;
+  }
+  .member-name{font-size:1rem !important}
+  .member-role{
+    font-size:.50rem !important;
+    letter-spacing:.13em !important;
+    line-height:1.5 !important;
+  }
+  .footer{
+    padding:58px 23px 22px !important;
+  }
+  .footer-content{
+    grid-template-columns:1fr 1fr !important;
+    gap:32px 20px !important;
+  }
+  .footer-content > .footer-contact{
+    grid-column:1/-1;
+  }
+  .footer-bottom{
+    flex-direction:column !important;
+    gap:10px !important;
+  }
+}
+@media (max-width:420px){
+  .team-grid{gap:24px 11px !important}
+  .member-name{font-size:.93rem !important}
+  .member-role{font-size:.46rem !important}
+  #artivoChatWidget .artivo-chat-toggle{
+    width:58px !important;
+    height:58px !important;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .about-statement,
+  #artivoChatWidget .artivo-chat-toggle::before{
+    animation:none !important;
+  }
+}
+
   </style>
 </head>
 <body>
