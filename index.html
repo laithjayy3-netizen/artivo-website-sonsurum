@@ -631,8 +631,9 @@ body{background:var(--ivory);}
     border-top:1px solid rgba(42,47,35,.06);
   }
   .references-header{
-    max-width:1600px;
-    margin:0 auto;
+    width:100%;
+    max-width:none;
+    margin:0;
     padding:0 clamp(22px,8vw,132px) clamp(18px,2.2vw,28px);
   }
   .references-header .section-index{
@@ -720,6 +721,25 @@ body{background:var(--ivory);}
   .hero-inner { padding-top: 138px !important; }
 }
 </style>
+
+<style id="artivo-mobile-hero-gap-correction-final">
+/* Corrective mobile layout: anchor the Hero content to the top instead of bottom-aligning it.
+   This removes the large empty gap above the eyebrow while leaving desktop unchanged. */
+@media (max-width: 700px) {
+  .hero {
+    align-items: flex-start !important;
+  }
+  .hero-inner {
+    margin: 0 auto !important;
+    padding-top: 106px !important;
+    padding-bottom: 28px !important;
+  }
+}
+@media (max-width: 390px) {
+  .hero-inner { padding-top: 100px !important; }
+}
+</style>
+
 </head>
 <body><div class="custom-cursor" id="customCursor"></div><canvas aria-hidden="true" id="bgCanvas"></canvas><div aria-hidden="true" class="ambient-overlay"></div><div aria-hidden="true" class="intro-preserved" id="intro">
 <div class="intro-orbit intro-orbit-a"></div>
